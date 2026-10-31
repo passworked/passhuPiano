@@ -1,0 +1,165 @@
+// Execute through Unity MCP execute_code in main-scene Play mode, then leave Play mode.
+// Bounded synthetic input against real backing Udon. No hardware or remote-client claim.
+var checks = new System.Collections.Generic.List<string>();
+var f = UnityEngine.Object.FindObjectOfType<MusicMidiPlayer.Logic.MidiPlayerFacade>();
+if (!UnityEditor.EditorApplication.isPlaying || f == null) return "Open main scene in Play mode first.";
+VRC.Udon.UdonBehaviour Back(UdonSharp.UdonSharpBehaviour b) { return UdonSharpEditor.UdonSharpEditorUtility.GetBackingUdonBehaviour(b); }
+void Need(bool ok, string message) { if (!ok) throw new System.InvalidOperationException(message); checks.Add(message); }
+void Call(VRC.Udon.UdonBehaviour b, string method, params object[] args)
+{
+    var program = ((UdonSharp.UdonSharpProgramAsset)b.programSource).SerializedProgramAsset.RetrieveProgram();
+    var symbols = program.SymbolTable.GetSymbols();
+    for (int a = 0; a < args.Length; a += 2)
+    {
+        var matches = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Where(symbols,
+            s => System.Text.RegularExpressions.Regex.IsMatch(s, "^__\\d+_" + (string)args[a] + "__param$")));
+        if (matches.Length == 0) throw new System.MissingMemberException(method + "." + args[a]);
+        foreach (var symbol in matches) b.SetProgramVariable(symbol, args[a + 1]);
+    }
+    var entries = program.EntryPoints.GetExportedSymbols();
+    b.SendCustomEvent(System.Linq.Enumerable.Contains(entries, method) ? method : "__0_" + method);
+}
+var facade = Back(f); var input = Back(f.performanceInput); var router = Back(f.instrumentRouter);
+var pool = Back(f.voicePool.ensemble); var network = Back(f.network);
+var originalEnabled = input.enabled;
+var originalFallback = (bool)network.GetProgramVariable("_localFallback");
+var originalPending = (bool)network.GetProgramVariable("hasPendingIntent");
+var originalMask = (int)router.GetProgramVariable("enabledMask");
+var originalAppearance = (int)router.GetProgramVariable("pianoAppearance");
+var originalFingers = (bool[])input.GetProgramVariable("enabledFingers");
+string error = null;
+int ActiveTarget(int identity)
+{
+    var active = (bool[])pool.GetProgramVariable("active"); var live = (bool[])pool.GetProgramVariable("live");
+    var ids = (int[])pool.GetProgramVariable("identities"); var targets = (int[])pool.GetProgramVariable("targets");
+    for (int i = 63; i >= 0; i--) if (active[i] && live[i] && ids[i] == identity) return targets[i];
+    return -1;
+}
+int[] Capture()
+{
+    Call(facade, "_CaptureLiveMidi");
+    return (int[])facade.GetProgramVariable("__0__CaptureLiveMidi__ret");
+}
+void Reset()
+{
+    Call(input, "ReleaseAll"); Call(facade, "_ResetLiveMidiOutput");
+}
+
+var originalMapping = (int[])((int[])facade.GetProgramVariable("hardwareMidiChannelTargets")).Clone();
+string originalKey = (string)facade.GetProgramVariable("midiPreferencesKey");
+void Midi(string kind, int channel, int number, int value)
+{
+    string prefix = "midi" + kind;
+    facade.SetProgramVariable(prefix + "Channel", channel);
+    facade.SetProgramVariable(prefix + "Number", number);
+    facade.SetProgramVariable(prefix + (kind == "ControlChange" ? "Value" : "Velocity"), value);
+    facade.SendCustomEvent("_" + prefix);
+}
+try
+{
+    Need((bool)facade.GetProgramVariable("isReady") && !(bool)facade.GetProgramVariable("isSongLoading"), "Main scene is ready");
+    facade.SetProgramVariable("midiPreferencesKey", "");
+    Need((int)Back(f.clock).GetProgramVariable("_state") == 0, "Transport is stopped");
+    input.enabled = false;
+    network.SetProgramVariable("_localFallback", true); network.SetProgramVariable("hasPendingIntent", false);
+    Call(facade, "_ApplyInstrumentSelection", "mask", 127, "appearance", 1);
+    for (int channel=0; channel<16; channel++)
+    {
+        if (channel==9) continue;
+        Reset(); Midi("NoteOn",channel,60,100);
+        int expected=0, id=channel*128+60;
+        Need(ActiveTarget(id)==expected, "Official MIDI channel "+(channel+1)+" resolves to target "+expected);
+        Need(((int[])facade.GetProgramVariable("_liveTargetOverrides"))[id]==0,
+            "Channel "+(channel+1)+" preserves explicit or automatic routing identity");
+        Midi("NoteOff",channel,60,0);
+        Need(!((bool[])facade.GetProgramVariable("_liveHeld"))[id], "Official NoteOff releases channel "+(channel+1));
+    }
+    Reset();
+    for(int channel=0;channel<7;channel++)
+    {
+        Call(facade,"SetHardwareMidiChannelTarget","channel",channel,"target",channel);
+        Midi("NoteOn",channel,60,100);
+    }
+    Need(System.Linq.Enumerable.All(System.Linq.Enumerable.Range(0,7),c=>ActiveTarget(c*128+60)==c),
+        "Seven hardware channels simultaneously play distinct instruments at one pitch");
+    Midi("NoteOff",1,60,0);
+    Need(!((bool[])facade.GetProgramVariable("_liveHeld"))[188] && ((bool[])facade.GetProgramVariable("_liveHeld"))[60],
+        "Releasing marimba does not release the same piano pitch");
+    Reset();
+    Midi("NoteOn",0,60,100);
+    Call(facade,"SetHardwareMidiChannelTarget","channel",0,"target",1);
+    Need(ActiveTarget(60)==0, "Editing channel mapping does not change an already held piano note");
+    Midi("NoteOn",0,61,100);
+    Need(ActiveTarget(61)==1, "The next note follows the new marimba mapping");
+    var snapshot=Capture();
+    Need(System.Linq.Enumerable.Any(snapshot,n=>((n>>8)&4095)==60&&(n>>20)==1)
+        &&System.Linq.Enumerable.Any(snapshot,n=>((n>>8)&4095)==61&&(n>>20)==2),
+        "Snapshot records original targets on both sides of a mapping change");
+    Midi("NoteOn",0,60,0);
+    Need(!((bool[])facade.GetProgramVariable("_liveHeld"))[60], "Velocity-zero NoteOn releases the original target after remapping");
+    Call(facade,"_ResetLiveMidiOutput");
+    Call(facade,"SetHardwareMidiChannelTarget","channel",0,"target",6);
+    Call(facade,"_RestoreLiveMidi","data",snapshot);
+    Need(ActiveTarget(60)==0&&ActiveTarget(61)==1, "Snapshot recovery ignores the receiver's current channel mapping");
+    Reset();
+    Call(facade,"SetHardwareMidiChannelTarget","channel",0,"target",1);
+    Midi("NoteOn",0,60,100); Midi("ControlChange",0,64,127); Midi("NoteOff",0,60,0);
+    Need(((bool[])facade.GetProgramVariable("_liveSustained"))[60], "Official CC64 sustains a mapped marimba note");
+    Call(facade,"SetHardwareMidiChannelTarget","channel",0,"target",4);
+    Midi("ControlChange",0,11,48);
+    Need(((int[])facade.GetProgramVariable("_liveExpression"))[0]==48, "Official CC11 stays on the original MIDI channel");
+    snapshot=Capture(); Call(facade,"_ResetLiveMidiOutput"); Call(facade,"_RestoreLiveMidi","data",snapshot);
+    Need(ActiveTarget(60)==1&&((bool[])facade.GetProgramVariable("_liveSustained"))[60],
+        "Sustained-note recovery retains its mapped timbre after a mapping edit");
+    Midi("ControlChange",0,64,0);
+    Need(!((bool[])facade.GetProgramVariable("_liveSustained"))[60], "Official pedal-up releases the previous mapped target");
+    Reset();
+    Call(facade,"SetHardwareMidiChannelTarget","channel",0,"target",1);
+    Call(facade,"_ApplyInstrumentSelection","mask",1,"appearance",1);
+    Midi("NoteOn",0,60,100);
+    Need(!((bool[])facade.GetProgramVariable("_liveHeld"))[60]&&ActiveTarget(60)==-1,
+        "A mapped but unchecked marimba stays silent instead of falling back to piano");
+    Call(facade,"SetHardwareMidiChannelTarget","channel",0,"target",-1);
+    Midi("NoteOn",0,60,100);
+    Need(ActiveTarget(60)==0, "Automatic mapping preserves the original enabled-instrument fallback");
+    Reset();
+    Call(facade,"_ApplyInstrumentSelection","mask",127,"appearance",1);
+    Call(facade,"SetHardwareMidiChannelTarget","channel",0,"target",2);
+    Midi("NoteOn",0,60,100); Midi("ControlChange",0,64,127); Midi("NoteOff",0,60,0);
+    Midi("ControlChange",0,121,0);
+    Need(!((bool[])facade.GetProgramVariable("_liveSustained"))[60], "CC121 clears sustain on a mapped channel");
+    Midi("NoteOn",0,60,100); Midi("ControlChange",0,123,0);
+    Need(!((bool[])facade.GetProgramVariable("_liveHeld"))[60], "CC123 clears held mapped notes");
+    Midi("NoteOn",0,60,100); Midi("ControlChange",0,120,0);
+    Need(ActiveTarget(60)==-1, "CC120 stops mapped audio immediately");
+    Reset();
+    var map=(int[])((int[])facade.GetProgramVariable("hardwareMidiChannelTargets")).Clone();
+    map[9]=0; facade.SetProgramVariable("hardwareMidiChannelTargets",map);
+    Midi("NoteOn",9,36,100);
+    Need(System.Linq.Enumerable.Any((bool[])Back(f.voicePool.drums).GetProgramVariable("_active"),a=>a)
+        &&ActiveTarget(9*128+36)==-1, "Channel 10 remains percussion even if its mapping slot names piano");
+    Midi("ControlChange",9,120,0);
+    Need(!System.Linq.Enumerable.Any((bool[])Back(f.voicePool.drums).GetProgramVariable("_active"),a=>a),
+        "Official percussion All Sound Off remains effective");
+    Call(facade,"SetHardwareMidiChannelTarget","channel",9,"target",6);
+    Need(((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"))[9]==0, "Mapping setter protects the fixed percussion channel");
+    Call(facade,"SetHardwareMidiChannelTarget","channel",0,"target",7);
+    Need(((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"))[0]==2, "Invalid target does not overwrite the configured mapping");
+    Reset();
+    Call(facade,"SetHardwareMidiChannelTarget","channel",15,"target",6);
+    Call(facade,"PerformInstrumentNoteOn","channel",15,"number",60,"velocity",100,"view",1);
+    Need(ActiveTarget(15*128+60)==0, "PC/VR physical-instrument input bypasses hardware channel mapping");
+    Need(f.voicePool.voiceSources.Length==64, "Hardware mapping keeps the shared 64-source budget");
+}
+catch(System.Exception e){error=e.ToString();}
+finally
+{
+    Call(input,"ReleaseAll"); Call(facade,"_ResetLiveMidiOutput");
+    facade.SetProgramVariable("hardwareMidiChannelTargets",originalMapping);
+    facade.SetProgramVariable("midiPreferencesKey",originalKey);
+    Call(facade,"_ApplyInstrumentSelection","mask",originalMask,"appearance",originalAppearance);
+    input.enabled=originalEnabled;
+    network.SetProgramVariable("_localFallback",originalFallback);network.SetProgramVariable("hasPendingIntent",originalPending);
+}
+return new{success=error==null,checks=checks.ToArray(),error=error??"",completedUtc=System.DateTime.UtcNow.ToString("o"),
+    scope="Editor/ClientSim: official _midiNoteOn/_midiNoteOff/_midiControlChange event entries on real backing Udon with local-fallback submission; no physical device, listening, serialization or real remote-client validation"};

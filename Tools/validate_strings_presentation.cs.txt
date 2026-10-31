@@ -1,0 +1,114 @@
+// Unity MCP execute_code, main-scene Play mode only. Exit Play mode after this probe.
+// Mutates runtime data only; never saves a scene, changes the catalog or publishes a build.
+var f=UnityEngine.Object.FindObjectOfType<MusicMidiPlayer.Logic.MidiPlayerFacade>();
+if(!UnityEditor.EditorApplication.isPlaying || f==null) throw new System.InvalidOperationException("Main-scene Play mode required.");
+VRC.Udon.UdonBehaviour Back(UdonSharp.UdonSharpBehaviour b) { return UdonSharpEditor.UdonSharpEditorUtility.GetBackingUdonBehaviour(b); }
+object Call(VRC.Udon.UdonBehaviour b,string method,params object[] args)
+{
+    var program=((UdonSharp.UdonSharpProgramAsset)b.programSource).SerializedProgramAsset.RetrieveProgram();
+    var symbols=program.SymbolTable.GetSymbols();
+    for(int a=0;a<args.Length;a+=2)
+        foreach(var s in symbols) if(System.Text.RegularExpressions.Regex.IsMatch(s,"^__\\d+_"+(string)args[a]+"__param$")) b.SetProgramVariable(s,args[a+1]);
+    b.SendCustomEvent(program.EntryPoints.GetExportedSymbols().Contains(method)?method:"__0_"+method);
+    var ret=symbols.FirstOrDefault(s=>s.EndsWith("_"+method+"__ret")); return ret==null?null:b.GetProgramVariable(ret);
+}
+var checks=new System.Collections.Generic.List<string>();
+void Need(bool ok,string message) { if(!ok) throw new System.Exception(message); checks.Add(message); }
+var facade=Back(f); var clock=Back(f.clock); var seq=Back(f.sequencer); var router=Back(f.instrumentRouter);
+var v=f.GetStringsView(3); var view=Back(v); var piano=Back(f.instrumentKeyboards[1]);
+var song=(VRC.Udon.UdonBehaviour)facade.GetProgramVariable("_song");
+var body=v.bodies[0];
+string error=null;
+try
+{
+    Need((bool)facade.GetProgramVariable("isReady") && !(bool)facade.GetProgramVariable("isSongLoading"),"Actual main-scene backing Udon is ready");
+    facade.enabled=false; Back(f.network).enabled=false;
+    Call(facade,"CommandStop");
+    Call(facade,"_ApplyInstrumentSelection","mask",4,"appearance",1);
+    var rest=body.localToWorldMatrix;
+    router.SetProgramVariable("enabledMask",4); Call(router,"ResolveSelection");
+    router.SetProgramVariable("notePrograms",new[]{40,40,40,40});
+    router.SetProgramVariable("fileProgramMap",new string('0',128));
+    clock.SetProgramVariable("_state",2); facade.SetProgramVariable("_networkBlocked",false);
+    song.SetProgramVariable("sourceHash",new string('a',64));
+    song.SetProgramVariable("pitch",new[]{55,63,70,77});
+    song.SetProgramVariable("velocity",new[]{110,110,110,110});
+    song.SetProgramVariable("channel",new[]{0,0,0,0});
+    song.SetProgramVariable("trackIndex",new[]{0,0,0,0});
+    song.SetProgramVariable("startMs",new[]{100,100,100,100});
+    song.SetProgramVariable("expressionOffsets",new int[17]); song.SetProgramVariable("isDecoded",true);
+    seq.SetProgramVariable("activeNoteIds",new[]{0,1,2,3}); seq.SetProgramVariable("activeNoteCount",0);
+    Call(view,"BindSong","song",song); Call(piano,"BindSong","song",song);
+    var palette=((UnityEngine.Color[])view.GetProgramVariable("songPalette")).ToArray();
+    Need(palette.SequenceEqual((UnityEngine.Color[])piano.GetProgramVariable("songPalette")),"Violin and piano have identical bright/dark source-hash palette colors");
+    Call(view,"Refresh","ms",0); seq.SetProgramVariable("activeNoteCount",4); Call(view,"Refresh","ms",100); Call(view,"Refresh","ms",300);
+    Need((int)view.GetProgramVariable("activeStringCount")==4,"Four real strings light independently for a routed chord");
+    Need((int)view.GetProgramVariable("liveParticleCount")>0 && (int)view.GetProgramVariable("liveSymbolParticleCount")>0,"Actual Udon emits both spark and music-symbol layers");
+    for(int i=0;i<4;i++)
+    {
+        int shade=i==1 || i==2?1:0;
+        Need(v.strings[i].sharedMaterial.GetColor("_GlowColor")==palette[shade] && v.stringParticles[i].main.startColor.color==palette[shade],"String "+i+" glow and sparks follow the piano pitch shade");
+        Need(UnityEngine.Vector3.Dot(v.stringParticles[i].transform.forward,UnityEngine.Vector3.up)>.999f && v.symbolParticles[i].GetComponent<UnityEngine.ParticleSystemRenderer>().renderMode==UnityEngine.ParticleSystemRenderMode.Mesh,"String "+i+" uses world-up motion and existing piano symbol meshes");
+    }
+    Need(v.symbolParticles.All(s=>s.GetComponent<UnityEngine.ParticleSystemRenderer>().sharedMaterial.GetColor("_Color")==palette[0]),"Symbols use the exact bright song tint without double tint multiplication");
+    var before=v.stringParticles.Concat(v.symbolParticles).Select(s=>{var p=new UnityEngine.ParticleSystem.Particle[s.main.maxParticles];int n=s.GetParticles(p);return p.Take(n).Select(x=>new {x.position,x.remainingLifetime}).ToArray();}).ToArray();
+    var bow=v.bows[0].localPosition;
+    for(int i=0;i<10;i++) Call(view,"Refresh","ms",300);
+    var after=v.stringParticles.Concat(v.symbolParticles).Select(s=>{var p=new UnityEngine.ParticleSystem.Particle[s.main.maxParticles];int n=s.GetParticles(p);return p.Take(n).Select(x=>new {x.position,x.remainingLifetime}).ToArray();}).ToArray();
+    Need(before.Zip(after,(a,b)=>a.SequenceEqual(b)).All(x=>x) && v.bows[0].localPosition==bow,"Paused musical time freezes both particle layers and bow without extra emission");
+    Call(view,"BindSong","song",song);
+    Need((int)view.GetProgramVariable("liveSymbolParticleCount")>0,"Repeated binding of unchanged song preserves effects");
+    // Capture the actual Udon-driven particles and string shader through a temporary camera.
+    // Isolate only this instrument in the capture; ClientSim's floating menu may occlude it.
+    var renderers=v.GetComponentsInChildren<UnityEngine.Renderer>(true);
+    var layers=renderers.Select(r=>r.gameObject.layer).ToArray();
+    foreach(var r in renderers) r.gameObject.layer=31;
+    System.IO.Directory.CreateDirectory("Captures");
+    var cameraHost=new UnityEngine.GameObject("StringsThemeProbeCamera"); var camera=cameraHost.AddComponent<UnityEngine.Camera>();
+    var target=body.TransformPoint(new UnityEngine.Vector3(0,.10f,.04f));
+    camera.transform.position=body.TransformPoint(new UnityEngine.Vector3(.20f,.15f,1.12f)); camera.transform.LookAt(target,body.up);
+    camera.fieldOfView=38; camera.nearClipPlane=.01f; camera.farClipPlane=50;
+    camera.cullingMask=1<<31; camera.clearFlags=UnityEngine.CameraClearFlags.SolidColor; camera.backgroundColor=new UnityEngine.Color(.025f,.03f,.045f);
+    var rt=new UnityEngine.RenderTexture(1200,1000,24); var previous=UnityEngine.RenderTexture.active;
+    camera.targetTexture=rt; camera.Render(); UnityEngine.RenderTexture.active=rt;
+    var texture=new UnityEngine.Texture2D(1200,1000,UnityEngine.TextureFormat.RGB24,false); texture.ReadPixels(new UnityEngine.Rect(0,0,1200,1000),0,0); texture.Apply();
+    System.IO.File.WriteAllBytes("Captures/Strings-PianoAligned-PlayMode.png",texture.EncodeToPNG());
+    UnityEngine.RenderTexture.active=previous; camera.targetTexture=null; rt.Release();
+    UnityEngine.Object.DestroyImmediate(texture); UnityEngine.Object.DestroyImmediate(rt); UnityEngine.Object.DestroyImmediate(cameraHost);
+    for(int i=0;i<renderers.Length;i++) renderers[i].gameObject.layer=layers[i];
+    facade.SetProgramVariable("applyGeneration",(int)facade.GetProgramVariable("applyGeneration")+1); Call(view,"Refresh","ms",1000);
+    Need((int)view.GetProgramVariable("liveSymbolParticleCount")==0,"Seek/generation rebuild clears old symbols without replaying historical attacks");
+    for(int step=0;step<80;step++)
+    {
+        int ms=1050+step*50; song.SetProgramVariable("startMs",new[]{ms,ms,ms,ms}); Call(view,"Refresh","ms",ms);
+        if((int)view.GetProgramVariable("liveParticleCount")>48 || (int)view.GetProgramVariable("liveSymbolParticleCount")>16) throw new System.Exception("Particle pool budget exceeded");
+    }
+    Need(true,"Dense attacks stay within 48 sparks and 16 symbols per instrument");
+    Need(body.localToWorldMatrix==rest,"Instrument body stays fixed throughout playback and seek");
+    router.SetProgramVariable("enabledMask",1); Call(router,"ResolveSelection"); Call(view,"Clear"); Call(view,"Refresh","ms",5100);
+    Need((int)view.GetProgramVariable("activeStringCount")==0 && (int)view.GetProgramVariable("liveSymbolParticleCount")==0,"Notes routed to piano do not light or emit violin effects");
+    Call(view,"Clear");
+    song.SetProgramVariable("sourceHash",new string('b',64)); Call(view,"BindSong","song",song); Call(piano,"BindSong","song",song);
+    var changed=(UnityEngine.Color[])view.GetProgramVariable("songPalette");
+    Need(!palette.SequenceEqual(changed) && changed.SequenceEqual((UnityEngine.Color[])piano.GetProgramVariable("songPalette")),"Changing source hash updates both instruments to the same new palette");
+    song.SetProgramVariable("sourceHash",new string('B',64)); Call(view,"BindSong","song",song);
+    Need(changed.SequenceEqual((UnityEngine.Color[])view.GetProgramVariable("songPalette")),"Uppercase SHA text preserves the same canonical palette");
+    Call(view,"BindSong","song",null); Call(piano,"BindSong","song",null);
+    Need(((UnityEngine.Color[])view.GetProgramVariable("songPalette")).SequenceEqual((UnityEngine.Color[])piano.GetProgramVariable("songPalette")),"Live-input/default palette agrees with piano when no song is bound");
+    // Check live routed voices without changing any public playback or network state.
+    clock.SetProgramVariable("_state",0); clock.SetProgramVariable("_frameDsp",10.0);
+    var pool=Back(f.voicePool.ensemble); var active=new bool[64]; var live=new bool[64]; var targets=new int[64]; var pitches=new int[64];
+    var velocities=new int[64]; var levels=new float[64]; var starts=new double[64]; var ids=new int[64];
+    for(int i=0;i<4;i++) {active[i]=true;live[i]=true;targets[i]=2;pitches[i]=v.openNotes[i];velocities[i]=110;levels[i]=.9f;starts[i]=10.1;ids[i]=pitches[i];}
+    pool.SetProgramVariable("active",active); pool.SetProgramVariable("live",live); pool.SetProgramVariable("targets",targets); pool.SetProgramVariable("pitches",pitches);
+    pool.SetProgramVariable("velocities",velocities); pool.SetProgramVariable("levels",levels); pool.SetProgramVariable("starts",starts); pool.SetProgramVariable("identities",ids); pool.SetProgramVariable("articulations",new int[64]);
+    active[0]=false;active[1]=false;active[2]=false;active[3]=false;pool.SetProgramVariable("active",active); Call(view,"Refresh","ms",0);
+    for(int i=0;i<4;i++)active[i]=true;pool.SetProgramVariable("active",active);clock.SetProgramVariable("_frameDsp",10.1);Call(view,"Refresh","ms",0);
+    Need((int)view.GetProgramVariable("activeStringCount")==4 && (int)view.GetProgramVariable("liveSymbolParticleCount")>0,"Live routed chord uses the same two effect layers");
+    Call(view,"Clear");
+    Need(v.stringParticles.Concat(v.symbolParticles).All(s=>s.particleCount==0) && (int)view.GetProgramVariable("activeStringCount")==0,"Stop/clear removes both particle layers and all string glow");
+}
+catch(System.Exception ex) { error=ex.ToString(); }
+var report=new {success=error==null,checks=checks.ToArray(),error,scope="Unity Editor/ClientSim actual backing Udon; no real VRChat client or multiplayer validation"};
+System.IO.Directory.CreateDirectory("Logs");System.IO.File.WriteAllText("Logs/strings-piano-presentation-playmode.json",Newtonsoft.Json.JsonConvert.SerializeObject(report,Newtonsoft.Json.Formatting.Indented));
+return report;

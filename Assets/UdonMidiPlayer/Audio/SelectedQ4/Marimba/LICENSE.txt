@@ -1,0 +1,5 @@
+University of Iowa Musical Instrument Samples. Created by Lawrence Fritts; performed by Andrew Thierauf.
+Permission: recordings may be downloaded and used for any projects, without restrictions.
+https://theremin.music.uiowa.edu/MIS.html
+Source: https://theremin.music.uiowa.edu/MIS-Pitches-2012/MISMarimba2012.html
+Marimba recorded March 20 2013, anechoic chamber, Earthworks QTC40, stereo 24-bit 44.1kHz. Yarn/cord ff are different mallet articulations, not two velocity layers.

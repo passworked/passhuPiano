@@ -1,0 +1,86 @@
+// Execute through Unity MCP execute_code in main-scene Play mode, then leave Play mode.
+// Bounded synthetic input against real backing Udon. No hardware or remote-client claim.
+var checks = new System.Collections.Generic.List<string>();
+var f = UnityEngine.Object.FindObjectOfType<MusicMidiPlayer.Logic.MidiPlayerFacade>();
+if (!UnityEditor.EditorApplication.isPlaying || f == null) return "Open main scene in Play mode first.";
+VRC.Udon.UdonBehaviour Back(UdonSharp.UdonSharpBehaviour b) { return UdonSharpEditor.UdonSharpEditorUtility.GetBackingUdonBehaviour(b); }
+void Need(bool ok, string message) { if (!ok) throw new System.InvalidOperationException(message); checks.Add(message); }
+void Call(VRC.Udon.UdonBehaviour b, string method, params object[] args)
+{
+    var program = ((UdonSharp.UdonSharpProgramAsset)b.programSource).SerializedProgramAsset.RetrieveProgram();
+    var symbols = program.SymbolTable.GetSymbols();
+    for (int a = 0; a < args.Length; a += 2)
+    {
+        var matches = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Where(symbols,
+            s => System.Text.RegularExpressions.Regex.IsMatch(s, "^__\\d+_" + (string)args[a] + "__param$")));
+        if (matches.Length == 0) throw new System.MissingMemberException(method + "." + args[a]);
+        foreach (var symbol in matches) b.SetProgramVariable(symbol, args[a + 1]);
+    }
+    var entries = program.EntryPoints.GetExportedSymbols();
+    b.SendCustomEvent(System.Linq.Enumerable.Contains(entries, method) ? method : "__0_" + method);
+}
+
+var ui=f.playerUI;var b=Back(ui);var facade=Back(f);var router=Back(f.instrumentRouter);
+string key=(string)facade.GetProgramVariable("midiPreferencesKey"),client=(string)b.GetProgramVariable("_clientLanguage");
+int preferred=(int)facade.GetProgramVariable("preferredMidiChannel"),mask=(int)router.GetProgramVariable("enabledMask"),lang=(int)b.GetProgramVariable("languageSelection");
+var map=(int[])((int[])facade.GetProgramVariable("hardwareMidiChannelTargets")).Clone();
+var dirty=(bool[])((bool[])facade.GetProgramVariable("_midiPreferenceDirtyChannels")).Clone();bool preferredDirty=(bool)facade.GetProgramVariable("_midiPreferredDirty");
+var canvas=ui.GetComponent<Canvas>();var oldCam=canvas.worldCamera;
+var nodes=ui.GetComponentsInChildren<Transform>(true);var layers=System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(nodes,t=>t.gameObject.layer));
+var host=new GameObject("MidiLearningRender_Temporary");host.hideFlags=HideFlags.HideAndDontSave;var camera=host.AddComponent<Camera>();
+var rt=new RenderTexture(1600,768,24);var oldRT=RenderTexture.active;var rayChecks=new System.Collections.Generic.List<string>();
+void Capture(string name)
+{
+    camera.targetTexture=rt;Canvas.ForceUpdateCanvases();camera.Render();RenderTexture.active=rt;
+    var tex=new Texture2D(rt.width,rt.height,TextureFormat.RGB24,false);tex.ReadPixels(new Rect(0,0,rt.width,rt.height),0,0);tex.Apply();
+    System.IO.File.WriteAllBytes("Captures/MidiPerformance/"+name+".png",tex.EncodeToPNG());UnityEngine.Object.DestroyImmediate(tex);
+}
+GameObject Hit(Component component)
+{
+    camera.targetTexture=null;Canvas.ForceUpdateCanvases();camera.Render();
+    var rect=(RectTransform)component.transform;var data=new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current);
+    data.position=camera.WorldToScreenPoint(rect.TransformPoint(rect.rect.center));
+    var hits=new System.Collections.Generic.List<UnityEngine.EventSystems.RaycastResult>();
+    ui.GetComponent<UnityEngine.UI.GraphicRaycaster>().Raycast(data,hits);return hits.Count==0?null:hits[0].gameObject;
+}
+try
+{
+    facade.SetProgramVariable("midiPreferencesKey","");router.SetProgramVariable("enabledMask",127);
+    foreach(var t in nodes)t.gameObject.layer=31;
+    camera.cullingMask=1<<31;camera.clearFlags=CameraClearFlags.SolidColor;camera.backgroundColor=Color.black;camera.orthographic=true;
+    var rect=(RectTransform)ui.transform;camera.transform.position=rect.TransformPoint(rect.rect.center)-ui.transform.forward*2;
+    camera.transform.rotation=Quaternion.LookRotation(ui.transform.forward,ui.transform.up);
+    camera.orthographicSize=rect.rect.height*Mathf.Abs(ui.transform.lossyScale.y)*.5f*1.04f;camera.nearClipPlane=.01f;camera.farClipPlane=10;canvas.worldCamera=camera;
+    System.IO.Directory.CreateDirectory("Captures/MidiPerformance");
+    if(!ui.settingsPanel.activeSelf)Call(b,"_ToggleSettingsPanel");
+    foreach(int language in new[]{2,1,3})
+    {
+        b.SetProgramVariable("languageSelection",language);b.SetProgramVariable("_clientLanguage",language==2?"zh-Hans":language==3?"ja":"en");Call(b,"ApplyLanguage");
+        facade.SetProgramVariable("preferredMidiChannel",-1);ui.midiMappingEntry.onClick.Invoke();
+        Capture("waiting-"+language);
+        facade.SetProgramVariable("midiNoteOnChannel",3);facade.SetProgramVariable("midiNoteOnNumber",60);facade.SetProgramVariable("midiNoteOnVelocity",100);facade.SendCustomEvent("_midiNoteOn");
+        Capture("choose-"+language);
+        if(language==2)
+        {
+            Need(Hit(ui.midiPerformanceTargets[2])==ui.midiPerformanceTargets[2].gameObject,"Simple violin choice receives the foremost UI raycast");
+            rayChecks.Add("Simple violin choice receives the foremost UI raycast");
+        }
+        ui.midiPerformanceTargets[2].onClick.Invoke();Capture("ready-"+language);
+        if(language==2)
+        {
+            var advanced=ui.midiPerformancePanel.transform.Find("Advanced").GetComponent<UnityEngine.UI.Button>();
+            Need(Hit(advanced)==advanced.gameObject,"Advanced entry receives UI raycasts above the old mapping page");
+            rayChecks.Add("Advanced entry receives UI raycasts above the old mapping page");
+        }
+        Call(b,"_CloseMidiMapping");
+    }
+    return new{success=true,raycastChecks=rayChecks.ToArray(),files="Captures/MidiPerformance/{waiting,choose,ready}-{1,2,3}.png"};
+}
+finally
+{
+    Call(b,"_CloseSettingsPanel");facade.SetProgramVariable("hardwareMidiChannelTargets",map);facade.SetProgramVariable("preferredMidiChannel",preferred);
+    facade.SetProgramVariable("_midiPreferenceDirtyChannels",dirty);facade.SetProgramVariable("_midiPreferredDirty",preferredDirty);facade.SetProgramVariable("midiPreferencesKey",key);
+    router.SetProgramVariable("enabledMask",mask);b.SetProgramVariable("languageSelection",lang);b.SetProgramVariable("_clientLanguage",client);Call(b,"ApplyLanguage");
+    canvas.worldCamera=oldCam;for(int i=0;i<nodes.Length;i++)nodes[i].gameObject.layer=layers[i];
+    RenderTexture.active=oldRT;camera.targetTexture=null;rt.Release();UnityEngine.Object.DestroyImmediate(rt);UnityEngine.Object.DestroyImmediate(host);
+}

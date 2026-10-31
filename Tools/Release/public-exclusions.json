@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "groups": [
+    {
+      "reason": "Derived notation and waterfall from mfiles Twinkle MIDI; personal/noncommercial source terms exceed the release score policy.",
+      "evidence": "Assets/music/Classic/SOURCES.txt; ArtSource/DemoMusicClassroom/twinkle-score.json",
+      "paths": [
+        "ArtSource/DemoMusicClassroom/JapaneseMusicClassroom-Cover-v2.blend",
+        "ArtSource/DemoMusicClassroom/twinkle-score.json",
+        "ArtSource/DemoMusicClassroom/twinkle-engraving-map.json",
+        "Docs/UdonMidiPlayer/Covers/classroom-cover-v2-4k.png",
+        "Docs/UdonMidiPlayer/Covers/classroom-cover-v2-1080p.jpg",
+        "Docs/UdonMidiPlayer/Covers/classroom-cover-v2-preview.png"
+      ],
+      "prefixes": []
+    },
+    {
+      "reason": "Historical playback screenshots have not been reviewed for embedded third-party musical data. Keep local until reviewed.",
+      "evidence": "Historical development previews; no release provenance record",
+      "paths": [],
+      "prefixes": ["Docs/UdonMidiPlayer/Previews/"]
+    }
+  ]
+}

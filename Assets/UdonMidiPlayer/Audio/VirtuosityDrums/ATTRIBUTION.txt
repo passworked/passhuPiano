@@ -1,0 +1,4 @@
+Virtuosity Drums by Versilian Studios LLC and Karoryfer Samples; performed by Austin McMahon.
+CC0-1.0. https://github.com/sfzinstruments/virtuosity_drums
+Pinned commit: 9f04cf9a734527edfbb0a4eee1f674e45bbf71bc
+Adaptation: selected original velocity layers and up to two round robins, OH kit and close auxiliary percussion; 48 kHz stereo Vorbis q4, full natural tails, no normalization. Explicit GM aliases and offline tom/cymbal tuning are listed in BANK-MAPPING.json.

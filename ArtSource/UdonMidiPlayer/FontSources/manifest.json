@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Unmodified redistributable source fonts for UdonMidiPlayer multilingual UI. No fonts installed; no Unity or meta assets copied.",
+  "acquiredAt": "2026-10-24T15:38:10.915Z",
+  "fonts": [
+    {
+      "file": "NotoSansCJKsc-Regular.otf",
+      "bytes": 16437364,
+      "sha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b",
+      "family": "Noto Sans CJK SC",
+      "style": "Regular",
+      "version": "Version 2.004;hotconv 1.0.118;makeotfexe 2.5.65603",
+      "copyright": "© 2014-2021 Adobe (http://www.adobe.com/).",
+      "license": "SIL Open Font License 1.1",
+      "licenseFile": "NotoSansCJK-OFL.txt",
+      "source": {
+        "kind": "local-copy",
+        "path": "C:/Users/<user>/ALCOM/Projects/PullTabIdle/Assets/PullTabIdle/Fonts/NotoSansCJKsc-Regular.otf",
+        "upstreamRepository": "https://github.com/notofonts/noto-cjk",
+        "upstreamCommit": "f8d157532fbfaeda587e826d4cd5b21a49186f7c",
+        "provenanceManifest": "C:/Users/<user>/ALCOM/Projects/KairoArcana/Assets/KairoArcana/Art/UI/Fonts/NotoSansCJKsc/font-manifest.json"
+      }
+    },
+    {
+      "file": "Comfortaa-Regular.ttf",
+      "bytes": 135304,
+      "sha256": "7aeecaf4c799f24f22e871a6f546ca89116cf11288c7a8ff42f11401dd5445c6",
+      "family": "Comfortaa",
+      "style": "Regular",
+      "version": "Version 3.001",
+      "copyright": "Copyright 2011 The Comfortaa Project Authors (aajohan@gmail.com), with Reserved Font Name \"Comfortaa\".",
+      "license": "SIL Open Font License 1.1",
+      "licenseFile": "Comfortaa-OFL.txt",
+      "source": {
+        "kind": "local-copy",
+        "path": "C:/Users/<user>/ALCOM/Projects/PullTabIdle/Packages/idv.jlchntoz.vvmw/Fonts/Comfortaa-Regular.ttf",
+        "redistributedBy": "VizVid 1.8.2"
+      }
+    },
+    {
+      "file": "NotoSansHebrew-Regular.ttf",
+      "bytes": 26900,
+      "sha256": "a7fa16fffb27bedb060a0866267c29e9859aeb9c21cc33f5b3aaf6eb062eca85",
+      "family": "Noto Sans Hebrew",
+      "style": "Regular",
+      "version": "Version 3.000; ttfautohint (v1.8) -l 8 -r 50 -G 200 -x 14 -D hebr -f none -a qsq -X \"\"",
+      "copyright": "Copyright 2019 Google Inc. All Rights Reserved.",
+      "license": "SIL Open Font License 1.1",
+      "licenseFile": "LICENSE_OFL.txt",
+      "source": {
+        "kind": "official-download",
+        "repository": "https://github.com/notofonts/noto-fonts",
+        "commit": "ffebf8c1ee449e544955a7e813c54f9b73848eac",
+        "path": "hinted/ttf/NotoSansHebrew/NotoSansHebrew-Regular.ttf",
+        "url": "https://raw.githubusercontent.com/notofonts/noto-fonts/ffebf8c1ee449e544955a7e813c54f9b73848eac/hinted/ttf/NotoSansHebrew/NotoSansHebrew-Regular.ttf"
+      }
+    },
+    {
+      "file": "NotoSansThai-Regular.ttf",
+      "bytes": 37752,
+      "sha256": "404ddfb5ed0aaa6b6ec8a85700d682978992062d67da93903967b56cbd9a4acc",
+      "family": "Noto Sans Thai",
+      "style": "Regular",
+      "version": "Version 2.000; ttfautohint (v1.8) -l 8 -r 50 -G 200 -x 14 -D thai -f none -a qsq -X \"\"",
+      "copyright": "Copyright 2016 Google Inc. All Rights Reserved.",
+      "license": "SIL Open Font License 1.1",
+      "licenseFile": "LICENSE_OFL.txt",
+      "source": {
+        "kind": "official-download",
+        "repository": "https://github.com/notofonts/noto-fonts",
+        "commit": "ffebf8c1ee449e544955a7e813c54f9b73848eac",
+        "path": "hinted/ttf/NotoSansThai/NotoSansThai-Regular.ttf",
+        "url": "https://raw.githubusercontent.com/notofonts/noto-fonts/ffebf8c1ee449e544955a7e813c54f9b73848eac/hinted/ttf/NotoSansThai/NotoSansThai-Regular.ttf"
+      }
+    }
+  ],
+  "licenses": [
+    {
+      "file": "NotoSansCJK-OFL.txt",
+      "bytes": 4301,
+      "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+      "source": "C:/Users/<user>/ALCOM/Projects/PullTabIdle/Assets/PullTabIdle/Fonts/LICENSE.txt"
+    },
+    {
+      "file": "Comfortaa-OFL.txt",
+      "bytes": 4301,
+      "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+      "source": "C:/Users/<user>/ALCOM/Projects/PullTabIdle/Packages/idv.jlchntoz.vvmw/Fonts/OFL.txt"
+    },
+    {
+      "file": "LICENSE_OFL.txt",
+      "bytes": 4377,
+      "sha256": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb",
+      "source": "https://raw.githubusercontent.com/notofonts/noto-fonts/ffebf8c1ee449e544955a7e813c54f9b73848eac/LICENSE"
+    }
+  ]
+}

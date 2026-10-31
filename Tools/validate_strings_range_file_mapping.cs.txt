@@ -1,0 +1,105 @@
+// Run once through Unity MCP execute_code in main-scene Play mode, then exit Play mode.
+// Exercises real backing Udon and native Buttons. All mutations are Play-mode-only.
+var f=UnityEngine.Object.FindObjectOfType<MusicMidiPlayer.Logic.MidiPlayerFacade>();
+if(!UnityEditor.EditorApplication.isPlaying || f==null) return "Open the main scene in Play mode.";
+VRC.Udon.UdonBehaviour Back(UdonSharp.UdonSharpBehaviour b) {return UdonSharpEditor.UdonSharpEditorUtility.GetBackingUdonBehaviour(b);}
+var facade=Back(f);var router=Back(f.instrumentRouter);var pool=Back(f.voicePool.ensemble);var clock=Back(f.clock);var net=Back(f.network);var ui=f.playerUI;var view=Back(ui);
+var checks=new System.Collections.Generic.List<string>();
+void Need(bool ok,string text){if(!ok)throw new System.InvalidOperationException(text);checks.Add(text);}
+object Call(VRC.Udon.UdonBehaviour b,string method,params object[] args)
+{
+    var p=((UdonSharp.UdonSharpProgramAsset)b.programSource).SerializedProgramAsset.RetrieveProgram();var symbols=p.SymbolTable.GetSymbols();
+    for(int a=0;a<args.Length;a+=2)
+        foreach(var s in symbols) if(System.Text.RegularExpressions.Regex.IsMatch(s,"^__\\d+_"+(string)args[a]+"__param$")) b.SetProgramVariable(s,args[a+1]);
+    var entries=p.EntryPoints.GetExportedSymbols();b.SendCustomEvent(System.Linq.Enumerable.Contains(entries,method)?method:"__0_"+method);
+    var ret=System.Linq.Enumerable.FirstOrDefault(symbols,s=>s.EndsWith("_"+method+"__ret"));return ret==null?null:b.GetProgramVariable(ret);
+}
+var distributions=new System.Collections.Generic.List<object>();
+string error=null;
+try
+{
+    Need((bool)facade.GetProgramVariable("isReady")&&!(bool)facade.GetProgramVariable("isSongLoading"),"Actual main-scene backing Udon is ready");
+    net.SetProgramVariable("_localFallback",true);Call(facade,"CommandStop");
+    Need(!f.instrumentRoots[7].activeSelf&&!ui.instrumentOptionButtons[7].gameObject.activeSelf,"Retired ensemble is absent from both the stage and instrument menu");
+    Need(ui.fileMappingEntry.transform.parent==ui.transform&&ui.fileMappingPanel.transform.parent==ui.transform,"Timbre mapping is an entry on the player, independent of settings and hardware MIDI");
+    // Six pair selections, midpoint and just-below/above, plus the complete MIDI range.
+    int[] low={55,48,36,24},high={96,86,77,60};
+    for(int a=0;a<4;a++) for(int b=a+1;b<4;b++)
+    {
+        int mask=(1<<(a+2))|(1<<(b+2)),sum=low[a]+high[b];
+        Call(facade,"_ApplyInstrumentSelection","mask",mask,"appearance",1);
+        foreach(int pitch in new[]{0,sum/2,(sum+1)/2,sum/2+1,127})
+        {
+            int actual=(int)Call(router,"ResolveProgramPitch","program",0,"pitch",pitch),expected=pitch*2>sum?a+2:b+2;
+            Need(actual==expected,"Pair "+(a+2)+"/"+(b+2)+" routes pitch "+pitch+" to "+expected);
+        }
+    }
+    Call(facade,"_ApplyInstrumentSelection","mask",60,"appearance",1);
+    foreach(int pitch in new[]{0,48,49,62,63,70,71,127})
+        Need((int)Call(router,"ResolveProgramPitch","program",0,"pitch",pitch)==(pitch<=48?5:pitch<=62?4:pitch<=70?3:2),"Four strings route pitch "+pitch+" across all three boundaries");
+    for(int p=40;p<=43;p++) Need((int)Call(router,"ResolveProgramPitch","program",p,"pitch",60)==p-38,"Available authored solo Program "+p+" retains its intended instrument");
+    // Compare the actual current Orangestar song through TargetForNote, preserving its real timbre metadata.
+    var song=(VRC.Udon.UdonBehaviour)facade.GetProgramVariable("_song");
+    int[] pitches=(int[])song.GetProgramVariable("pitch"),channels=(int[])song.GetProgramVariable("channel"),programs=(int[])router.GetProgramVariable("notePrograms");
+    var counts=new int[6];var cache=new System.Collections.Generic.Dictionary<int,int>();
+    for(int n=0;n<pitches.Length;n++) if(channels[n]!=9)
+    {
+        int key=programs[n]*128+pitches[n];
+        if(!cache.TryGetValue(key,out int target)){target=(int)Call(router,"TargetForNote","note",n);cache.Add(key,target);}
+        if(target<2||target>5) throw new System.InvalidOperationException("Invalid string target for note key "+key);
+        counts[target]++;
+    }
+    distributions.Add(new{song=song.GetProgramVariable("title"),notes=pitches.Length,violin=counts[2],viola=counts[3],cello=counts[4],contrabass=counts[5]});
+    Need(System.Linq.Enumerable.All(System.Linq.Enumerable.Range(2,4),t=>counts[t]>0),"Orangestar piano arrangement now distributes real notes across all four strings");
+    Call(facade,"_ApplyInstrumentSelection","mask",1,"appearance",1);
+    ui.fileMappingEntry.onClick.Invoke();
+    Need(ui.fileMappingPanel.activeSelf&&!ui.settingsPanel.activeSelf,"Native player entry opens timbre mapping without opening settings");
+    Need(ui.fileProgramButtons[0].gameObject.activeSelf&&ui.fileProgramLabels[0].text.Contains("001"),"Current song's used original timbre is listed with a one-based GM number");
+    ui.fileProgramButtons[0].onClick.Invoke();
+    Need(ui.fileChoicePanel.activeSelf&&System.Linq.Enumerable.All(ui.fileTargetButtons,b=>b.gameObject.activeSelf),"Picker offers automatic and all six instruments, including disabled targets");
+    ui.fileTargetButtons[6].onClick.Invoke(); // Double bass, currently disabled.
+    Need((int)router.GetProgramVariable("enabledMask")==33&&f.instrumentRoots[6].activeSelf,"Selecting disabled double bass enables its public bit and stage model");
+    Need((string)router.GetProgramVariable("fileProgramMap")=="6"+new string('0',127),"Original Program 0 is explicitly mapped to double bass");
+    Need((string)net.GetProgramVariable("_confirmedFileProgramMap")== (string)router.GetProgramVariable("fileProgramMap")&&(int)net.GetProgramVariable("_confirmedMask")==33,"Mapping and automatically enabled instrument commit together in the complete confirmed snapshot");
+    int firstMelody=System.Array.FindIndex(channels,c=>c!=9);
+    Need((int)Call(router,"TargetForNote","note",firstMelody)==5,"File notes follow the explicit double-bass override");
+    Need((int)Call(router,"ResolveProgramPitch","program",0,"pitch",80)==0,"File override does not alter ordinary live MIDI routing");
+    // Hold playback at a nonzero position, change mapping through real buttons, and inspect real voices.
+    Call(facade,"CommandSeek","progress",.25f);
+    double paused=(double)clock.GetProgramVariable("_position");
+    ui.fileProgramButtons[0].onClick.Invoke();ui.fileTargetButtons[3].onClick.Invoke(); // Violin.
+    Need((int)clock.GetProgramVariable("_state")==2&&System.Math.Abs((double)clock.GetProgramVariable("_position")-paused)<.000001,"Mapping while paused retains the exact frozen playback position");
+    Call(facade,"CommandPlay");Call(pool,"UpdateVoices","ms",(int)(paused*1000),"generation",(int)facade.GetProgramVariable("applyGeneration"));
+    Need((int)clock.GetProgramVariable("_state")==1,"Playback resumes after a mapping change");
+    var active=(bool[])pool.GetProgramVariable("active");var targets=(int[])pool.GetProgramVariable("targets");
+    Need(System.Linq.Enumerable.Any(active,a=>a)&&System.Linq.Enumerable.All(System.Linq.Enumerable.Where(System.Linq.Enumerable.Range(0,64),i=>active[i]),i=>targets[i]==2),"Actual recovered AudioSource voices use the mapped violin");
+    double playing=(double)clock.GetProgramVariable("_position");
+    ui.fileProgramButtons[0].onClick.Invoke();ui.fileTargetButtons[5].onClick.Invoke(); // Cello auto-enabled during playback.
+    Need((int)clock.GetProgramVariable("_state")==1&&System.Math.Abs((double)clock.GetProgramVariable("_position")-playing)<.000001,"Mapping during playback keeps Playing and the current musical position");
+    active=(bool[])pool.GetProgramVariable("active");targets=(int[])pool.GetProgramVariable("targets");
+    Need(System.Linq.Enumerable.Any(active,a=>a)&&System.Linq.Enumerable.All(System.Linq.Enumerable.Where(System.Linq.Enumerable.Range(0,64),i=>active[i]),i=>targets[i]==4),"Playback rebuild sends current real voices to newly enabled cello");
+    Call(facade,"CommandPause");
+    string before=(string)router.GetProgramVariable("fileProgramMap");int beforeMask=(int)router.GetProgramVariable("enabledMask");
+    Call(Back(f.gate),"SetLocked","value",true);Call(facade,"CommandFileProgramTarget","program",0,"target",1);
+    Need((string)router.GetProgramVariable("fileProgramMap")==before&&(int)router.GetProgramVariable("enabledMask")==beforeMask,"Locked controls reject mapping and auto-enable together");
+    Call(Back(f.gate),"SetLocked","value",false);
+    Call(net,"_CommitInstrumentState");
+    Call(facade,"_ApplyRoutingState","mask",1,"appearance",1,"map","");
+    Call(Back(f.gate),"SetLocked","value",true); Call(net,"_CommitInstrumentState"); Call(Back(f.gate),"SetLocked","value",false);
+    Need((string)router.GetProgramVariable("fileProgramMap")==before&&(int)router.GetProgramVariable("enabledMask")==beforeMask
+        &&(int)clock.GetProgramVariable("_state")==2,"Rollback restores the complete confirmed mapping, enabled set and paused state");
+    ui.fileResetButton.onClick.Invoke();Need((string)router.GetProgramVariable("fileProgramMap")=="","Reset restores automatic file routing");
+    // Fixed percussion channel never enters the melody overrides.
+    Need(!(bool)Call(router,"IsValidFileProgramMap","map",new string('7',128))&&!(bool)Call(router,"IsValidFileProgramMap","map","1"),"Malformed and retired-target maps are rejected before snapshot application");
+    foreach(var pair in new[]{new[]{1,0},new[]{2,1},new[]{2,2},new[]{3,3}})
+    {
+        string[] languages={"en","zh-Hans","zh-Hant","ja"};view.SetProgramVariable("languageSelection",pair[0]);view.SetProgramVariable("_clientLanguage",languages[pair[1]]);Call(view,"ApplyLanguage");
+        Need(!ui.fileMappingTitle.text.StartsWith("file.")&&!ui.fileProgramLabels[0].text.Contains("gm."),"Playback mapping and GM names localize for "+languages[pair[1]]);
+    }
+    Call(view,"_ToggleSettingsPanel");Need(!ui.fileMappingPanel.activeSelf&&ui.settingsPanel.activeSelf,"Opening settings closes the playback mapping overlay");
+    Call(view,"_CloseSettingsPanel");Call(facade,"CommandStop");
+}
+catch(System.Exception e){error=e.ToString();}
+var report=new{success=error==null,checks=checks.ToArray(),distributions=distributions.ToArray(),error=error??"",completedUtc=System.DateTime.UtcNow.ToString("o"),scope="Editor/ClientSim real backing Udon, original Orangestar MIDI, native Buttons, actual recovered voices; no physical MIDI, real VRChat or multi-client claim"};
+System.IO.File.WriteAllText("Logs/strings-range-file-mapping-playmode.json",Newtonsoft.Json.JsonConvert.SerializeObject(report,Newtonsoft.Json.Formatting.Indented));
+return report;

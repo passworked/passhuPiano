@@ -1,0 +1,96 @@
+// Main-scene Play mode, actual backing Udon. Exit Play mode after running. No scene save/build.
+var f=UnityEngine.Object.FindObjectOfType<MusicMidiPlayer.Logic.MidiPlayerFacade>();
+if(!UnityEditor.EditorApplication.isPlaying || f==null)throw new System.Exception("Main-scene Play mode required");
+VRC.Udon.UdonBehaviour Back(UdonSharp.UdonSharpBehaviour b){return UdonSharpEditor.UdonSharpEditorUtility.GetBackingUdonBehaviour(b);}
+object Call(VRC.Udon.UdonBehaviour b,string method,params object[] args)
+{
+    var p=((UdonSharp.UdonSharpProgramAsset)b.programSource).SerializedProgramAsset.RetrieveProgram();var symbols=p.SymbolTable.GetSymbols();
+    for(int a=0;a<args.Length;a+=2)foreach(var s in symbols)if(System.Text.RegularExpressions.Regex.IsMatch(s,"^__\\d+_"+(string)args[a]+"__param$"))b.SetProgramVariable(s,args[a+1]);
+    b.SendCustomEvent(p.EntryPoints.GetExportedSymbols().Contains(method)?method:"__0_"+method);
+    var ret=symbols.FirstOrDefault(s=>s.EndsWith("_"+method+"__ret"));return ret==null?null:b.GetProgramVariable(ret);
+}
+var checks=new System.Collections.Generic.List<string>();
+void Need(bool ok,string message){if(!ok)throw new System.Exception(message);checks.Add(message);}
+var facade=Back(f);var router=Back(f.instrumentRouter);var net=Back(f.network);var clock=Back(f.clock);var pool=Back(f.voicePool.ensemble);var seq=Back(f.sequencer);var ui=f.playerUI;
+string error=null;
+void Capture(UnityEngine.Camera c,string path)
+{
+    var rt=new UnityEngine.RenderTexture(1200,1000,24);var prev=UnityEngine.RenderTexture.active;c.targetTexture=rt;c.Render();UnityEngine.RenderTexture.active=rt;
+    var t=new UnityEngine.Texture2D(1200,1000,UnityEngine.TextureFormat.RGB24,false);t.ReadPixels(new UnityEngine.Rect(0,0,1200,1000),0,0);t.Apply();System.IO.File.WriteAllBytes(path,t.EncodeToPNG());
+    UnityEngine.RenderTexture.active=prev;c.targetTexture=null;rt.Release();UnityEngine.Object.DestroyImmediate(t);UnityEngine.Object.DestroyImmediate(rt);
+}
+try
+{
+    Need((bool)facade.GetProgramVariable("isReady")&&!(bool)facade.GetProgramVariable("isSongLoading"),"Actual backing Udon is ready");
+    facade.enabled=false;net.enabled=false;net.SetProgramVariable("_localFallback",true);Call(facade,"CommandStop");
+    Call(facade,"_ApplyInstrumentSelection","mask",61,"appearance",1);Call(facade,"_ApplyStringArticulationOverrides","choices",0);
+    ui.instrumentButton.onClick.Invoke();Call(Back(ui),"RefreshState");
+    Need(ui.stringStyleEntries.Length==4&&ui.stringStyleEntries.All(b=>b.gameObject.activeSelf),"Four enabled strings each have their own articulation entry");
+    int[] choices={1,2,3,0};
+    for(int i=0;i<4;i++)
+    {
+        ui.stringStyleEntries[i].onClick.Invoke();Need(ui.stringsStyleOptions.activeSelf,"Native articulation entry opens for target "+(i+2));
+        ui.stringsStyleButtons[choices[i]==0?3:choices[i]-1].onClick.Invoke();
+        Need(!ui.stringsStyleOptions.activeSelf&&(int)Call(router,"StringArticulationChoice","target",i+2)==choices[i],"Native choice updates only target "+(i+2));
+    }
+    Need((int)router.GetProgramVariable("stringArticulationOverrides")==57&&(int)net.GetProgramVariable("_confirmedStringArticulations")==57,"Complete confirmed snapshot preserves four independent choices");
+    for(int target=2;target<6;target++)for(int choice=0;choice<4;choice++)
+    {
+        Call(facade,"CommandStringArticulation","target",target,"choice",choice);
+        int expected=choice==0?2:choice-1;
+        Need((int)Call(router,"ArticulationForTarget","target",target,"program",45)==expected,"Target "+target+" choice "+choice+" overrides or follows authored pizzicato");
+    }
+    Call(facade,"_ApplyStringArticulationOverrides","choices",57);
+    // Live notes pinned to each actual instrument. Keep piano and other strings running on a style change.
+    var overrides=(int[])facade.GetProgramVariable("_liveTargetOverrides");
+    for(int i=0;i<5;i++)overrides[i*128+60]=i==0?1:i+2;
+    facade.SetProgramVariable("_liveTargetOverrides",overrides);clock.SetProgramVariable("_state",0);clock.SetProgramVariable("_frameDsp",UnityEngine.AudioSettings.dspTime);
+    for(int i=0;i<5;i++)Call(pool,"LiveNoteDown","id",i*128+60,"pitch",60,"velocity",110);
+    var active=(bool[])pool.GetProgramVariable("active");var targets=(int[])pool.GetProgramVariable("targets");var starts=(double[])pool.GetProgramVariable("starts");
+    var preserved=Enumerable.Range(0,64).Where(i=>active[i]&&targets[i]!=2).Select(i=>new{slot=i,target=targets[i],start=starts[i]}).ToArray();
+    Need(Enumerable.Range(2,4).All(t=>Enumerable.Range(0,64).Any(i=>active[i]&&targets[i]==t&&((int[])pool.GetProgramVariable("articulations"))[i]==(t==2?0:t==3?1:t==4?2:0))),"Simultaneous live strings use independently selected sample articulations");
+    Call(facade,"CommandStringArticulation","target",2,"choice",3);
+    active=(bool[])pool.GetProgramVariable("active");starts=(double[])pool.GetProgramVariable("starts");
+    Need(preserved.All(x=>active[x.slot]&&starts[x.slot]==x.start&&((int[])pool.GetProgramVariable("targets"))[x.slot]==x.target),"Changing violin articulation preserves piano and other strings' source slots and onset times");
+    Need(Enumerable.Range(0,64).Any(i=>active[i]&&((int[])pool.GetProgramVariable("targets"))[i]==2&&((int[])pool.GetProgramVariable("articulations"))[i]==2),"Held violin switches to its new articulation");
+    Call(pool,"StopAll");clock.SetProgramVariable("_state",2);clock.SetProgramVariable("_position",.25);
+    Call(facade,"CommandStringArticulation","target",3,"choice",1);
+    Need(!((bool[])pool.GetProgramVariable("active")).Any(x=>x)&&(double)clock.GetProgramVariable("_position")==.25,"Changing a paused articulation stays silent and keeps transport position");
+    // File notes: one authored solo string program per instrument, then check appearance colors/effects.
+    var song=(VRC.Udon.UdonBehaviour)facade.GetProgramVariable("_song");
+    song.SetProgramVariable("sourceHash",new string('c',64));song.SetProgramVariable("isDecoded",true);song.SetProgramVariable("expressionOffsets",new int[17]);
+    song.SetProgramVariable("pitch",new[]{55,49,38,29});song.SetProgramVariable("velocity",new[]{110,110,110,110});song.SetProgramVariable("channel",new[]{0,1,2,3});song.SetProgramVariable("trackIndex",new[]{0,1,2,3});
+    song.SetProgramVariable("startMs",new[]{100,100,100,100});song.SetProgramVariable("keyUpMs",new[]{2000,2000,2000,2000});song.SetProgramVariable("releaseMs",new[]{2500,2500,2500,2500});
+    song.SetProgramVariable("eventMs",new[]{100,100,100,100});song.SetProgramVariable("eventKind",new[]{0,0,0,0});song.SetProgramVariable("eventNoteId",new[]{0,1,2,3});
+    song.SetProgramVariable("timbreEventIndex",new[]{0,1,2,3});song.SetProgramVariable("timbreKind",new[]{0,0,0,0});song.SetProgramVariable("timbreChannel",new[]{0,1,2,3});song.SetProgramVariable("timbreValue",new[]{40,41,42,43});
+    Call(router,"BeginBindSong","song",song);Call(router,"BindStep","budget",512);
+    Call(pool,"BindSong","song",song);Call(seq,"BindSong","data",song);Call(facade,"_ApplyStringArticulationOverrides","choices",57);
+    clock.SetProgramVariable("_state",1);clock.SetProgramVariable("_frameDsp",UnityEngine.AudioSettings.dspTime);
+    seq.SetProgramVariable("activeNoteIds",new[]{0,1,2,3});seq.SetProgramVariable("activeNoteCount",4);Call(pool,"RebuildAt","ms",120,"generation",777);
+    active=(bool[])pool.GetProgramVariable("active");targets=(int[])pool.GetProgramVariable("targets");var styles=(int[])pool.GetProgramVariable("articulations");
+    Need(Enumerable.Range(2,4).All(t=>Enumerable.Range(0,64).Any(i=>active[i]&&targets[i]==t&&styles[i]==(t==2?0:t==3?1:t==4?2:0))),"File/seek recovery selects independent sample articulations for all four instruments");
+    Call(pool,"StopAll");clock.SetProgramVariable("_state",2);
+    Call(Back(f.instrumentKeyboards[1]),"BindSong","song",song);var palette=(UnityEngine.Color[])Back(f.instrumentKeyboards[1]).GetProgramVariable("songPalette");
+    System.IO.Directory.CreateDirectory("Captures/IndependentStrings");
+    for(int i=0;i<4;i++)
+    {
+        var v=f.GetStringsView(i+3);var view=Back(v);Call(view,"BindSong","song",song);seq.SetProgramVariable("activeNoteCount",0);Call(view,"Refresh","ms",0);seq.SetProgramVariable("activeNoteCount",4);Call(view,"Refresh","ms",100);Call(view,"Refresh","ms",250);
+        Need(((UnityEngine.Color[])view.GetProgramVariable("songPalette")).SequenceEqual(palette),v.name+" has exactly the piano source-hash palette");
+        Need((int)view.GetProgramVariable("activeStringCount")>0&&(int)view.GetProgramVariable("liveParticleCount")>0&&(int)view.GetProgramVariable("liveSymbolParticleCount")>0,v.name+" renders string glow, sparks and floating music symbols");
+        var renderers=v.GetComponentsInChildren<UnityEngine.Renderer>(true);var layers=renderers.Select(r=>r.gameObject.layer).ToArray();foreach(var r in renderers)r.gameObject.layer=31;
+        var host=new UnityEngine.GameObject("StringCaptureCamera");var c=host.AddComponent<UnityEngine.Camera>();var body=v.bodies[0];
+        c.transform.position=body.TransformPoint(new UnityEngine.Vector3(.20f,.15f,1.20f));c.transform.LookAt(body.TransformPoint(new UnityEngine.Vector3(0,.10f,.04f)),body.up);c.fieldOfView=38;c.nearClipPlane=.01f;c.cullingMask=1<<31;c.clearFlags=UnityEngine.CameraClearFlags.SolidColor;c.backgroundColor=new UnityEngine.Color(.025f,.03f,.045f);
+        Capture(c,"Captures/IndependentStrings/"+v.name+".png");UnityEngine.Object.DestroyImmediate(host);for(int r=0;r<renderers.Length;r++)renderers[r].gameObject.layer=layers[r];Call(view,"Clear");
+    }
+    // Receive/late-join and rejected-snapshot rollback, using the real deserialization entry.
+    clock.SetProgramVariable("_state",0);clock.SetProgramVariable("_position",0.0);Call(facade,"CommandStop");Call(facade,"_ApplyStringArticulationOverrides","choices",57);Call(net,"_CommitInstrumentState");
+    var owner=VRC.SDKBase.Networking.GetOwner(f.network.gameObject);Need(VRC.SDKBase.Utilities.IsValid(owner),"ClientSim supplies an actual transport owner for receive checks");
+    net.SetProgramVariable("catalogHash",f.library.catalogHash);net.SetProgramVariable("songId",facade.GetProgramVariable("selectedSongId"));net.SetProgramVariable("state",0);net.SetProgramVariable("anchorPositionSeconds",0.0);net.SetProgramVariable("anchorServerSeconds",UnityEngine.Time.realtimeSinceStartupAsDouble);net.SetProgramVariable("writerPlayerId",owner.playerId);net.SetProgramVariable("snapshotSequence",123);net.SetProgramVariable("instrumentIndex",1);net.SetProgramVariable("enabledInstrumentMask",61);net.SetProgramVariable("pianoAppearance",1);net.SetProgramVariable("fileProgramMap","");net.SetProgramVariable("stringsArticulation",0);net.SetProgramVariable("stringArticulationOverrides",228);net.SetProgramVariable("hasPendingIntent",false);
+    net.SendCustomEvent("_onDeserialization");
+    Need((int)router.GetProgramVariable("stringArticulationOverrides")==228&&(int)net.GetProgramVariable("_confirmedStringArticulations")==228,"Received full snapshot restores all independent choices for late join/ownership recovery");
+    Call(facade,"_ApplyStringArticulationOverrides","choices",57);net.SetProgramVariable("stringArticulationOverrides",256);net.SetProgramVariable("hasPendingIntent",true);net.SendCustomEvent("_onDeserialization");
+    Need((int)router.GetProgramVariable("stringArticulationOverrides")==228,"Invalid packed choices are rejected and pending state rolls back to confirmed choices");
+}
+catch(System.Exception ex){error=ex.ToString();}
+var report=new{success=error==null,checks=checks.ToArray(),error,scope="Unity Editor/ClientSim actual backing Udon and native Buttons; no real VRChat multiplayer or listening test"};
+System.IO.Directory.CreateDirectory("Logs");System.IO.File.WriteAllText("Logs/independent-strings-playmode.json",Newtonsoft.Json.JsonConvert.SerializeObject(report,Newtonsoft.Json.Formatting.Indented));return report;

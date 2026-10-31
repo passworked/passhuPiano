@@ -1,0 +1,99 @@
+// Execute through Unity MCP execute_code in main-scene Play mode, then leave Play mode.
+// Bounded synthetic input against real backing Udon. No hardware or remote-client claim.
+var checks = new System.Collections.Generic.List<string>();
+var f = UnityEngine.Object.FindObjectOfType<MusicMidiPlayer.Logic.MidiPlayerFacade>();
+if (!UnityEditor.EditorApplication.isPlaying || f == null) return "Open main scene in Play mode first.";
+VRC.Udon.UdonBehaviour Back(UdonSharp.UdonSharpBehaviour b) { return UdonSharpEditor.UdonSharpEditorUtility.GetBackingUdonBehaviour(b); }
+void Need(bool ok, string message) { if (!ok) throw new System.InvalidOperationException(message); checks.Add(message); }
+void Call(VRC.Udon.UdonBehaviour b, string method, params object[] args)
+{
+    var program = ((UdonSharp.UdonSharpProgramAsset)b.programSource).SerializedProgramAsset.RetrieveProgram();
+    var symbols = program.SymbolTable.GetSymbols();
+    for (int a = 0; a < args.Length; a += 2)
+    {
+        var matches = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Where(symbols,
+            s => System.Text.RegularExpressions.Regex.IsMatch(s, "^__\\d+_" + (string)args[a] + "__param$")));
+        if (matches.Length == 0) throw new System.MissingMemberException(method + "." + args[a]);
+        foreach (var symbol in matches) b.SetProgramVariable(symbol, args[a + 1]);
+    }
+    var entries = program.EntryPoints.GetExportedSymbols();
+    b.SendCustomEvent(System.Linq.Enumerable.Contains(entries, method) ? method : "__0_" + method);
+}
+
+var ui=f.playerUI;var b=Back(ui);var facade=Back(f);var router=Back(f.instrumentRouter);var network=Back(f.network);
+var originalMap=(int[])((int[])facade.GetProgramVariable("hardwareMidiChannelTargets")).Clone();
+string originalKey=(string)facade.GetProgramVariable("midiPreferencesKey");
+int originalMask=(int)router.GetProgramVariable("enabledMask"),originalLanguage=(int)b.GetProgramVariable("languageSelection");
+bool pending=(bool)network.GetProgramVariable("hasPendingIntent"),locked=(bool)Back(f.gate).GetProgramVariable("_locked");
+int state=(int)Back(f.clock).GetProgramVariable("_state");string error=null;
+try
+{
+    Need((bool)facade.GetProgramVariable("isReady"),"Main scene backing Udon is ready");
+    facade.SetProgramVariable("midiPreferencesKey","");
+    Call(Back(f.gate),"SetLocked","value",true);
+    router.SetProgramVariable("enabledMask",5); // piano + violin
+    ui.transform.Find("Settings").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+    ui.midiMappingEntry.onClick.Invoke();
+    ui.midiPerformancePanel.transform.Find("Advanced").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+    Need(ui.settingsPanel.activeSelf&&ui.midiMappingPanel.activeSelf,"Native MIDI entry opens the settings subpage");
+    for(int c=0;c<16;c++)
+    {
+        ui.midiChannelButtons[c].onClick.Invoke();
+        if(c==9){Need(!ui.midiChannelButtons[c].interactable&&!ui.midiChoicePanel.activeSelf,"Channel 10 remains fixed percussion");continue;}
+        Need(ui.midiChoicePanel.activeSelf,"Channel "+(c+1)+" opens its choices");
+        Need(System.Linq.Enumerable.All(System.Linq.Enumerable.Range(0,8),i=>ui.midiTargetButtons[i].gameObject.activeSelf==(i==0||i==1||i==3)),
+            "Channel "+(c+1)+" offers only automatic, enabled piano and enabled violin");
+        ui.midiTargetButtons[3].onClick.Invoke();
+        Need(((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"))[c]==2&&!ui.midiChoicePanel.activeSelf,
+            "Channel "+(c+1)+" saves the selected violin locally and closes choices");
+        ui.midiChannelButtons[c].onClick.Invoke();ui.midiTargetButtons[0].onClick.Invoke();
+        Need(((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"))[c]==-1,"Channel "+(c+1)+" can return to automatic");
+    }
+    Need((bool)network.GetProgramVariable("hasPendingIntent")==pending&&(int)Back(f.clock).GetProgramVariable("_state")==state
+        &&(int)router.GetProgramVariable("enabledMask")==5,"Mapping edits under locked playback do not submit ownership, transport or enabled-set changes");
+    Call(facade,"SetHardwareMidiChannelTarget","channel",1,"target",1);
+    Call(b,"RefreshState");
+    Need(ui.midiChannelValues[1].text.Contains("disabled")||ui.midiChannelValues[1].text.Contains("未")||ui.midiChannelValues[1].text.Contains("無効"),
+        "A configured but unchecked target is retained and marked unavailable");
+    foreach(int mask in new[]{0,1,5,64,127})
+    {
+        router.SetProgramVariable("enabledMask",mask);ui.midiChannelButtons[0].onClick.Invoke();Call(b,"RefreshState");
+        Need(System.Linq.Enumerable.All(System.Linq.Enumerable.Range(0,8),i=>ui.midiTargetButtons[i].gameObject.activeSelf==(i==0||(mask&(1<<(i-1)))!=0)),
+            "Open choices track enabled-set changes for mask "+mask);
+        int before=((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"))[0];
+        if(mask==0)
+        {
+            ui.midiTargetButtons[2].onClick.Invoke();
+            Need(((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"))[0]==before,
+                "Stale or hidden choice events cannot select an unchecked instrument");
+        }
+        Call(b,"_CloseMidiChoices");
+    }
+    router.SetProgramVariable("enabledMask",127);ui.midiChannelButtons[0].onClick.Invoke();
+    var selections=new[]{1,2,2,3};var clientLanguages=new[]{"en","zh-Hans","zh-Hant","ja"};
+    var titles=new[]{"MIDI CHANNELS","MIDI 通道映射","MIDI 通道對應","MIDI チャンネル設定"};
+    var autos=new[]{"Automatic","自动","自動","自動"};
+    for(int i=0;i<4;i++)
+    {
+        b.SetProgramVariable("languageSelection",selections[i]);b.SetProgramVariable("_clientLanguage",clientLanguages[i]);Call(b,"ApplyLanguage");
+        Need(ui.midiMappingTitle.text==titles[i]&&ui.midiTargetLabels[0].text==autos[i],"Open mapping and choices localize correctly for "+clientLanguages[i]);
+    }
+    ui.midiChoicePanel.GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+    Need(!ui.midiChoicePanel.activeSelf&&ui.midiMappingPanel.activeSelf,"Clicking outside choices returns to the mapping page");
+    ui.midiMappingPanel.transform.Find("Back").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+    Need(!ui.midiMappingPanel.activeSelf&&ui.midiPerformancePanel.activeSelf,"Back restores MIDI performance");
+    ui.midiMappingEntry.onClick.Invoke();ui.midiPerformancePanel.transform.Find("Advanced").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();ui.midiChannelButtons[0].onClick.Invoke();Call(b,"_CloseSettingsPanel");
+    Need(!ui.settingsPanel.activeSelf&&!ui.midiMappingPanel.activeSelf&&!ui.midiChoicePanel.activeSelf,"Closing settings dismisses both MIDI subpanels");
+    Call(b,"_ToggleSettingsPanel");
+    Need(!ui.midiMappingPanel.activeSelf&&!ui.midiChoicePanel.activeSelf,"Reopening settings starts on the normal settings page");
+    Call(b,"_CloseSettingsPanel");
+}
+catch(System.Exception e){error=e.ToString();}
+finally
+{
+    facade.SetProgramVariable("hardwareMidiChannelTargets",originalMap);router.SetProgramVariable("enabledMask",originalMask);
+    facade.SetProgramVariable("midiPreferencesKey",originalKey);
+    b.SetProgramVariable("languageSelection",originalLanguage);Call(b,"_CloseSettingsPanel");Call(b,"ApplyLanguage");Call(Back(f.gate),"SetLocked","value",locked);
+}
+return new{success=error==null,checks=checks.ToArray(),error=error??"",completedUtc=System.DateTime.UtcNow.ToString("o"),
+scope="Editor/ClientSim native Button callbacks and real backing Udon, locked playback and four language variants; no physical MIDI, VR controllers or real multiplayer validation"};

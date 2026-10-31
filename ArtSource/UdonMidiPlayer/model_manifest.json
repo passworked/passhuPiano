@@ -1,0 +1,1082 @@
+{
+  "generator": "Blender 5.2.3 LTS",
+  "world_unit": "metre",
+  "blender_axes": "X=pitch,Y=rear,Z=up",
+  "viewRootScale": 0.025,
+  "viewRootPosition": [
+    0,
+    0.78,
+    0
+  ],
+  "keyboardWidthM": 1.3,
+  "contents": "piano body, 88 keys, stand only",
+  "keys": [
+    {
+      "pitch": 21,
+      "x": -25.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_021_A0",
+      "origin_blender_local": [
+        -25.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 22,
+      "x": -25,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_022_As0",
+      "origin_blender_local": [
+        -25.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 23,
+      "x": -24.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_023_B0",
+      "origin_blender_local": [
+        -24.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 24,
+      "x": -23.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_024_C1",
+      "origin_blender_local": [
+        -23.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 25,
+      "x": -23,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_025_Cs1",
+      "origin_blender_local": [
+        -23.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 26,
+      "x": -22.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_026_D1",
+      "origin_blender_local": [
+        -22.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 27,
+      "x": -22,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_027_Ds1",
+      "origin_blender_local": [
+        -22.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 28,
+      "x": -21.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_028_E1",
+      "origin_blender_local": [
+        -21.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 29,
+      "x": -20.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_029_F1",
+      "origin_blender_local": [
+        -20.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 30,
+      "x": -20,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_030_Fs1",
+      "origin_blender_local": [
+        -20.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 31,
+      "x": -19.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_031_G1",
+      "origin_blender_local": [
+        -19.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 32,
+      "x": -19,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_032_Gs1",
+      "origin_blender_local": [
+        -19.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 33,
+      "x": -18.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_033_A1",
+      "origin_blender_local": [
+        -18.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 34,
+      "x": -18,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_034_As1",
+      "origin_blender_local": [
+        -18.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 35,
+      "x": -17.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_035_B1",
+      "origin_blender_local": [
+        -17.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 36,
+      "x": -16.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_036_C2",
+      "origin_blender_local": [
+        -16.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 37,
+      "x": -16,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_037_Cs2",
+      "origin_blender_local": [
+        -16.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 38,
+      "x": -15.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_038_D2",
+      "origin_blender_local": [
+        -15.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 39,
+      "x": -15,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_039_Ds2",
+      "origin_blender_local": [
+        -15.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 40,
+      "x": -14.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_040_E2",
+      "origin_blender_local": [
+        -14.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 41,
+      "x": -13.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_041_F2",
+      "origin_blender_local": [
+        -13.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 42,
+      "x": -13,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_042_Fs2",
+      "origin_blender_local": [
+        -13.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 43,
+      "x": -12.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_043_G2",
+      "origin_blender_local": [
+        -12.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 44,
+      "x": -12,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_044_Gs2",
+      "origin_blender_local": [
+        -12.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 45,
+      "x": -11.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_045_A2",
+      "origin_blender_local": [
+        -11.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 46,
+      "x": -11,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_046_As2",
+      "origin_blender_local": [
+        -11.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 47,
+      "x": -10.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_047_B2",
+      "origin_blender_local": [
+        -10.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 48,
+      "x": -9.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_048_C3",
+      "origin_blender_local": [
+        -9.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 49,
+      "x": -9,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_049_Cs3",
+      "origin_blender_local": [
+        -9.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 50,
+      "x": -8.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_050_D3",
+      "origin_blender_local": [
+        -8.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 51,
+      "x": -8,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_051_Ds3",
+      "origin_blender_local": [
+        -8.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 52,
+      "x": -7.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_052_E3",
+      "origin_blender_local": [
+        -7.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 53,
+      "x": -6.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_053_F3",
+      "origin_blender_local": [
+        -6.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 54,
+      "x": -6,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_054_Fs3",
+      "origin_blender_local": [
+        -6.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 55,
+      "x": -5.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_055_G3",
+      "origin_blender_local": [
+        -5.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 56,
+      "x": -5,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_056_Gs3",
+      "origin_blender_local": [
+        -5.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 57,
+      "x": -4.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_057_A3",
+      "origin_blender_local": [
+        -4.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 58,
+      "x": -4,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_058_As3",
+      "origin_blender_local": [
+        -4.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 59,
+      "x": -3.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_059_B3",
+      "origin_blender_local": [
+        -3.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 60,
+      "x": -2.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_060_C4",
+      "origin_blender_local": [
+        -2.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 61,
+      "x": -2,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_061_Cs4",
+      "origin_blender_local": [
+        -2.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 62,
+      "x": -1.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_062_D4",
+      "origin_blender_local": [
+        -1.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 63,
+      "x": -1,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_063_Ds4",
+      "origin_blender_local": [
+        -1.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 64,
+      "x": -0.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_064_E4",
+      "origin_blender_local": [
+        -0.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 65,
+      "x": 0.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_065_F4",
+      "origin_blender_local": [
+        0.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 66,
+      "x": 1,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_066_Fs4",
+      "origin_blender_local": [
+        1.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 67,
+      "x": 1.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_067_G4",
+      "origin_blender_local": [
+        1.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 68,
+      "x": 2,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_068_Gs4",
+      "origin_blender_local": [
+        2.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 69,
+      "x": 2.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_069_A4",
+      "origin_blender_local": [
+        2.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 70,
+      "x": 3,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_070_As4",
+      "origin_blender_local": [
+        3.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 71,
+      "x": 3.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_071_B4",
+      "origin_blender_local": [
+        3.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 72,
+      "x": 4.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_072_C5",
+      "origin_blender_local": [
+        4.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 73,
+      "x": 5,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_073_Cs5",
+      "origin_blender_local": [
+        5.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 74,
+      "x": 5.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_074_D5",
+      "origin_blender_local": [
+        5.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 75,
+      "x": 6,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_075_Ds5",
+      "origin_blender_local": [
+        6.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 76,
+      "x": 6.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_076_E5",
+      "origin_blender_local": [
+        6.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 77,
+      "x": 7.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_077_F5",
+      "origin_blender_local": [
+        7.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 78,
+      "x": 8,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_078_Fs5",
+      "origin_blender_local": [
+        8.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 79,
+      "x": 8.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_079_G5",
+      "origin_blender_local": [
+        8.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 80,
+      "x": 9,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_080_Gs5",
+      "origin_blender_local": [
+        9.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 81,
+      "x": 9.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_081_A5",
+      "origin_blender_local": [
+        9.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 82,
+      "x": 10,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_082_As5",
+      "origin_blender_local": [
+        10.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 83,
+      "x": 10.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_083_B5",
+      "origin_blender_local": [
+        10.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 84,
+      "x": 11.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_084_C6",
+      "origin_blender_local": [
+        11.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 85,
+      "x": 12,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_085_Cs6",
+      "origin_blender_local": [
+        12.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 86,
+      "x": 12.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_086_D6",
+      "origin_blender_local": [
+        12.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 87,
+      "x": 13,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_087_Ds6",
+      "origin_blender_local": [
+        13.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 88,
+      "x": 13.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_088_E6",
+      "origin_blender_local": [
+        13.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 89,
+      "x": 14.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_089_F6",
+      "origin_blender_local": [
+        14.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 90,
+      "x": 15,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_090_Fs6",
+      "origin_blender_local": [
+        15.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 91,
+      "x": 15.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_091_G6",
+      "origin_blender_local": [
+        15.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 92,
+      "x": 16,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_092_Gs6",
+      "origin_blender_local": [
+        16.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 93,
+      "x": 16.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_093_A6",
+      "origin_blender_local": [
+        16.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 94,
+      "x": 17,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_094_As6",
+      "origin_blender_local": [
+        17.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 95,
+      "x": 17.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_095_B6",
+      "origin_blender_local": [
+        17.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 96,
+      "x": 18.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_096_C7",
+      "origin_blender_local": [
+        18.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 97,
+      "x": 19,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_097_Cs7",
+      "origin_blender_local": [
+        19.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 98,
+      "x": 19.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_098_D7",
+      "origin_blender_local": [
+        19.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 99,
+      "x": 20,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_099_Ds7",
+      "origin_blender_local": [
+        20.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 100,
+      "x": 20.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_100_E7",
+      "origin_blender_local": [
+        20.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 101,
+      "x": 21.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_101_F7",
+      "origin_blender_local": [
+        21.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 102,
+      "x": 22,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_102_Fs7",
+      "origin_blender_local": [
+        22.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 103,
+      "x": 22.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_103_G7",
+      "origin_blender_local": [
+        22.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 104,
+      "x": 23,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_104_Gs7",
+      "origin_blender_local": [
+        23.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 105,
+      "x": 23.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_105_A7",
+      "origin_blender_local": [
+        23.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 106,
+      "x": 24,
+      "width": 0.62,
+      "black": true,
+      "name": "Key_106_As7",
+      "origin_blender_local": [
+        24.0,
+        -1.5,
+        0.15000000596046448
+      ]
+    },
+    {
+      "pitch": 107,
+      "x": 24.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_107_B7",
+      "origin_blender_local": [
+        24.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pitch": 108,
+      "x": 25.5,
+      "width": 1,
+      "black": false,
+      "name": "Key_108_C8",
+      "origin_blender_local": [
+        25.5,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "materials": [
+    "Body_Graphite",
+    "Side_Walnut",
+    "Trim_Aluminum",
+    "Accent_Teal",
+    "Screen_Ink",
+    "Key_Ivory",
+    "Key_Ebony"
+  ],
+  "meshCount": 89,
+  "triangles": 15540
+}

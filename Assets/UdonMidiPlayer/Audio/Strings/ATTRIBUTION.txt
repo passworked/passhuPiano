@@ -1,0 +1,3 @@
+VSCO 2 Community Edition — Versilian Studios / Sam Gossner; Ivy Audio / Simon Dalzell. CC0-1.0.
+https://versilian-studios.com/vsco-community/
+Adaptation: mono 48 kHz PCM16, one strong recorded velocity layer, natural attacks and crossfaded sustain bodies; explicit spiccato and pizzicato; auxiliary upper roots. Full provenance in BANK-MAPPING.json.

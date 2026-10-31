@@ -1,0 +1,2 @@
+Salamander Grand Piano — Alexander Holm; FreePats SF2 v3+20200602. CC BY 3.0. https://freepats.zenvoid.org/Piano/acoustic-grand-piano.html
+Adaptation: original v3/v7/v11/v15, 30 minor-third roots per layer, 48kHz stereo Vorbis q4 encoded from lossless extracted FLAC, full tails; original SF2 tuning and release. Velocity boundaries 44/69/100 match audition nearest-center selection. Retain ORIGINAL-README.txt.

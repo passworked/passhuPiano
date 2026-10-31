@@ -1,0 +1,155 @@
+// Execute through Unity MCP execute_code in main-scene Play mode, then leave Play mode.
+// Bounded synthetic input against real backing Udon. No hardware or remote-client claim.
+var checks = new System.Collections.Generic.List<string>();
+var f = UnityEngine.Object.FindObjectOfType<MusicMidiPlayer.Logic.MidiPlayerFacade>();
+if (!UnityEditor.EditorApplication.isPlaying || f == null) return "Open main scene in Play mode first.";
+VRC.Udon.UdonBehaviour Back(UdonSharp.UdonSharpBehaviour b) { return UdonSharpEditor.UdonSharpEditorUtility.GetBackingUdonBehaviour(b); }
+void Need(bool ok, string message) { if (!ok) throw new System.InvalidOperationException(message); checks.Add(message); }
+void Call(VRC.Udon.UdonBehaviour b, string method, params object[] args)
+{
+    var program = ((UdonSharp.UdonSharpProgramAsset)b.programSource).SerializedProgramAsset.RetrieveProgram();
+    var symbols = program.SymbolTable.GetSymbols();
+    for (int a = 0; a < args.Length; a += 2)
+    {
+        var matches = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Where(symbols,
+            s => System.Text.RegularExpressions.Regex.IsMatch(s, "^__\\d+_" + (string)args[a] + "__param$")));
+        if (matches.Length == 0) throw new System.MissingMemberException(method + "." + args[a]);
+        foreach (var symbol in matches) b.SetProgramVariable(symbol, args[a + 1]);
+    }
+    var entries = program.EntryPoints.GetExportedSymbols();
+    b.SendCustomEvent(System.Linq.Enumerable.Contains(entries, method) ? method : "__0_" + method);
+}
+var facade = Back(f); var input = Back(f.performanceInput); var router = Back(f.instrumentRouter);
+var pool = Back(f.voicePool.ensemble); var network = Back(f.network);
+var originalEnabled = input.enabled;
+var originalFallback = (bool)network.GetProgramVariable("_localFallback");
+var originalPending = (bool)network.GetProgramVariable("hasPendingIntent");
+var originalMask = (int)router.GetProgramVariable("enabledMask");
+var originalAppearance = (int)router.GetProgramVariable("pianoAppearance");
+var originalFingers = (bool[])input.GetProgramVariable("enabledFingers");
+string error = null;
+int ActiveTarget(int identity)
+{
+    var active = (bool[])pool.GetProgramVariable("active"); var live = (bool[])pool.GetProgramVariable("live");
+    var ids = (int[])pool.GetProgramVariable("identities"); var targets = (int[])pool.GetProgramVariable("targets");
+    for (int i = 63; i >= 0; i--) if (active[i] && live[i] && ids[i] == identity) return targets[i];
+    return -1;
+}
+int[] Capture()
+{
+    Call(facade, "_CaptureLiveMidi");
+    return (int[])facade.GetProgramVariable("__0__CaptureLiveMidi__ret");
+}
+void Reset()
+{
+    Call(input, "ReleaseAll"); Call(facade, "_ResetLiveMidiOutput");
+}
+void Point(int view, int finger, int pitch, float height)
+{
+    int k = view * 88 + pitch - 21;
+    var min = f.performanceInput.keyMinimum[k]; var max = f.performanceInput.keyMaximum[k];
+    var point = new UnityEngine.Vector3((min.x + max.x) * .5f, max.y + height, (min.z + max.z) * .5f);
+    Call(input, "_ReadFingerPoint", "finger", finger, "worldPoint", f.performanceInput.instrumentFrames[view].TransformPoint(point));
+}
+try
+{
+    Need((bool)facade.GetProgramVariable("isReady") && !(bool)facade.GetProgramVariable("isSongLoading"), "Main scene is ready");
+    // Isolate synthetic notes from ClientSim serialization acknowledgement timing.
+    network.SetProgramVariable("_localFallback", true); network.SetProgramVariable("hasPendingIntent", false);
+    Need((int)Back(f.clock).GetProgramVariable("_state") == 0, "Transport is stopped");
+    input.enabled = false;
+    input.SetProgramVariable("enabledFingers", new[] {true,true,true,true,true,true,true,true,true,true});
+    Call(facade, "_ApplyInstrumentSelection", "mask", 127, "appearance", 1);
+    int pianoId = 15 * 128 + 60, marimbaId = 14 * 128 + 60;
+    Point(1, 1, 60, .02f); Point(1, 1, 60, 0);
+    Point(2, 6, 60, .02f); Point(2, 6, 60, 0);
+    Need(ActiveTarget(pianoId) == 0 && ActiveTarget(marimbaId) == 1, "Two VR fingers simultaneously play piano and marimba at the same pitch");
+    Need(((int[])facade.GetProgramVariable("_liveTargetOverrides"))[pianoId] == 1 && ((int[])facade.GetProgramVariable("_liveTargetOverrides"))[marimbaId] == 2,
+        "Physical instruments carry distinct target overrides");
+    Call(router, "RefreshKeyCounts", "ms", 0, "live", true);
+    var counts = (int[])router.GetProgramVariable("keyCounts");
+    Need(counts[60] == 1 && counts[128 + 60] == 1, "Each keyboard receives only its own held-key visualization");
+    Point(2, 7, 60, .02f); Point(2, 7, 60, 0);
+    var ids = (int[])pool.GetProgramVariable("identities"); var active = (bool[])pool.GetProgramVariable("active");
+    Need(System.Linq.Enumerable.Count(System.Linq.Enumerable.Range(0,64), i => active[i] && ids[i] == marimbaId) == 1,
+        "Two fingers on one marimba bar start only one voice");
+    Point(2, 6, 60, .05f);
+    Need(((bool[])facade.GetProgramVariable("_liveHeld"))[marimbaId], "Marimba remains held until its last finger leaves");
+    Point(2, 7, 60, .05f);
+    Need(!((bool[])facade.GetProgramVariable("_liveHeld"))[marimbaId] && ((bool[])facade.GetProgramVariable("_liveHeld"))[pianoId],
+        "Marimba release does not release the same piano pitch");
+    Reset(); Point(2, 2, 60, -.03f); Point(2, 2, 60, 0);
+    Need(!((bool[])facade.GetProgramVariable("_liveHeld"))[marimbaId], "Reaching a marimba bar from below does not trigger it");
+    Reset(); Call(facade, "_ApplyInstrumentSelection", "mask", 1, "appearance", 1);
+    Point(2, 2, 60, .02f); Point(2, 2, 60, 0);
+    Need(!((bool[])facade.GetProgramVariable("_liveHeld"))[marimbaId], "Disabled marimba has no VR touch response");
+    Call(facade, "_ApplyInstrumentSelection", "mask", 127, "appearance", 1); Reset();
+    var channels = new[] {15,15,14,13,12,11,10,8};
+    var seats = f.transform.root.GetComponentsInChildren<MusicMidiPlayer.Logic.MidiPerformanceSeat>(true);
+    var targetSet = new System.Collections.Generic.HashSet<int>();
+    for (int view = 0; view < 8; view++)
+    {
+        Reset();
+        Call(facade, "_ApplyInstrumentSelection", "mask", 127, "appearance", view < 2 ? view : 1);
+        var seat = System.Linq.Enumerable.First(seats, s => s.instrumentIndex == view);
+        Call(input, "EnterSeat", "seat", Back(seat));
+        input.SetProgramVariable("baseNote", 60);
+        Call(input, "_DesktopKeyDown", "key", 0);
+        int id = channels[view] * 128 + 60, expected = view < 2 ? 0 : view - 1;
+        Need(ActiveTarget(id) == expected, "PC seat view " + view + " plays its own target " + expected);
+        targetSet.Add(ActiveTarget(id));
+        var sourceA = (int[])pool.GetProgramVariable("_a"); active = (bool[])pool.GetProgramVariable("active");
+        ids = (int[])pool.GetProgramVariable("identities");
+        int slot = System.Linq.Enumerable.First(System.Linq.Enumerable.Range(0,64), s => active[s] && ids[s] == id);
+        Need(f.voicePool.voiceSources[sourceA[slot]].clip != null, "PC seat view " + view + " has a real sample on its AudioSource");
+        input.SetProgramVariable("baseNote", 72); Call(input, "_DesktopKeyUp", "key", 0);
+        Need(!((bool[])facade.GetProgramVariable("_liveHeld"))[id], "PC octave change releases the original note for view " + view);
+    }
+    Need(targetSet.Count == 7, "PC seats cover all seven timbres and both piano appearances");
+    Reset();
+    var marimbaSeat = System.Linq.Enumerable.First(seats, s => s.instrumentIndex == 2);
+    var pianoSeat = System.Linq.Enumerable.First(seats, s => s.instrumentIndex == 1);
+    Call(input, "EnterSeat", "seat", Back(marimbaSeat)); input.SetProgramVariable("baseNote", 60);
+    Call(input, "_DesktopKeyDown", "key", 0);
+    Call(network, "_SubmitLiveMidi", "kind", 2, "channel", 14, "number", 64, "value", 127);
+    Call(input, "_DesktopKeyUp", "key", 0);
+    Need(((bool[])facade.GetProgramVariable("_liveSustained"))[marimbaId], "Pedal holds the marimba voice on its own channel");
+    var snapshot = Capture();
+    Need(System.Linq.Enumerable.Any(snapshot, n => ((n >> 8) & 4095) == marimbaId && (n >> 20) == 2 && (n & 128) != 0),
+        "Sparse snapshot stores the sustained marimba target");
+    Call(facade, "_ResetLiveMidiOutput"); Call(facade, "_RestoreLiveMidi", "data", snapshot);
+    Need(ActiveTarget(marimbaId) == 1 && ((bool[])facade.GetProgramVariable("_liveSustained"))[marimbaId],
+        "Snapshot recovery restores marimba rather than Program-0 piano");
+    var startTimes = (double[])pool.GetProgramVariable("starts");
+    Call(facade, "_RestoreLiveMidi", "data", snapshot);
+    Need(System.Linq.Enumerable.SequenceEqual(startTimes, (double[])pool.GetProgramVariable("starts")), "Repeated identical snapshots do not retrigger held audio");
+    Call(network, "_SubmitLiveMidi", "kind", 2, "channel", 14, "number", 64, "value", 0);
+    Need(!((bool[])facade.GetProgramVariable("_liveSustained"))[marimbaId], "Pedal up releases the restored marimba voice");
+    Reset(); Call(input, "_DesktopKeyDown", "key", 0);
+    Call(input, "EnterSeat", "seat", Back(pianoSeat));
+    Need(!((bool[])facade.GetProgramVariable("_liveHeld"))[marimbaId], "Changing seats releases keys belonging to the previous instrument");
+    Reset();
+    Call(facade, "PerformInstrumentNoteOn", "channel", 14, "number", 60, "velocity", 100, "view", 2);
+    Need(((bool[])facade.GetProgramVariable("_liveHeld"))[marimbaId], "Explicit manual note passes through the authenticated local network submission path");
+    Call(facade, "_ApplyInstrumentSelection", "mask", 1, "appearance", 1);
+    Need(!((bool[])facade.GetProgramVariable("_liveHeld"))[marimbaId] && ActiveTarget(marimbaId) == -1,
+        "Unchecking a manually played instrument silences it without routing it to piano");
+    Call(facade, "_RestoreLiveMidi", "data", snapshot);
+    Need(!((bool[])facade.GetProgramVariable("_liveHeld"))[marimbaId] && !((bool[])facade.GetProgramVariable("_liveSustained"))[marimbaId],
+        "A stale snapshot cannot restore a disabled manual target");
+    Reset();
+    Call(facade, "PerformNoteOn", "channel", 0, "number", 60, "velocity", 100);
+    Need(ActiveTarget(60) == 0 && ((int[])facade.GetProgramVariable("_liveTargetOverrides"))[60] == 0,
+        "Hardware-style MIDI continues using Program routing without a physical target override");
+    Need(f.voicePool.voiceSources.Length == 64, "Shared physical AudioSource budget stays at 64");
+}
+catch (System.Exception e) { error = e.ToString(); }
+finally
+{
+    Call(input, "ReleaseAll"); Call(facade, "_ResetLiveMidiOutput");
+    Call(facade, "_ApplyInstrumentSelection", "mask", originalMask, "appearance", originalAppearance);
+    input.SetProgramVariable("enabledFingers", originalFingers); input.enabled = originalEnabled;
+    network.SetProgramVariable("_localFallback", originalFallback); network.SetProgramVariable("hasPendingIntent", originalPending);
+}
+return new { success = error == null, checks = checks.ToArray(), error = error ?? "", completedUtc = System.DateTime.UtcNow.ToString("o"),
+    scope = "Editor/ClientSim synthetic finger points and desktop key entries against real backing Udon, using local-fallback network submission; no serialization acknowledgement, VR hardware, physical keyboard, listening or real VRChat network validation" };

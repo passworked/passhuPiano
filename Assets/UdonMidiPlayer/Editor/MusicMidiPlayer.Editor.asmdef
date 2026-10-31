@@ -1,0 +1,7 @@
+{
+  "name": "MusicMidiPlayer.Editor",
+  "rootNamespace": "MusicMidiPlayer.Editor",
+  "references": ["MusicMidiPlayer.Runtime", "UdonSharp.Runtime", "UdonSharp.Editor", "VRC.SDKBase", "VRC.SDK3", "VRC.Udon", "VRC.Udon.Editor", "Unity.TextMeshPro", "UnityEngine.UI"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true
+}

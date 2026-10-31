@@ -1,0 +1,108 @@
+using System;
+using System.IO;
+using UnityEditor;
+using UnityEngine;
+using MusicMidiPlayer.Editor.Assets;
+using MusicMidiPlayer.Editor.Baking;
+
+namespace MusicMidiPlayer.Editor.Prefab
+{
+    public static class ProceduralPianoGenerator
+    {
+        private const string Folder = "Assets/UdonMidiPlayer/Audio/GeneratedPiano";
+        private const string BankPath = "Assets/UdonMidiPlayer/Editor/Generated/DefaultPianoBank.asset";
+
+        public static PianoBankAsset CreateDefaultBank()
+        {
+            Directory.CreateDirectory(Folder);
+            Directory.CreateDirectory(Path.GetDirectoryName(BankPath));
+            const int regions = 24;
+            const int rate = 44100;
+            var roots = new int[regions];
+            for (int region = 0; region < regions; region++)
+            {
+                int pitch = 21 + (int)Math.Round(region * 87.0 / (regions - 1));
+                roots[region] = pitch;
+                string path = Folder + "/Piano_" + pitch.ToString("000") + ".wav";
+                if (File.Exists(path)) continue;
+                double frequency = 440.0 * Math.Pow(2.0, (pitch - 69) / 12.0);
+                double duration = 4.0 + 8.0 * (108 - pitch) / 87.0;
+                int frames = (int)(duration * rate);
+                var samples = new float[frames];
+                var random = new System.Random(pitch * 7919);
+                var amplitudes = new double[12];
+                var phases = new double[12];
+                var decays = new double[12];
+                var frequencies = new double[12];
+                for (int harmonic = 1; harmonic <= 12; harmonic++)
+                {
+                    frequencies[harmonic - 1] = frequency * harmonic * Math.Sqrt(1.0 + 0.00018 * harmonic * harmonic);
+                    amplitudes[harmonic - 1] = frequencies[harmonic - 1] < rate * 0.45 ? 1.0 / Math.Pow(harmonic, 1.55) : 0;
+                    phases[harmonic - 1] = random.NextDouble() * Math.PI * 2;
+                    decays[harmonic - 1] = (duration / 4.8) / (1 + 0.32 * (harmonic - 1));
+                }
+                double peak = 0;
+                for (int i = 0; i < frames; i++)
+                {
+                    double t = i / (double)rate;
+                    double value = 0;
+                    for (int h = 0; h < 12; h++) value += amplitudes[h] * Math.Sin(2 * Math.PI * frequencies[h] * t + phases[h]) * Math.Exp(-t / decays[h]);
+                    value += (random.NextDouble() * 2 - 1) * 0.028 * Math.Exp(-t * 65);
+                    value *= Math.Min(1, t / 0.004) * Math.Min(1, (duration - t) / 0.06);
+                    samples[i] = (float)value;
+                    peak = Math.Max(peak, Math.Abs(value));
+                }
+                float gain = (float)(0.8 / Math.Max(peak, 0.001));
+                WriteWave(path, samples, gain, rate);
+            }
+            AssetDatabase.Refresh();
+            var bank = AssetDatabase.LoadAssetAtPath<PianoBankAsset>(BankPath);
+            if (bank == null) { bank = ScriptableObject.CreateInstance<PianoBankAsset>(); AssetDatabase.CreateAsset(bank, BankPath); }
+            bank.clips = new AudioClip[regions];
+            bank.rootPitch = roots;
+            bank.lowPitch = new int[regions];
+            bank.highPitch = new int[regions];
+            bank.regionGain = new float[regions];
+            bank.tuningCents = new float[regions];
+            bank.releaseDurationMs = new int[regions];
+            for (int region = 0; region < regions; region++)
+            {
+                string path = Folder + "/Piano_" + roots[region].ToString("000") + ".wav";
+                var importer = AssetImporter.GetAtPath(path) as AudioImporter;
+                if (importer != null)
+                {
+                    var settings = importer.defaultSampleSettings;
+                    settings.loadType = AudioClipLoadType.DecompressOnLoad;
+                    settings.compressionFormat = AudioCompressionFormat.PCM;
+                    settings.sampleRateSetting = AudioSampleRateSetting.PreserveSampleRate;
+                    settings.preloadAudioData = true;
+                    importer.defaultSampleSettings = settings;
+                    importer.forceToMono = true;
+                    importer.SaveAndReimport();
+                }
+                bank.clips[region] = AssetDatabase.LoadAssetAtPath<AudioClip>(path);
+                bank.lowPitch[region] = region == 0 ? 21 : bank.highPitch[region - 1] + 1;
+                bank.highPitch[region] = region == regions - 1 ? 108 : (roots[region] + roots[region + 1]) / 2;
+                bank.regionGain[region] = 1;
+                bank.releaseDurationMs[region] = 180;
+            }
+            MidiDataBaker.PrepareBank(bank);
+            EditorUtility.SetDirty(bank);
+            File.WriteAllText(Folder + "/SOURCE.txt", "Music MIDI Player - Procedural Piano\n\nThese mono PCM samples are generated by ProceduralPianoGenerator.cs from additive, inharmonic partials with natural decay and a short synthetic hammer transient. No third-party recordings are included. This is a synthetic piano starter bank, not a recorded acoustic grand. Replace the bank in Configure Player to use your own distributable recordings.\n");
+            AssetDatabase.SaveAssets();
+            return bank;
+        }
+
+        private static void WriteWave(string path, float[] samples, float gain, int rate)
+        {
+            using (var writer = new BinaryWriter(File.Open(path, FileMode.Create)))
+            {
+                writer.Write(System.Text.Encoding.ASCII.GetBytes("RIFF")); writer.Write(36 + samples.Length * 2);
+                writer.Write(System.Text.Encoding.ASCII.GetBytes("WAVEfmt ")); writer.Write(16); writer.Write((short)1); writer.Write((short)1);
+                writer.Write(rate); writer.Write(rate * 2); writer.Write((short)2); writer.Write((short)16);
+                writer.Write(System.Text.Encoding.ASCII.GetBytes("data")); writer.Write(samples.Length * 2);
+                for (int i = 0; i < samples.Length; i++) writer.Write((short)Math.Max(short.MinValue, Math.Min(short.MaxValue, (int)Math.Round(samples[i] * gain * 32767))));
+            }
+        }
+    }
+}

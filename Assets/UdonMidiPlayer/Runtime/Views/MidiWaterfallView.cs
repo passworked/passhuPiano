@@ -1,0 +1,533 @@
+using UdonSharp;
+using UnityEngine;
+using MusicMidiPlayer.Data;
+using MusicMidiPlayer.Logic;
+
+namespace MusicMidiPlayer.Views
+{
+    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
+    [AddComponentMenu("Music MIDI Player/MIDI Waterfall View")]
+    public class MidiWaterfallView : UdonSharpBehaviour
+    {
+        public PianoKeyboardView keyboard;
+        public MidiInstrumentRouter instrumentRouter;
+        public int instrumentTarget;
+        public MidiWaterfallEffects effects;
+        public Transform[] barTransforms;
+        public Renderer[] barRenderers;
+        public float[] keyX;
+        public float[] keyWidth;
+        public bool[] keyIsBlack;
+        public Vector3[] keyHitPositions;
+        // Legacy serialized names retained to preserve scene/prefab and Udon bindings.
+        [Tooltip("Landing positions along the common rear edge of the keyboard/bar layout.")]
+        public Vector3[] keyRootHitPositions;
+        [Tooltip("Land at the rear edge of the keyboard/bar layout.")]
+        public bool landAtKeyRoot;
+        public Material whiteNoteMaterial;
+        public Material blackNoteMaterial;
+        public Material whiteHitMaterial;
+        public Material blackHitMaterial;
+        public Material volumeNoteMaterial;
+        public float noteEmissionIntensity = 3f;
+        public int windowMs = 3000;
+        public float viewHeight = 6f;
+        public float barGapRatio = 0.08f;
+        public float minimumBarHeight = 0.03f;
+        public float barDepth = 0.008f;
+        public float blackBarZ = -0.012f;
+        [HideInInspector] public int visibleCandidateCount;
+        [HideInInspector] public int visibleRenderedCount;
+        [HideInInspector] public int droppedVisualCount;
+
+        private int[] _liveId;
+        private int[] _livePitch;
+        private float[] _liveStart;
+        private float[] _liveEnd;
+        private MidiSongData _song;
+        private MidiSequencer _sequencer;
+        private string _boundContentHash = "";
+        private Material[] _barMaterials;
+        private Material[] _barHitMaterials;
+        private bool _barPaletteReady;
+        private int[] _pitchKeys;
+        private Vector3[] _pitchHitPositions;
+        private int[] _slotNote;
+
+        private int[] _noteSlot;
+        private bool[] _slotHit;
+        private int[] _freeSlots;
+        private int _freeCount;
+        private int _capacity;
+        private int _generation = -1;
+        private int _lastPositionMs;
+        private int _worstSlot = -1;
+
+        public void Initialize()
+        {
+            if (_barMaterials == null) _barMaterials = new Material[88];
+            if (_barHitMaterials == null) _barHitMaterials = new Material[88];
+            int count = barTransforms == null ? 0 : Mathf.Min(512, barTransforms.Length);
+            if (_slotNote != null && _capacity == count) return;
+            _capacity = count;
+            _liveId = new int[count];
+            _livePitch = new int[count];
+            _liveStart = new float[count];
+            _liveEnd = new float[count];
+            for (int i = 0; i < count; i++) _liveId[i] = -1;
+            _slotNote = new int[count];
+
+            _slotHit = new bool[count];
+            _freeSlots = new int[count];
+            _freeCount = count;
+            MaterialPropertyBlock noteProperties = new MaterialPropertyBlock();
+            for (int i = 0; i < count; i++)
+            {
+                if (barRenderers != null && i < barRenderers.Length && barRenderers[i] != null)
+                {
+                    noteProperties.Clear();
+                    barRenderers[i].GetPropertyBlock(noteProperties);
+                    noteProperties.SetFloat("_NoteOrder", (i + 1f) / Mathf.Max(1, count));
+                    barRenderers[i].SetPropertyBlock(noteProperties);
+                }
+                _slotNote[i] = -1;
+                _freeSlots[i] = count - 1 - i;
+                if (barTransforms[i] != null) barTransforms[i].gameObject.SetActive(false);
+            }
+            if (keyX == null || keyX.Length != 88 || keyWidth == null || keyWidth.Length != 88
+                || keyIsBlack == null || keyIsBlack.Length != 88)
+            {
+                keyX = new float[88];
+                keyWidth = new float[88];
+                keyIsBlack = new bool[88];
+                int whites = 0;
+                for (int key = 0; key < 88; key++)
+                {
+                    int pc = (key + 21) % 12;
+                    bool black = pc == 1 || pc == 3 || pc == 6 || pc == 8 || pc == 10;
+                    keyIsBlack[key] = black;
+                    keyWidth[key] = black ? 0.62f : 1f;
+                    keyX[key] = (black ? whites : whites + 0.5f) - 26f;
+                    if (!black) whites++;
+                }
+            }
+            BuildPitchLayout();
+        }
+
+        private void BuildPitchLayout()
+        {
+            _pitchKeys = new int[128];
+            _pitchHitPositions = new Vector3[128];
+            Vector3[] positions = landAtKeyRoot && keyRootHitPositions != null && keyRootHitPositions.Length == 88
+                ? keyRootHitPositions : keyHitPositions;
+            bool hasHits = positions != null && positions.Length == 88;
+            for (int pitch = 0; pitch < 128; pitch++)
+            {
+                int key = pitch - 21;
+                while (key < 0) key += 12;
+                while (key >= 88) key -= 12;
+                _pitchKeys[pitch] = key;
+                Vector3 point = hasHits ? positions[key]
+                    : new Vector3(keyX[key], 0f, keyIsBlack[key] ? blackBarZ : 0f);
+                int octaves = (pitch - 21 - key) / 12;
+                if (octaves != 0)
+                {
+                    int neighbor = octaves < 0 ? key + 12 : key - 12;
+                    float neighborX = hasHits ? positions[neighbor].x : keyX[neighbor];
+                    float octaveWidth = octaves < 0 ? neighborX - point.x : point.x - neighborX;
+                    point.x += octaves * octaveWidth;
+                }
+                _pitchHitPositions[pitch] = point;
+            }
+        }
+
+        public void BindSong(MidiSongData data, MidiSequencer sequencer)
+        {
+            Initialize();
+            string hash = data == null ? "" : data.contentHash;
+            bool changed = _song != data || _boundContentHash != hash;
+            ClearGeometry(_generation);
+            _song = data;
+            _sequencer = sequencer;
+            _boundContentHash = hash;
+            if (keyboard != null) keyboard.BindSong(data);
+            BuildBarPalette();
+            int count = data == null || data.startMs == null ? 0 : data.startMs.Length;
+            _noteSlot = new int[count];
+            for (int i = 0; i < count; i++) _noteSlot[i] = -1;
+            if (changed && effects != null) effects.BindSong(data);
+        }
+
+        public void RebuildAt(int positionMs, int generation)
+        {
+            if (generation < _generation) return;
+            RebuildGeometry(positionMs, generation);
+            if (effects != null) effects.RebuildAt(positionMs, generation);
+        }
+
+        // Local pause/resume changes audio generation but must retain transient particles/lights.
+        public void RebuildGeometryAt(int positionMs, int generation)
+        {
+            if (generation < _generation) return;
+            RebuildGeometry(positionMs, generation);
+            if (effects != null) effects.Refresh(positionMs, generation);
+        }
+
+        private void RebuildGeometry(int positionMs, int generation)
+        {
+            Initialize();
+            ClearGeometry(generation);
+            if (_song == null || _sequencer == null || _noteSlot == null) return;
+            _lastPositionMs = positionMs;
+            FillCandidates(positionMs);
+            UpdateGeometry(positionMs);
+        }
+
+        public void Refresh(int positionMs, int generation)
+        {
+            Initialize();
+            if (_song == null || _sequencer == null || generation < _generation) return;
+            if (_generation != generation || positionMs < _lastPositionMs)
+            {
+                RebuildAt(positionMs, generation);
+                return;
+            }
+            for (int i = 0; i < _capacity; i++)
+                if (_slotNote[i] >= 0 && !Candidate(_slotNote[i], positionMs)) ReleaseSlot(i);
+            _worstSlot = -1;
+            FillCandidates(positionMs);
+            UpdateGeometry(positionMs);
+            _lastPositionMs = positionMs;
+            if (effects != null) effects.Refresh(positionMs, generation);
+        }
+
+        public void Clear(int generation)
+        {
+            ClearGeometry(generation);
+            if (effects != null) effects.Clear(generation);
+        }
+
+        private void ClearGeometry(int generation)
+        {
+            Initialize();
+            _generation = generation;
+            _freeCount = _capacity;
+            _worstSlot = -1;
+            _lastPositionMs = 0;
+            for (int i = 0; i < _capacity; i++)
+            {
+                int note = _slotNote[i];
+                if (_noteSlot != null && note >= 0 && note < _noteSlot.Length) _noteSlot[note] = -1;
+                _liveId[i] = -1;
+                _slotNote[i] = -1;
+                _slotHit[i] = false;
+                _freeSlots[i] = _capacity - 1 - i;
+                if (barTransforms[i] != null) barTransforms[i].gameObject.SetActive(false);
+            }
+            visibleRenderedCount = 0;
+            visibleCandidateCount = 0;
+            droppedVisualCount = 0;
+        }
+
+        private void FillCandidates(int positionMs)
+        {
+            visibleCandidateCount = 0;
+            int count = Mathf.Min(_sequencer.activeNoteCount, _sequencer.activeNoteIds.Length);
+            for (int i = 0; i < count; i++)
+            {
+                int note = _sequencer.activeNoteIds[i];
+                if (!Candidate(note, positionMs) || _song.startMs[note] > positionMs) continue;
+                visibleCandidateCount++;
+                OfferNote(note, positionMs);
+            }
+            int endMs = positionMs > int.MaxValue - Mathf.Max(1, windowMs) ? int.MaxValue : positionMs + Mathf.Max(1, windowMs);
+            int first = UpperBoundStart(positionMs);
+            int end = UpperBoundStart(endMs);
+            for (int note = first; note < end; note++)
+            {
+                if (!Candidate(note, positionMs)) continue;
+                visibleCandidateCount++;
+                // Future notes are already ordered by BetterVisual (start, ID).
+                // Once the pool's worst note wins, no later note can enter it.
+                if (_freeCount == 0)
+                {
+                    if (_worstSlot < 0) FindWorst(positionMs);
+                    if (_worstSlot < 0 || !BetterVisual(note, _slotNote[_worstSlot], positionMs))
+                    {
+                        visibleCandidateCount += end - note - 1;
+                        break;
+                    }
+                }
+                OfferNote(note, positionMs);
+            }
+            visibleRenderedCount = _capacity - _freeCount;
+            droppedVisualCount = Mathf.Max(0, visibleCandidateCount - visibleRenderedCount);
+        }
+
+        private bool Candidate(int note, int positionMs)
+        {
+            if (_song == null || note < 0 || note >= _song.startMs.Length) return false;
+            if (_song.channel[note] == 9) return false;
+            if (instrumentRouter != null && instrumentRouter.TargetForNote(note) != instrumentTarget) return false;
+            if (_song.pitch[note] < 0 || _song.pitch[note] > 127) return false;
+            if (_song.keyUpMs[note] <= positionMs) return false;
+            return (long)_song.startMs[note] <= (long)positionMs + Mathf.Max(1, windowMs);
+        }
+
+        private void OfferNote(int note, int positionMs)
+        {
+            if (_capacity == 0 || _noteSlot[note] >= 0) return;
+            int slot;
+            if (_freeCount > 0)
+            {
+                _freeCount--;
+                slot = _freeSlots[_freeCount];
+            }
+            else
+            {
+                if (_worstSlot < 0) FindWorst(positionMs);
+                slot = _worstSlot;
+                if (slot < 0 || !BetterVisual(note, _slotNote[slot], positionMs)) return;
+                _noteSlot[_slotNote[slot]] = -1;
+            }
+            _slotNote[slot] = note;
+            _noteSlot[note] = slot;
+            _slotHit[slot] = false;
+            if (barTransforms[slot] != null) barTransforms[slot].gameObject.SetActive(true);
+            SetMaterial(slot, note, false);
+            _worstSlot = -1;
+        }
+
+        private void ReleaseSlot(int slot)
+        {
+            int note = _slotNote[slot];
+            if (note < 0) return;
+            _noteSlot[note] = -1;
+            _slotNote[slot] = -1;
+            _freeSlots[_freeCount] = slot;
+            _freeCount++;
+            if (barTransforms[slot] != null) barTransforms[slot].gameObject.SetActive(false);
+            _worstSlot = -1;
+        }
+
+        private void FindWorst(int positionMs)
+        {
+            _worstSlot = -1;
+            for (int i = 0; i < _capacity; i++)
+            {
+                if (_slotNote[i] < 0) continue;
+                if (_worstSlot < 0 || BetterVisual(_slotNote[_worstSlot], _slotNote[i], positionMs)) _worstSlot = i;
+            }
+        }
+
+        private bool BetterVisual(int a, int b, int positionMs)
+        {
+            bool aHeld = _song.startMs[a] <= positionMs;
+            bool bHeld = _song.startMs[b] <= positionMs;
+            if (aHeld != bHeld) return aHeld;
+            if (_song.startMs[a] != _song.startMs[b]) return _song.startMs[a] < _song.startMs[b];
+            return a < b;
+        }
+
+        private void UpdateGeometry(int positionMs)
+        {
+            float height = Mathf.Max(0.001f, viewHeight);
+            float unitsPerMs = height / Mathf.Max(1, windowMs);
+            for (int i = 0; i < _capacity; i++)
+            {
+                int note = _slotNote[i];
+                Transform bar = barTransforms[i];
+                if (note < 0 || bar == null) continue;
+                int pitch = _song.pitch[note];
+                int key = _pitchKeys[pitch];
+                float low = Mathf.Clamp((_song.startMs[note] - positionMs) * unitsPerMs, 0f, height);
+                float high = Mathf.Clamp((_song.keyUpMs[note] - positionMs) * unitsPerMs, 0f, height);
+                float length = Mathf.Min(height, Mathf.Max(high - low, Mathf.Max(0.001f, minimumBarHeight)));
+                float center = Mathf.Clamp((low + high) * 0.5f, length * 0.5f, height - length * 0.5f);
+                Vector3 landing = _pitchHitPositions[pitch];
+                float width = Mathf.Max(0.001f, keyWidth[key] * (1f - Mathf.Clamp01(barGapRatio)));
+                bar.localPosition = landing + Vector3.up * center;
+                bar.localScale = new Vector3(width, length, Mathf.Max(0.001f, barDepth));
+                bool hit = _song.startMs[note] <= positionMs;
+                if (hit != _slotHit[i]) { _slotHit[i] = hit; SetMaterial(i, note, hit); }
+            }
+        }
+
+        public void LiveNoteDown(int identity, int pitch)
+        {
+            Initialize();
+            if (pitch < 0 || pitch > 127 || _capacity == 0) return;
+            int slot = -1;
+            for (int i = 0; i < _capacity; i++)
+                if (_liveId[i] < 0) { slot = i; break; }
+            if (slot < 0)
+            {
+                slot = 0;
+                for (int i = 1; i < _capacity; i++)
+                    if (_liveStart[i] < _liveStart[slot]) slot = i;
+            }
+            _liveId[slot] = identity;
+            _livePitch[slot] = pitch;
+            _liveStart[slot] = Time.realtimeSinceStartup;
+            _liveEnd[slot] = -1f;
+            if (barRenderers != null && slot < barRenderers.Length && barRenderers[slot] != null)
+                barRenderers[slot].sharedMaterial = GetBarMaterial(pitch);
+            RefreshLive();
+        }
+
+        public void LiveNoteUp(int identity)
+        {
+            Initialize();
+            for (int i = 0; i < _capacity; i++)
+                if (_liveId[i] == identity && _liveEnd[i] < 0f) _liveEnd[i] = Time.realtimeSinceStartup;
+        }
+
+        public void RefreshLive()
+        {
+            Initialize();
+            float now = Time.realtimeSinceStartup;
+            float height = Mathf.Max(0.001f, viewHeight);
+            float speed = height * 1000f / Mathf.Max(1, windowMs);
+            visibleRenderedCount = 0;
+            for (int i = 0; i < _capacity; i++)
+            {
+                if (_liveId[i] < 0 || barTransforms[i] == null) continue;
+                Transform bar = barTransforms[i];
+                float low = _liveEnd[i] < 0f ? 0f : (now - _liveEnd[i]) * speed;
+                if (low >= height)
+                {
+                    _liveId[i] = -1;
+                    bar.gameObject.SetActive(false);
+                    continue;
+                }
+                float high = Mathf.Min(height, (now - _liveStart[i]) * speed);
+                float length = Mathf.Min(height - low, Mathf.Max(minimumBarHeight, high - low));
+                int pitch = _livePitch[i];
+                int key = _pitchKeys[pitch];
+                Vector3 landing = _pitchHitPositions[pitch];
+                float width = Mathf.Max(0.001f, keyWidth[key] * (1f - Mathf.Clamp01(barGapRatio)));
+                bar.localPosition = landing + Vector3.up * (low + length * 0.5f);
+                bar.localScale = new Vector3(width, length, Mathf.Max(0.001f, barDepth));
+                bar.gameObject.SetActive(true);
+                visibleRenderedCount++;
+            }
+            visibleCandidateCount = visibleRenderedCount;
+        }
+
+        public Vector3 GetKeyHitPosition(int key)
+        {
+            Initialize();
+            int pitch = key + 21;
+            if (pitch < 0 || pitch > 127) return Vector3.zero;
+            return _pitchHitPositions[pitch];
+        }
+
+        public void SetLandingAtKeyRoot(bool enabled)
+        {
+            if (landAtKeyRoot == enabled) return;
+            Initialize();
+            landAtKeyRoot = enabled;
+            BuildPitchLayout();
+            for (int i = 0; i < _capacity; i++)
+                if (_liveId[i] >= 0) { RefreshLive(); return; }
+            // Reposition visible notes and retire effects at the old landing line locally.
+            RebuildAt(_lastPositionMs, _generation);
+        }
+
+        private void SetMaterial(int slot, int note, bool hit)
+        {
+            if (barRenderers == null || slot >= barRenderers.Length || barRenderers[slot] == null) return;
+            Material noteMaterial = GetBarMaterial(_song.pitch[note]);
+            int key = _pitchKeys[_song.pitch[note]];
+            if (hit && _barHitMaterials[key] != null) noteMaterial = _barHitMaterials[key];
+            if (noteMaterial != null)
+            {
+                barRenderers[slot].sharedMaterial = noteMaterial;
+                return;
+            }
+            bool black = keyIsBlack[_pitchKeys[_song.pitch[note]]];
+            Material material = black
+                ? (hit && blackHitMaterial != null ? blackHitMaterial : blackNoteMaterial)
+                : (hit && whiteHitMaterial != null ? whiteHitMaterial : whiteNoteMaterial);
+            if (material != null) barRenderers[slot].sharedMaterial = material;
+        }
+
+        public Material GetBarMaterial(int midiPitch)
+        {
+            Initialize();
+            if (midiPitch < 0 || midiPitch > 127) return null;
+            int key = _pitchKeys[midiPitch];
+            if (!_barPaletteReady) BuildBarPalette();
+            return _barMaterials[key];
+        }
+
+        private void BuildBarPalette()
+        {
+            for (int key = 0; key < 88; key++)
+            {
+                if (_barMaterials[key] == null && barRenderers != null && barRenderers.Length > 0)
+                {
+                    Renderer renderer = null;
+                    int preferred = key % barRenderers.Length;
+                    if (barRenderers[preferred] != null) renderer = barRenderers[preferred];
+                    else
+                        for (int i = 0; i < barRenderers.Length; i++)
+                            if (barRenderers[i] != null) { renderer = barRenderers[i]; break; }
+                    Material template = volumeNoteMaterial;
+                    if (template == null) template = keyIsBlack[key] ? blackNoteMaterial : whiteNoteMaterial;
+                    if (renderer != null && template != null)
+                    {
+                        Material previous = renderer.sharedMaterial;
+                        renderer.sharedMaterial = template;
+                        // Exactly once per pitch. This clone belongs to the waterfall, never the key.
+                        _barMaterials[key] = renderer.material;
+                        renderer.sharedMaterial = previous;
+                    }
+                }
+                Material material = _barMaterials[key];
+                if (material == null) continue;
+                Material keyMaterial = keyboard == null ? null : keyboard.GetNoteMaterial(key + 21);
+                Color color = keyMaterial == null ? Color.white : keyMaterial.color;
+                if (material.HasProperty("_Color")) material.SetColor("_Color", color);
+                if (material.HasProperty("_BaseColor")) material.SetColor("_BaseColor", color);
+                if (material.HasProperty("_EmissionColor")) material.SetColor("_EmissionColor", color * Mathf.Max(0f, noteEmissionIntensity));
+                if (material.HasProperty("_BreathAmount")) material.SetFloat("_BreathAmount", 0f);
+                // Cache a separate hit material so future notes of this pitch stay dim.
+                if (_barHitMaterials[key] == null && barRenderers != null)
+                {
+                    for (int i = 0; i < barRenderers.Length; i++)
+                    {
+                        Renderer renderer = barRenderers[i];
+                        if (renderer == null) continue;
+                        Material previous = renderer.sharedMaterial;
+                        renderer.sharedMaterial = material;
+                        _barHitMaterials[key] = renderer.material;
+                        renderer.sharedMaterial = previous;
+                        break;
+                    }
+                }
+                Material hitMaterial = _barHitMaterials[key];
+                if (hitMaterial == null) continue;
+                if (hitMaterial.HasProperty("_BreathAmount")) hitMaterial.SetFloat("_BreathAmount", 1f);
+                Color hitColor = Color.Lerp(color, Color.white, 0.25f);
+                if (hitMaterial.HasProperty("_Color")) hitMaterial.SetColor("_Color", hitColor);
+                if (hitMaterial.HasProperty("_BaseColor")) hitMaterial.SetColor("_BaseColor", hitColor);
+                if (hitMaterial.HasProperty("_EmissionColor")) hitMaterial.SetColor("_EmissionColor", hitColor * Mathf.Max(1f, noteEmissionIntensity * 2.5f));
+            }
+            _barPaletteReady = true;
+        }
+
+        private int UpperBoundStart(int timeMs)
+        {
+            int lo = 0;
+            int hi = _song.startMs.Length;
+            while (lo < hi)
+            {
+                int mid = lo + (hi - lo) / 2;
+                if (_song.startMs[mid] <= timeMs) lo = mid + 1;
+                else hi = mid;
+            }
+            return lo;
+        }
+    }
+}

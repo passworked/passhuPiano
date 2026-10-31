@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: effdb65524dd22343ab9f522071d60bf
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: -361012149, guid: 215be632cb025bd429dd50a3fa942168, type: 3}
+  ImportSettings:
+    AudioClip: {instanceID: 0}
+    OverrideBpm: 0
+    Bpm: 120

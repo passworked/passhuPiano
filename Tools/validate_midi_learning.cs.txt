@@ -1,0 +1,145 @@
+// Execute through Unity MCP execute_code in main-scene Play mode, then leave Play mode.
+// Bounded synthetic input against real backing Udon. No hardware or remote-client claim.
+var checks = new System.Collections.Generic.List<string>();
+var f = UnityEngine.Object.FindObjectOfType<MusicMidiPlayer.Logic.MidiPlayerFacade>();
+if (!UnityEditor.EditorApplication.isPlaying || f == null) return "Open main scene in Play mode first.";
+VRC.Udon.UdonBehaviour Back(UdonSharp.UdonSharpBehaviour b) { return UdonSharpEditor.UdonSharpEditorUtility.GetBackingUdonBehaviour(b); }
+void Need(bool ok, string message) { if (!ok) throw new System.InvalidOperationException(message); checks.Add(message); }
+void Call(VRC.Udon.UdonBehaviour b, string method, params object[] args)
+{
+    var program = ((UdonSharp.UdonSharpProgramAsset)b.programSource).SerializedProgramAsset.RetrieveProgram();
+    var symbols = program.SymbolTable.GetSymbols();
+    for (int a = 0; a < args.Length; a += 2)
+    {
+        var matches = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Where(symbols,
+            s => System.Text.RegularExpressions.Regex.IsMatch(s, "^__\\d+_" + (string)args[a] + "__param$")));
+        if (matches.Length == 0) throw new System.MissingMemberException(method + "." + args[a]);
+        foreach (var symbol in matches) b.SetProgramVariable(symbol, args[a + 1]);
+    }
+    var entries = program.EntryPoints.GetExportedSymbols();
+    b.SendCustomEvent(System.Linq.Enumerable.Contains(entries, method) ? method : "__0_" + method);
+}
+
+var ui=f.playerUI;var b=Back(ui);var facade=Back(f);var router=Back(f.instrumentRouter);var pool=Back(f.voicePool.ensemble);var network=Back(f.network);var input=Back(f.performanceInput);
+var originalMap=(int[])((int[])facade.GetProgramVariable("hardwareMidiChannelTargets")).Clone();
+var originalDirty=(bool[])((bool[])facade.GetProgramVariable("_midiPreferenceDirtyChannels")).Clone();
+string originalKey=(string)facade.GetProgramVariable("midiPreferencesKey");
+int originalPreferred=(int)facade.GetProgramVariable("preferredMidiChannel"),originalMask=(int)router.GetProgramVariable("enabledMask"),originalLanguage=(int)b.GetProgramVariable("languageSelection");
+bool restored=(bool)facade.GetProgramVariable("_midiPreferencesRestored"),preferredDirty=(bool)facade.GetProgramVariable("_midiPreferredDirty"),pending=(bool)network.GetProgramVariable("hasPendingIntent"),fallback=(bool)network.GetProgramVariable("_localFallback"),locked=(bool)Back(f.gate).GetProgramVariable("_locked"),inputEnabled=input.enabled;
+string originalClientLanguage=(string)b.GetProgramVariable("_clientLanguage");string error=null;
+void Midi(string kind,int channel,int number,int value)
+{
+    string prefix="midi"+kind;facade.SetProgramVariable(prefix+"Channel",channel);facade.SetProgramVariable(prefix+"Number",number);
+    facade.SetProgramVariable(prefix+(kind=="ControlChange"?"Value":"Velocity"),value);facade.SendCustomEvent("_"+prefix);
+}
+int ActiveTarget(int id)
+{
+    var active=(bool[])pool.GetProgramVariable("active");var ids=(int[])pool.GetProgramVariable("identities");var targets=(int[])pool.GetProgramVariable("targets");
+    for(int i=0;i<64;i++)if(active[i]&&ids[i]==id)return targets[i];return -1;
+}
+string Encode(){Call(facade,"EncodeMidiPreferences");return (string)facade.GetProgramVariable("__0_EncodeMidiPreferences__ret");}
+bool Restore(string text){Call(facade,"RestoreMidiPreferences","encodedPreferences",text);var symbols=((UdonSharp.UdonSharpProgramAsset)facade.programSource).SerializedProgramAsset.RetrieveProgram().SymbolTable.GetSymbols();return (bool)facade.GetProgramVariable(System.Linq.Enumerable.First(symbols,s=>s.EndsWith("RestoreMidiPreferences__ret")));}
+try
+{
+    Need((bool)facade.GetProgramVariable("isReady"),"Main-scene backing Udon is ready");
+    // Never write test choices to the user's real ClientSim persistent-data key.
+    facade.SetProgramVariable("midiPreferencesKey","");facade.SetProgramVariable("_midiPreferencesRestored",false);
+    facade.SetProgramVariable("_midiPreferenceDirtyChannels",new bool[16]);facade.SetProgramVariable("_midiPreferredDirty",false);
+    facade.SetProgramVariable("preferredMidiChannel",-1);
+    network.SetProgramVariable("_localFallback",true);network.SetProgramVariable("hasPendingIntent",false);input.enabled=false;
+    Call(Back(f.gate),"SetLocked","value",false);Call(facade,"_ResetLiveMidiOutput");router.SetProgramVariable("enabledMask",5);
+    b.SetProgramVariable("languageSelection",2);b.SetProgramVariable("_clientLanguage","zh-Hans");Call(b,"ApplyLanguage");
+    Call(b,"_ToggleSettingsPanel");ui.midiMappingEntry.onClick.Invoke();
+    Need(ui.midiPerformancePanel.activeSelf&&!ui.midiMappingPanel.activeSelf,"Settings entry opens MIDI performance instead of the channel table");
+    Need(ui.midiPerformancePrompt.text.Contains("按一个键")&&!ui.midiPerformancePrompt.text.Contains("通道"),"First-time prompt asks for a key without channel terminology");
+    Need(System.Linq.Enumerable.All(ui.midiPerformanceTargets,x=>!x.gameObject.activeSelf),"Instrument choices wait until hardware input is detected");
+    Midi("ControlChange",3,11,100);Midi("NoteOn",3,60,0);
+    Need((int)b.GetProgramVariable("_midiLearnChannel")==-1,"Controller changes and zero-velocity note-ons do not learn a channel");
+    Midi("NoteOn",3,60,100);
+    Need((int)b.GetProgramVariable("_midiLearnChannel")==3&&(int)b.GetProgramVariable("_midiLearnState")==1,"Official MIDI note-on automatically identifies the input channel");
+    Need(ActiveTarget(3*128+60)==-1&&!((bool[])facade.GetProgramVariable("_liveHeld"))[3*128+60],"The detection key does not sound the old instrument");
+    Need(System.Linq.Enumerable.All(System.Linq.Enumerable.Range(0,7),i=>ui.midiPerformanceTargets[i].gameObject.activeSelf==(i==0||i==2)),
+        "Simple choices show only enabled piano and violin, without automatic or disabled targets");
+    Midi("NoteOn",5,62,100);
+    Need((int)b.GetProgramVariable("_midiLearnChannel")==3&&ActiveTarget(5*128+62)==-1,"Additional notes during instrument selection do not replace the identified input or leak sound");
+    ui.midiPerformanceTargets[2].onClick.Invoke();
+    Need(((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"))[3]==2&&(int)facade.GetProgramVariable("preferredMidiChannel")==3,
+        "Selecting violin configures the detected input and remembers the choice");
+    Need(ui.midiPerformancePrompt.text.Contains("已设为小提琴")&&ui.midiPerformancePrompt.text.Contains("开始演奏"),"Selection displays the ready-to-play confirmation");
+    Midi("NoteOn",3,61,100);Need(ActiveTarget(3*128+61)==2,"The next hardware key immediately plays the selected violin");Midi("NoteOff",3,61,0);
+    Need(!(bool)facade.GetProgramVariable("_midiPreferenceWriteQueued"),"Changes before data restoration do not queue persistence writes");
+    Call(b,"_CloseMidiMapping");ui.midiMappingEntry.onClick.Invoke();
+    Need((int)b.GetProgramVariable("_midiLearnState")==2&&ui.midiPerformanceTargetMarks[2].activeSelf,"Reopening recalls the current choice without another detection step");
+    ui.midiPerformanceRescanButton.onClick.Invoke();
+    Need((int)b.GetProgramVariable("_midiLearnState")==0,"Rescan returns to the key prompt");
+    Call(b,"_OnMidiPreferencesRestored");
+    Need((int)b.GetProgramVariable("_midiLearnState")==0,"A late restore notification cannot cancel an explicit rescan");
+    Midi("NoteOn",9,36,100);
+    Need((int)b.GetProgramVariable("_midiLearnChannel")==-1&&ui.midiPerformanceHint.text.Contains("旋律"),"Percussion input prompts for a melodic key instead of remapping drums");
+    Midi("NoteOn",4,60,100);ui.midiPerformanceTargets[0].onClick.Invoke();
+    Need(((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"))[4]==0&&(int)facade.GetProgramVariable("preferredMidiChannel")==4,
+        "Rescan can set a different input to piano");
+    ui.midiPerformancePanel.transform.Find("Advanced").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+    Need(ui.midiMappingPanel.activeSelf&&!ui.midiPerformancePanel.activeSelf,"Advanced opens the original channel table and suspends learning");
+    ui.midiChannelButtons[15].onClick.Invoke();ui.midiTargetButtons[0].onClick.Invoke();
+    Need(((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"))[15]==-1,"Advanced automatic channel mapping remains available");
+    ui.midiMappingPanel.transform.Find("Back").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+    Need(ui.midiPerformancePanel.activeSelf&&!ui.midiMappingPanel.activeSelf,"Advanced Back returns to MIDI performance");
+    router.SetProgramVariable("enabledMask",0);Call(b,"RefreshState");
+    Need(System.Linq.Enumerable.All(ui.midiPerformanceTargets,x=>!x.gameObject.activeSelf)&&ui.midiPerformanceHint.text.Contains("启用"),
+        "No enabled instruments produces an enable-instrument hint");
+    router.SetProgramVariable("enabledMask",127);Call(b,"RefreshState");
+    facade.SetProgramVariable("hardwareMidiChannelTargets",new[]{0,1,2,3,4,5,6,-1,-1,-1,-1,-1,-1,-1,-1,-1});
+    facade.SetProgramVariable("preferredMidiChannel",3);
+    string encoded=Encode();
+    Need(encoded=="1"+"1234567000000000"+"3","Versioned preference record stores the 16 mappings and preferred input in 18 characters");
+    facade.SetProgramVariable("_midiPreferenceDirtyChannels",new bool[16]);facade.SetProgramVariable("_midiPreferredDirty",false);
+    facade.SetProgramVariable("hardwareMidiChannelTargets",new[]{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1});
+    facade.SetProgramVariable("preferredMidiChannel",-1);
+    Need(Restore(encoded)&&((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"))[2]==2&&(int)facade.GetProgramVariable("preferredMidiChannel")==3,
+        "Preference decoding restores both instrument mapping and the remembered input");
+    var before=(int[])((int[])facade.GetProgramVariable("hardwareMidiChannelTargets")).Clone();
+    foreach(string bad in new[]{"","2"+encoded.Substring(1),"1"+"1234567800000000"+"3",encoded.Substring(0,17)+"9",encoded.Substring(0,17)})
+        Need(!Restore(bad)&&System.Linq.Enumerable.SequenceEqual(before,(int[])facade.GetProgramVariable("hardwareMidiChannelTargets")),
+            "Invalid preference record is rejected without partial mutation: "+bad);
+    var dirty=new bool[16];dirty[3]=true;
+    facade.SetProgramVariable("_midiPreferenceDirtyChannels",dirty);facade.SetProgramVariable("_midiPreferredDirty",true);
+    var edited=(int[])((int[])facade.GetProgramVariable("hardwareMidiChannelTargets")).Clone();edited[3]=2;facade.SetProgramVariable("hardwareMidiChannelTargets",edited);
+    Need(Restore("1"+"7654321000000000"+"4")&&((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"))[0]==6
+        &&((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"))[3]==2&&(int)facade.GetProgramVariable("preferredMidiChannel")==3,
+        "Late restoration merges untouched channels while preserving the just-edited channel and remembered input");
+    facade.SetProgramVariable("preferredMidiChannel",-1);Call(b,"_CloseMidiMapping");ui.midiMappingEntry.onClick.Invoke();
+    facade.SetProgramVariable("preferredMidiChannel",3);Call(b,"_OnMidiPreferencesRestored");
+    Need((int)b.GetProgramVariable("_midiLearnChannel")==3&&(int)b.GetProgramVariable("_midiLearnState")==2,
+        "Asynchronous restored preferences can advance an untouched first-time prompt to the remembered ready state");
+    var langs=new[]{1,2,2,3};var clients=new[]{"en","zh-Hans","zh-Hant","ja"};
+    var titles=new[]{"MIDI PLAY","MIDI 演奏","MIDI 演奏","MIDI 演奏"};
+    for(int i=0;i<4;i++)
+    {
+        b.SetProgramVariable("languageSelection",langs[i]);b.SetProgramVariable("_clientLanguage",clients[i]);Call(b,"ApplyLanguage");
+        Need(ui.midiPerformanceTitle.text==titles[i]&&ui.midiPerformancePrompt.text.IndexOf("{instrument}",System.StringComparison.Ordinal)<0,
+            "Performance flow localizes and resolves the instrument placeholder for "+clients[i]);
+    }
+    facade.SetProgramVariable("_midiPreferencesRestored",false);
+    facade.SetProgramVariable("onPlayerRestoredPlayer",null);facade.SendCustomEvent("_onPlayerRestored");
+    Need(!(bool)facade.GetProgramVariable("_midiPreferencesRestored"),"Invalid player restoration cannot enable persistence access");
+    facade.SetProgramVariable("onPlayerRestoredPlayer",VRC.SDKBase.Networking.LocalPlayer);facade.SendCustomEvent("_onPlayerRestored");
+    Need((bool)facade.GetProgramVariable("_midiPreferencesRestored"),"Official local-player restore event enables the persistence lifecycle");
+    Call(b,"_CloseSettingsPanel");
+    Need(!ui.midiPerformancePanel.activeSelf&&!ui.midiMappingPanel.activeSelf&&!ui.midiChoicePanel.activeSelf,"Closing settings dismisses simple, advanced and choice views");
+    Need((int)router.GetProgramVariable("enabledMask")==127&&(int)Back(f.clock).GetProgramVariable("_state")==0,
+        "Recognition and preference restoration do not change shared playback or auto-enable instruments");
+}
+catch(System.Exception e){error=e.ToString();}
+finally
+{
+    Call(facade,"_ResetLiveMidiOutput");Call(b,"_CloseSettingsPanel");
+    facade.SetProgramVariable("hardwareMidiChannelTargets",originalMap);facade.SetProgramVariable("preferredMidiChannel",originalPreferred);
+    facade.SetProgramVariable("_midiPreferenceDirtyChannels",originalDirty);facade.SetProgramVariable("_midiPreferredDirty",preferredDirty);
+    facade.SetProgramVariable("_midiPreferencesRestored",restored);facade.SetProgramVariable("midiPreferencesKey",originalKey);
+    router.SetProgramVariable("enabledMask",originalMask);b.SetProgramVariable("languageSelection",originalLanguage);b.SetProgramVariable("_clientLanguage",originalClientLanguage);Call(b,"ApplyLanguage");
+    network.SetProgramVariable("hasPendingIntent",pending);network.SetProgramVariable("_localFallback",fallback);
+    Call(Back(f.gate),"SetLocked","value",locked);input.enabled=inputEnabled;
+}
+return new{success=error==null,checks=checks.ToArray(),error=error??"",completedUtc=System.DateTime.UtcNow.ToString("o"),
+    scope="Editor/ClientSim native UI and official MIDI callbacks on real backing Udon; persistence record and late-restore merge tested without writing player data; real server rejoin and physical hardware not validated"};

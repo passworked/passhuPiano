@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "description": "Unmodified OFL source fonts used by player-local TextMeshPro fallback assets. Latin appearance is retained; dynamic multi-atlas fonts add characters as required.",
+  "vizvidReference": "https://github.com/JLChnToZ/VVMW/tree/1b0606d873b95a724da2d12b3ac0e156824fc5ed/Packages/idv.jlchntoz.vvmw/Fonts",
+  "fonts": [
+    {
+      "file": "NotoSansCJKsc-Regular.otf",
+      "sha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b",
+      "family": "Noto Sans CJK SC",
+      "version": "Version 2.004;hotconv 1.0.118;makeotfexe 2.5.65603",
+      "copyright": "© 2014-2021 Adobe (http://www.adobe.com/).",
+      "license": "SIL Open Font License 1.1",
+      "licenseFile": "NotoSansCJK-OFL.txt",
+      "upstream": "https://github.com/notofonts/noto-cjk"
+    },
+    {
+      "file": "Comfortaa-Regular.ttf",
+      "sha256": "7aeecaf4c799f24f22e871a6f546ca89116cf11288c7a8ff42f11401dd5445c6",
+      "family": "Comfortaa",
+      "version": "Version 3.001",
+      "copyright": "Copyright 2011 The Comfortaa Project Authors (aajohan@gmail.com), with Reserved Font Name \"Comfortaa\".",
+      "license": "SIL Open Font License 1.1",
+      "licenseFile": "Comfortaa-OFL.txt",
+      "upstream": "https://github.com/JLChnToZ/VVMW/tree/1b0606d873b95a724da2d12b3ac0e156824fc5ed/Packages/idv.jlchntoz.vvmw/Fonts"
+    },
+    {
+      "file": "NotoSansHebrew-Regular.ttf",
+      "sha256": "a7fa16fffb27bedb060a0866267c29e9859aeb9c21cc33f5b3aaf6eb062eca85",
+      "family": "Noto Sans Hebrew",
+      "version": "Version 3.000; ttfautohint (v1.8) -l 8 -r 50 -G 200 -x 14 -D hebr -f none -a qsq -X \"\"",
+      "copyright": "Copyright 2019 Google Inc. All Rights Reserved.",
+      "license": "SIL Open Font License 1.1",
+      "licenseFile": "LICENSE_OFL.txt",
+      "upstream": "https://raw.githubusercontent.com/notofonts/noto-fonts/ffebf8c1ee449e544955a7e813c54f9b73848eac/hinted/ttf/NotoSansHebrew/NotoSansHebrew-Regular.ttf"
+    },
+    {
+      "file": "NotoSansThai-Regular.ttf",
+      "sha256": "404ddfb5ed0aaa6b6ec8a85700d682978992062d67da93903967b56cbd9a4acc",
+      "family": "Noto Sans Thai",
+      "version": "Version 2.000; ttfautohint (v1.8) -l 8 -r 50 -G 200 -x 14 -D thai -f none -a qsq -X \"\"",
+      "copyright": "Copyright 2016 Google Inc. All Rights Reserved.",
+      "license": "SIL Open Font License 1.1",
+      "licenseFile": "LICENSE_OFL.txt",
+      "upstream": "https://raw.githubusercontent.com/notofonts/noto-fonts/ffebf8c1ee449e544955a7e813c54f9b73848eac/hinted/ttf/NotoSansThai/NotoSansThai-Regular.ttf"
+    }
+  ]
+}

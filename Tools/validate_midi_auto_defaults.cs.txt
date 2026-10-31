@@ -1,0 +1,96 @@
+// Execute through Unity MCP execute_code in main-scene Play mode, then leave Play mode.
+// Bounded synthetic input against real backing Udon. No hardware or remote-client claim.
+var checks = new System.Collections.Generic.List<string>();
+var f = UnityEngine.Object.FindObjectOfType<MusicMidiPlayer.Logic.MidiPlayerFacade>();
+if (!UnityEditor.EditorApplication.isPlaying || f == null) return "Open main scene in Play mode first.";
+VRC.Udon.UdonBehaviour Back(UdonSharp.UdonSharpBehaviour b) { return UdonSharpEditor.UdonSharpEditorUtility.GetBackingUdonBehaviour(b); }
+void Need(bool ok, string message) { if (!ok) throw new System.InvalidOperationException(message); checks.Add(message); }
+void Call(VRC.Udon.UdonBehaviour b, string method, params object[] args)
+{
+    var program = ((UdonSharp.UdonSharpProgramAsset)b.programSource).SerializedProgramAsset.RetrieveProgram();
+    var symbols = program.SymbolTable.GetSymbols();
+    for (int a = 0; a < args.Length; a += 2)
+    {
+        var matches = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Where(symbols,
+            s => System.Text.RegularExpressions.Regex.IsMatch(s, "^__\\d+_" + (string)args[a] + "__param$")));
+        if (matches.Length == 0) throw new System.MissingMemberException(method + "." + args[a]);
+        foreach (var symbol in matches) b.SetProgramVariable(symbol, args[a + 1]);
+    }
+    var entries = program.EntryPoints.GetExportedSymbols();
+    b.SendCustomEvent(System.Linq.Enumerable.Contains(entries, method) ? method : "__0_" + method);
+}
+
+var facade=Back(f);var router=Back(f.instrumentRouter);var pool=Back(f.voicePool.ensemble);var network=Back(f.network);var input=Back(f.performanceInput);
+var originalMap=(int[])((int[])facade.GetProgramVariable("hardwareMidiChannelTargets")).Clone();
+var originalDirty=(bool[])((bool[])facade.GetProgramVariable("_midiPreferenceDirtyChannels")).Clone();
+string key=(string)facade.GetProgramVariable("midiPreferencesKey");int preferred=(int)facade.GetProgramVariable("preferredMidiChannel");
+bool preferredDirty=(bool)facade.GetProgramVariable("_midiPreferredDirty"),fallback=(bool)network.GetProgramVariable("_localFallback"),pending=(bool)network.GetProgramVariable("hasPendingIntent"),inputEnabled=input.enabled;
+int mask=(int)router.GetProgramVariable("enabledMask"),appearance=(int)router.GetProgramVariable("pianoAppearance");string error=null;
+void Midi(bool down,int channel,int pitch=60)
+{
+    string prefix=down?"midiNoteOn":"midiNoteOff";facade.SetProgramVariable(prefix+"Channel",channel);facade.SetProgramVariable(prefix+"Number",pitch);
+    facade.SetProgramVariable(prefix+"Velocity",down?100:0);facade.SendCustomEvent("_"+prefix);
+}
+int Slot(int identity)
+{
+    var active=(bool[])pool.GetProgramVariable("active");var ids=(int[])pool.GetProgramVariable("identities");
+    for(int i=0;i<64;i++)if(active[i]&&ids[i]==identity)return i;return -1;
+}
+int Target(int identity){int slot=Slot(identity);return slot<0?-1:((int[])pool.GetProgramVariable("targets"))[slot];}
+void Reset(){Call(facade,"_ResetLiveMidiOutput");}
+bool Restore(string record)
+{
+    Call(facade,"RestoreMidiPreferences","encodedPreferences",record);
+    var symbols=((UdonSharp.UdonSharpProgramAsset)facade.programSource).SerializedProgramAsset.RetrieveProgram().SymbolTable.GetSymbols();
+    return (bool)facade.GetProgramVariable(System.Linq.Enumerable.First(symbols,s=>s.EndsWith("RestoreMidiPreferences__ret")));
+}
+try
+{
+    Need((bool)facade.GetProgramVariable("isReady")&&(int)Back(f.clock).GetProgramVariable("_state")==0,"Fresh main-scene player is ready and stopped");
+    Need(System.Linq.Enumerable.All(originalMap,t=>t==-1),"All 16 fresh-profile mapping slots default to automatic");
+    Need(!f.playerUI.settingsPanel.activeSelf&&!f.playerUI.midiPerformancePanel.activeSelf,"No MIDI settings or identification page is opened");
+    facade.SetProgramVariable("midiPreferencesKey","");network.SetProgramVariable("_localFallback",true);network.SetProgramVariable("hasPendingIntent",false);input.enabled=false;
+    foreach(int selection in new[]{1,2,4,8,16,32,64,6,20})
+    {
+        Call(facade,"_ApplyInstrumentSelection","mask",selection,"appearance",1);
+        int expected=selection==1?0:selection==2||selection==6?1:selection==4||selection==20?2:selection==8?3:selection==16?4:selection==32?5:6;
+        for(int channel=0;channel<16;channel++)
+        {
+            if(channel==9)continue;Reset();Midi(true,channel);
+            int id=channel*128+60,slot=Slot(id);
+            Need(slot>=0&&Target(id)==expected&&((int[])facade.GetProgramVariable("_liveTargetOverrides"))[id]==0,
+                "Zero-config channel "+(channel+1)+" uses enabled target "+expected+" for selection "+selection);
+            var a=(int[])pool.GetProgramVariable("_a");
+            Need(a[slot]>=0&&f.voicePool.voiceSources[a[slot]].clip!=null&&f.voicePool.voiceSources[a[slot]].pitch>0,
+                "Channel "+(channel+1)+" has a real sample and playback pitch for selection "+selection);
+            Midi(false,channel);
+            Need(!((bool[])facade.GetProgramVariable("_liveHeld"))[id],"NoteOff releases channel "+(channel+1)+" for selection "+selection);
+        }
+    }
+    Reset();Call(facade,"_ApplyInstrumentSelection","mask",127,"appearance",1);
+    Call(facade,"SetHardwareMidiChannelTarget","channel",2,"target",2);Midi(true,2);
+    Need(Target(2*128+60)==2&&((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"))[2]==2,"An actively chosen violin mapping overrides the automatic default");
+    Reset();facade.SetProgramVariable("_midiPreferenceDirtyChannels",new bool[16]);facade.SetProgramVariable("_midiPreferredDirty",false);
+    Need(Restore("1"+"2000000000000000"+"0"),"Existing saved preference schema still restores successfully");
+    Midi(true,0);Need(Target(60)==1&&(int)facade.GetProgramVariable("preferredMidiChannel")==0,"A restored explicit marimba mapping and preferred input are preserved");
+    Reset();Call(facade,"_ApplyInstrumentSelection","mask",4,"appearance",1);Midi(true,0);
+    Need(Slot(60)<0&&((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"))[0]==1,"Disabled explicit targets stay silent without erasing or rewriting the saved choice");
+    Midi(true,1);Need(Target(128+60)==2,"Other automatic channels still play the enabled violin alongside an explicit saved mapping");
+    Reset();Need(Restore("1"+"1234567000000000"+"3"),"Legacy saved multi-channel mappings are retained instead of being guessed or reset");
+    Need(System.Linq.Enumerable.SequenceEqual((int[])facade.GetProgramVariable("hardwareMidiChannelTargets"),new[]{0,1,2,3,4,5,6,-1,-1,-1,-1,-1,-1,-1,-1,-1}),
+        "All actively saved channel targets survive the default change");
+    Call(facade,"_ApplyInstrumentSelection","mask",0,"appearance",1);Midi(true,9,36);
+    Need(System.Linq.Enumerable.Any((bool[])Back(f.voicePool.drums).GetProgramVariable("_active"),v=>v),"MIDI channel 10 still plays drums when no melodic instrument is enabled");
+    Need(!((bool[])facade.GetProgramVariable("_liveHeld"))[9*128+36],"Percussion does not enter melodic held-note identities");
+    Need(!f.playerUI.midiPerformancePanel.activeSelf&&f.voicePool.voiceSources.Length==64,"Direct MIDI playback requires no setup page and retains the 64-source budget");
+}
+catch(System.Exception e){error=e.ToString();}
+finally
+{
+    Reset();facade.SetProgramVariable("hardwareMidiChannelTargets",originalMap);facade.SetProgramVariable("_midiPreferenceDirtyChannels",originalDirty);
+    facade.SetProgramVariable("_midiPreferredDirty",preferredDirty);facade.SetProgramVariable("preferredMidiChannel",preferred);facade.SetProgramVariable("midiPreferencesKey",key);
+    Call(facade,"_ApplyInstrumentSelection","mask",mask,"appearance",appearance);
+    network.SetProgramVariable("_localFallback",fallback);network.SetProgramVariable("hasPendingIntent",pending);input.enabled=inputEnabled;
+}
+return new{success=error==null,checks=checks.ToArray(),error=error??"",completedUtc=System.DateTime.UtcNow.ToString("o"),
+scope="Editor/ClientSim official MIDI callbacks against backing Udon with local-fallback submission; all 15 melodic channels, seven single-instrument selections, two multi-instrument selections, explicit/restored mappings and percussion; no hardware, listening or real remote-client validation"};

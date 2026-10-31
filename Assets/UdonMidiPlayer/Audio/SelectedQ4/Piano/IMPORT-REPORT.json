@@ -1,0 +1,11 @@
+{
+  "clips": 120,
+  "recordedClips": 120,
+  "velocityLayers": 4,
+  "sourceQuality": 4,
+  "encodedSourceBytes": 21439157,
+  "decodedFloat32EstimateBytes": 637250688.0,
+  "observedEditorClipMemoryBytes": 319083864,
+  "bankHash": "c63e562430c31daa14308ecb6f419f7b7a353e41366891cbacfd49d211fccf0f",
+  "note": "PCM / DecompressOnLoad; source Ogg q4 is not build/download size."
+}

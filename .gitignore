@@ -1,0 +1,37 @@
+# Local Unity state and release outputs
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/UserSettings/
+/Captures/
+/ClientSimStorage/
+/RecoveryBackups/
+/Downloads/
+/Releases/
+/.vs/
+/.idea/
+*.csproj
+*.sln
+*.user
+*.pidb
+*.suo
+*.tmp
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
+# SDKs are restored through VPM, never vendored as project-owned code.
+/Packages/com.vrchat.*/
+/Tools/LiveMidi/python_packages/
+/Tools/LiveMidi/Extracted/
+/Tools/LiveMidi/Layout/
+/Tools/LiveMidi/Payload/
+/Tools/LiveMidi/Portable/
+/Assets/UdonMidiPlayer/Runtime/RegressionTemp/
+/Assets/UdonMidiPlayer/Runtime/RegressionTemp.meta

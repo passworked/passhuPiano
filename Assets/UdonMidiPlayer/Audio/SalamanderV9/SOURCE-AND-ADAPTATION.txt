@@ -1,0 +1,12 @@
+Salamander Grand Piano — v9 single-layer adaptation for Music MIDI Player
+
+Original piano recordings: Alexander Holm (Yamaha C5).
+Source distribution: Salamander Grand Piano (FreePats), SF2 v3+20200602, assembled by roberto@zenvoid.org for the FreePats project.
+Official source: https://freepats.zenvoid.org/Piano/acoustic-grand-piano.html
+License: Creative Commons Attribution 3.0 Unported (CC BY 3.0) — https://creativecommons.org/licenses/by/3.0/
+The unmodified upstream readme, including its additional credits and changelog, is preserved in ORIGINAL-README.txt. No endorsement by the original creators is implied.
+
+Changes: selected only recorded velocity layer v9 (one of the original 16), retaining all 30 minor-third roots A0–C8, 48,000 Hz, stereo and each selected sample's full natural tail; no loops. Original SF2 per-root signed fine tuning (generator 52), key ranges and release timecents (generator 38) are retained in BANK-MAPPING.json and baked into the player bank; left/right metadata must agree. Existing extracted/encoded Vorbis q8 files from the user's 2026-10-24 Salamander analysis are copied byte-for-byte, verified in SHA256SUMS.txt. The importer performs no Ogg encoding. All MIDI velocities use this one timbre with gain response, so this adaptation does not reproduce the original 16-layer timbral dynamics, pedal/mechanical noises or all SFZ/SF2 behavior.
+
+Unity import policy: PC validation: DecompressOnLoad + PCM, PreserveSampleRate, stereo, preload. Original Vorbis q8 files copied byte-for-byte. Unity PCM import creates an internal decoded/platform representation; no second Vorbis encoding is requested. No claim of identical source/build size, exact internal bit depth, or original-recording losslessness.
+The 10,188,801-byte (about 9.72 MiB) selection is the encoded-source payload, not a Unity build/download or runtime-memory guarantee. Unity decodes/imports the Ogg sources into its PCM/platform representation; this may involve internal sample representation/quantization. A Quality=1 Vorbis setting would not establish bitstream pass-through, so it is not used as a no-re-encoding claim. Actual imported frame counts and observed Editor AudioClip memory are recorded in IMPORT-REPORT.json; target-player memory and final build/download size require separate measurement.

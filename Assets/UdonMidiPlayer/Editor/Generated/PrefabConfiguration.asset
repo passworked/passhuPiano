@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e36e6271ff456454e9548fd7fe44731b, type: 3}
+  m_Name: PrefabConfiguration
+  m_EditorClassIdentifier: 
+  library: {fileID: 11400000, guid: c5c40508b47c79f429521d16b71e3527, type: 2}
+  bank: {fileID: 11400000, guid: 809dce11a357b6a44b442ad23d4d60df, type: 2}
+  pianoModel: {fileID: 919132149155446097, guid: 66cfe9e8a87eb474f9c6aa6cf05e6677, type: 3}
+  voiceLimit: 64
+  visibleNoteLimit: 512
+  windowMs: 3000
+  viewHeight: 1.85
+  defaultSongId: a374787c7fb01dc469f4c6db6cc44bb6

@@ -1,0 +1,5310 @@
+{
+  "wavCommit": "440300901dfe9275fd84e0b7763af1f8443ae62e",
+  "sfzCommit": "6dd651d55dde97fd4028699be9d4481f26917891",
+  "sampleRate": 48000,
+  "channels": 1,
+  "velocityLayers": 1,
+  "articulations": [
+    "sustain",
+    "spiccato",
+    "pizzicato"
+  ],
+  "regions": [
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 55,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-055-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-055-loop.wav",
+      "attackFrames": 119040,
+      "loopFrames": 48000,
+      "peak": 0.16193389892578125,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_G3_f.wav",
+      "sourceSha256": "80bae3776b0ccd3d4774f47429e829c7764f5fe6061ff844a8affc6ac68b7899",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 115200,
+        "endFrame": 167040,
+        "crossfadeFrames": 3840,
+        "score": 0.012643821331527194,
+        "loopBoundaryStep": 0.002527838572859764
+      },
+      "attackSha256": "83362f0d7d6400f01838bb53be98424e828df4242b8ff024018f7d0e3a11e8b5",
+      "loopSha256": "106e210c49a483dfd9473ad4b08c3b29426c6957e1f3f9eb991cf47ce96e1e19"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 57,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-057-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-057-loop.wav",
+      "attackFrames": 85440,
+      "loopFrames": 62400,
+      "peak": 0.15675684809684753,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_A3_f.wav",
+      "sourceSha256": "76934f3a85e4ba3b6518132c2fe6effa340c33fbb02f94e88c60b00073dc722f",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 81600,
+        "endFrame": 147840,
+        "crossfadeFrames": 3840,
+        "score": 0.011972687894457075,
+        "loopBoundaryStep": 0.005219932645559311
+      },
+      "attackSha256": "9dc5d77bb42095c05b400b0826e2839b5510e942898e9700cf2377123610a692",
+      "loopSha256": "af87f18935ba5a67ecb6efa8ec02ff13315b1959b56a88e138dde1666217769e"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 60,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-060-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-060-loop.wav",
+      "attackFrames": 119040,
+      "loopFrames": 62400,
+      "peak": 0.43859192728996277,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_C4_f.wav",
+      "sourceSha256": "4169605b51a72454f11bc2c34efc66c1d9993fd2b7d5f097a025ef9d3a2dbdfa",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 115200,
+        "endFrame": 181440,
+        "crossfadeFrames": 3840,
+        "score": 0.014072363150013752,
+        "loopBoundaryStep": 0.006302043795585632
+      },
+      "attackSha256": "0e0ccd5a646bf497ba97c5843d869d2ddeaaa3c82c42782138cd5e926f2dc324",
+      "loopSha256": "298ba3ce0851dbe9cacd8a7c476bbb68c2850af5fd1498bfbfb8f663326ef122"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 64,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-064-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-064-loop.wav",
+      "attackFrames": 90240,
+      "loopFrames": 48000,
+      "peak": 0.27102532982826233,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_E4_f.wav",
+      "sourceSha256": "418512905f3294a23cf999f0587bf8e04d60192fe317ea8c80c150a85670eda2",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 86400,
+        "endFrame": 138240,
+        "crossfadeFrames": 3840,
+        "score": 0.02240870357123243,
+        "loopBoundaryStep": 0.010123347863554955
+      },
+      "attackSha256": "512931c9eaa34def113c42d978d33d4d21752ba44a9d905de7c3b99c8efc6a60",
+      "loopSha256": "96f678709c306d8d767914baaf92e455e82e1d388648da778c69db25b3c11a70"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 67,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-067-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-067-loop.wav",
+      "attackFrames": 80640,
+      "loopFrames": 62400,
+      "peak": 0.16533929109573364,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_G4_f.wav",
+      "sourceSha256": "14e3ea3d5172722d4d2686bae5da3d603800a7a474fa295d98275a9410913822",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 76800,
+        "endFrame": 143040,
+        "crossfadeFrames": 3840,
+        "score": 0.014472447479894821,
+        "loopBoundaryStep": 0.010239681228995323
+      },
+      "attackSha256": "4e955ae12911419071e3a80e93066564d1c0954f0b01db119ebbe42240b2f3ba",
+      "loopSha256": "5e1a615b4324c9400142cb162296b5a6200723eb3522901896ce75fe3d73bd4b"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 69,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-069-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-069-loop.wav",
+      "attackFrames": 71040,
+      "loopFrames": 48000,
+      "peak": 0.26496103405952454,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_A4_f.wav",
+      "sourceSha256": "19e5374658351508a9e2c929e871a43caff41e62d5e3363ead6f88428a9ab863",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 67200,
+        "endFrame": 119040,
+        "crossfadeFrames": 3840,
+        "score": 0.01588823575676234,
+        "loopBoundaryStep": 0.013852465897798538
+      },
+      "attackSha256": "e9916601406ce1c0fa949dd7f4fcb9c268cab5dc48f7d8891ab05dc914fcc2f4",
+      "loopSha256": "74b8e0dcf2e7b12cb3ba0d73c72c8f1e291bf3f7108a93fe7b8ec2cc4437c59a"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 72,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-072-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-072-loop.wav",
+      "attackFrames": 119040,
+      "loopFrames": 48000,
+      "peak": 0.361002117395401,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_C5_f.wav",
+      "sourceSha256": "af72f852ef2892233699851dacf5f8d97d446822d8eb4ce9e0ec27d5a721b118",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 115200,
+        "endFrame": 167040,
+        "crossfadeFrames": 3840,
+        "score": 0.017614625287818694,
+        "loopBoundaryStep": 0.03835386037826538
+      },
+      "attackSha256": "5dbd23f5d7d95a74ea2638ed1b214ad7f40929945224c33cc16a2b892592dd0c",
+      "loopSha256": "f6e0f9695f1c51de97f63530aca78039893d0f624d3a0ee313d73f56a560351e"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 76,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-076-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-076-loop.wav",
+      "attackFrames": 85440,
+      "loopFrames": 48000,
+      "peak": 0.20093151926994324,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_E5_f.wav",
+      "sourceSha256": "5c278e263fd59650190fc58294945cd291906eb1abd8293f728a96a878d1d478",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 81600,
+        "endFrame": 133440,
+        "crossfadeFrames": 3840,
+        "score": 0.019431297080869787,
+        "loopBoundaryStep": 0.007165201008319855
+      },
+      "attackSha256": "6d7cb7a9e57517016b7a681c9d2413d5d1cca0e180790eac774b4c21111edbf2",
+      "loopSha256": "037c18b447bcfef3e863edcf075570cebf2eb0cfef482feeb59f2de1486f8f64"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 79,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-079-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-079-loop.wav",
+      "attackFrames": 114240,
+      "loopFrames": 100800,
+      "peak": 0.2318672388792038,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_G5_f.wav",
+      "sourceSha256": "b5bb27541d6187e6eeb20baf50625ca35fc9d44c7f113936a9369bc7ce490a68",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 110400,
+        "endFrame": 215040,
+        "crossfadeFrames": 3840,
+        "score": 0.014944949234912304,
+        "loopBoundaryStep": 0.025455400347709656
+      },
+      "attackSha256": "1491dfaea49731057129019ed7fd2010e12dce8ea02d6f56ffe06fbaa50a5dbe",
+      "loopSha256": "11b0ed3026316a575f507fdc109f0fdb9523fb2b31f72d724bfe9b61b495cb59"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 81,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-081-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-081-loop.wav",
+      "attackFrames": 99840,
+      "loopFrames": 62400,
+      "peak": 0.3041180968284607,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_A5_f.wav",
+      "sourceSha256": "0558d79d23db55c710e664e6283b62619f5a582ce261a5c082700a0d01536627",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 96000,
+        "endFrame": 162240,
+        "crossfadeFrames": 3840,
+        "score": 0.024376729173879147,
+        "loopBoundaryStep": 0.0011221617460250854
+      },
+      "attackSha256": "6b6536408fdd0e416a9afd0e5dd4eae4498345f41f1690c911b3cd6a09bd11bb",
+      "loopSha256": "cfe8d7bb41f0e439d68020a3a119f60dfb5d47ebb0e4b41fcceb922257c211e2"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 84,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-084-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-084-loop.wav",
+      "attackFrames": 90240,
+      "loopFrames": 81600,
+      "peak": 0.2723406255245209,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_C6_f.wav",
+      "sourceSha256": "7ec8e0c2dde75282a4aaacccc713c84faa3e84daa9cf43df45ffc0e209964d46",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 86400,
+        "endFrame": 171840,
+        "crossfadeFrames": 3840,
+        "score": 0.016020292078332214,
+        "loopBoundaryStep": 0.0011306405067443848
+      },
+      "attackSha256": "dd93da45d4b56a99f6a25d6179a63ddc684a0f9c06d702dc5854f3170bfd82d2",
+      "loopSha256": "787825a018ee728a9aeeb68baa7e8cded75b3fa6544ca3a1adf584c02bd791cc"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 88,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-088-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-088-loop.wav",
+      "attackFrames": 85440,
+      "loopFrames": 81600,
+      "peak": 0.1893000602722168,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_E6_f.wav",
+      "sourceSha256": "8d1712f5659274a83aa90807132084559633e4817027c8a5b5f40826b3d9bc84",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 81600,
+        "endFrame": 167040,
+        "crossfadeFrames": 3840,
+        "score": 0.022171925145863358,
+        "loopBoundaryStep": 0.045951373875141144
+      },
+      "attackSha256": "cb5b0d1bd64dc3292dfd71c8332449a59c1c51ae6948a4b0fb1db24f33ddc342",
+      "loopSha256": "840eec165bbee3ef2f1722fea0ed326c050d8d1eb95b42eccfec69cdb80ff217"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 91,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-091-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-091-loop.wav",
+      "attackFrames": 66240,
+      "loopFrames": 62400,
+      "peak": 0.15646690130233765,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_G6_f.wav",
+      "sourceSha256": "68c49e55565810ea822866e3d39e51c1a5ad53cfa1a67bc25836ca7feac3fe0c",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 62400,
+        "endFrame": 128640,
+        "crossfadeFrames": 3840,
+        "score": 0.01006039651462845,
+        "loopBoundaryStep": 0.02554459124803543
+      },
+      "attackSha256": "3f51a75fe7f00c90c8b51a461eba820ebd7756301cb50131cd71b6da0dae39ec",
+      "loopSha256": "1131b9d97c2e1785201b3775b9bc3e109be740829f317355350d18047cb95a24"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 93,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-093-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-093-loop.wav",
+      "attackFrames": 66240,
+      "loopFrames": 62400,
+      "peak": 0.17099428176879883,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_A6_f.wav",
+      "sourceSha256": "37f6cc2f12b1b443a77d3ee370178da4a002a2ac3b6529663cc7ee002728ddcf",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 62400,
+        "endFrame": 128640,
+        "crossfadeFrames": 3840,
+        "score": 0.01864091386227466,
+        "loopBoundaryStep": 0.024067800492048264
+      },
+      "attackSha256": "6f531583adcf585f9f90d03bdbaa35f0015fec579ae78e39d464d76f86b9d7a6",
+      "loopSha256": "113dc940d7e21060f4f81fb49a3ddb48a4072bd7f362b4f219ee88af2dc4c55b"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 96,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-096-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-096-loop.wav",
+      "attackFrames": 109440,
+      "loopFrames": 81600,
+      "peak": 0.16958589851856232,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_C7_f.wav",
+      "sourceSha256": "f8223aed62911ef3f6937111bf3cdcc36fc25a636d4f99480b97029c4d28f393",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 105600,
+        "endFrame": 191040,
+        "crossfadeFrames": 3840,
+        "score": 0.015716876166841746,
+        "loopBoundaryStep": 0.011209113523364067
+      },
+      "attackSha256": "e841700d4bca52b47ce469bc4a23533815859591af03f7caf74879dccb052a6e",
+      "loopSha256": "9ceb9580ceedeb6366e534ce13092645654e87bc2347d72b5f216d177bbeaa7c"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 55,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-055-attack.wav",
+      "loop": "",
+      "attackFrames": 106623,
+      "loopFrames": 0,
+      "peak": 0.38815605640411377,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_G2_v2_rr1.wav",
+      "sourceSha256": "3bcd4edde6d9c9882ad16d3ba8d1999b6190581cb4af77df6b0d6606d7b4a60e",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "adbe1ccc1d48c9739f171558a0259afbf627e860078fd7f139310d83acd2f2d6"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 57,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-057-attack.wav",
+      "loop": "",
+      "attackFrames": 79541,
+      "loopFrames": 0,
+      "peak": 0.1447071135044098,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_A2_v2_rr1.wav",
+      "sourceSha256": "4d7f9520bbde4f43324554b53bf147d2b5ea1a8c1234a7375793420f8a29f1d6",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "571df48c94131c8a72eba4c3df547dfef17c9ac417ea56c0c536c67ff1b791bc"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 60,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-060-attack.wav",
+      "loop": "",
+      "attackFrames": 54853,
+      "loopFrames": 0,
+      "peak": 0.261700302362442,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_C3_v2_rr1.wav",
+      "sourceSha256": "004ab9c49db15533ee5f47d626138a5af3f044f19131827a0911ec3648c0e68e",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "b6bedd7e2394199146f2cef35aaeffdfd10e268e4aa602aed6d94371bf3b7ec3"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 64,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-064-attack.wav",
+      "loop": "",
+      "attackFrames": 79107,
+      "loopFrames": 0,
+      "peak": 0.14148055016994476,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_E3_v2_rr1.wav",
+      "sourceSha256": "b4a9d9a85016a0ee4db54256d3a7384288823821b866df4bd1cd226a05cf2396",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "e8b28b556f248c52b32b49da791e94b577c70ce9db33eec878785482bed55416"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 67,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-067-attack.wav",
+      "loop": "",
+      "attackFrames": 56435,
+      "loopFrames": 0,
+      "peak": 0.13952487707138062,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_G3_v2_rr1.wav",
+      "sourceSha256": "af5163b8b919a07cb85abeb1fbb2f1f124889f9b0417e4f41571f6d7588f5665",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "a0e1000a8aa6a6b9f7602debf0fb9ac7d32a7aae9c827e1bc57e74c5d8d85035"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 69,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-069-attack.wav",
+      "loop": "",
+      "attackFrames": 66887,
+      "loopFrames": 0,
+      "peak": 0.16142989695072174,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_A3_v2_rr1.wav",
+      "sourceSha256": "cda80f0f3d2deebc97d313581f810cb1b42b516cd26d617252e62e12ea205a1b",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "a6770b22de3881a7dbd2162f2a2b018e8085001c1b42e9b2ab10e2d353e5f5e5"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 72,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-072-attack.wav",
+      "loop": "",
+      "attackFrames": 57640,
+      "loopFrames": 0,
+      "peak": 0.26950663328170776,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_C4_v2_rr1.wav",
+      "sourceSha256": "0071c0e2cf8ee18b6502f392015dc89ed39a6320f8a430779a50c48b1cb37f42",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "ba62bd90dbb1f7ee495aaeff4ebe820a770e5f292966031c900df5d99ce696d3"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 76,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-076-attack.wav",
+      "loop": "",
+      "attackFrames": 88753,
+      "loopFrames": 0,
+      "peak": 0.15434736013412476,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_E4_v2_rr1.wav",
+      "sourceSha256": "365e59e228e7af42d9277381d16bbd088983d99190e746da6ae81f9b10cb48fe",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "500489b3b82e2151bb09d1e99bacf329c23682a83f535927a0652ae1e4e00d3b"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 79,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-079-attack.wav",
+      "loop": "",
+      "attackFrames": 61633,
+      "loopFrames": 0,
+      "peak": 0.14177222549915314,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_G4_v2_rr1.wav",
+      "sourceSha256": "acfee187b8d0e781aaae2c2f68250c42e1d8f410a595673502fb96f1469a789e",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "288aa542807f366b4497e88249ef5f96dfc6337848fc5c17d5e9844743dff725"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 81,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-081-attack.wav",
+      "loop": "",
+      "attackFrames": 66528,
+      "loopFrames": 0,
+      "peak": 0.17088356614112854,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_A4_v2_rr1.wav",
+      "sourceSha256": "6c506b5fccacbbbadb70993ff00d77c68a185af79febb35dc7101eb616046650",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "bcce674ba71d4c2beea1db30b84311bf8ce2654340530bf899d5cdeb4172f84d"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 84,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-084-attack.wav",
+      "loop": "",
+      "attackFrames": 59261,
+      "loopFrames": 0,
+      "peak": 0.26251673698425293,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_C5_v2_rr1.wav",
+      "sourceSha256": "28788d5a97438d739403627aea0f8aa42fa6582d75c4e8f4f2431cfae1cd4738",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "659da8dd93bb397f0af4904063c9bff11804244aeea11a090eb1b946a5cf7656"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 88,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-088-attack.wav",
+      "loop": "",
+      "attackFrames": 55665,
+      "loopFrames": 0,
+      "peak": 0.06088973954319954,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_E5_v2_rr1.wav",
+      "sourceSha256": "3c440d43b09b1a152fdf9308f4773ec8c55cea05b97ed06e50dbce1a9d2a2256",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "1bfd80b6c17b3a7669169d53d399b1e602a6b6e3d4754144bb64eb5c70fe1be9"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 91,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-091-attack.wav",
+      "loop": "",
+      "attackFrames": 44601,
+      "loopFrames": 0,
+      "peak": 0.13311982154846191,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_G5_v2_rr1.wav",
+      "sourceSha256": "f83bc69d68304da0f24d042ce01f5e8c9f824cc70fe19eea8b11e8fc6131df99",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "d4c889ed389ee4e381d8d3fa4a61e4d334326fffd346a567bbb76ec731eaed0f"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 93,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-093-attack.wav",
+      "loop": "",
+      "attackFrames": 65294,
+      "loopFrames": 0,
+      "peak": 0.15665559470653534,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_A5_v2_rr1.wav",
+      "sourceSha256": "c5e2925c08a55dd4329c74bc9f0b832dac4e405d04da7a19fd790bff71f02162",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "3b19c0c3214a89fef32b0064d92bf220e8c4dc82af82b301d9b8e4f2dd93122b"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 96,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-096-attack.wav",
+      "loop": "",
+      "attackFrames": 53573,
+      "loopFrames": 0,
+      "peak": 0.07486367970705032,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_C6_v2_rr1.wav",
+      "sourceSha256": "4e854001e15c23bb42e1f9dd8ca276e54d279423c6dd94db9bab6385cd9641c2",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "0e6fbc98b17eecd89531910f4523486e0e529db5e08d2e0b0191d1fd5c067da7"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 55,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-055-attack.wav",
+      "loop": "",
+      "attackFrames": 192835,
+      "loopFrames": 0,
+      "peak": 0.0520116463303566,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_G3_f_RR1.wav",
+      "sourceSha256": "dc56b8193aaa29d9a0704aeee8672437a00bd12ec5e964e9a02765ead48fcdf6",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "c58ca93ea6209899034fbfc369c178788d8be5c5a7c01a70c9832d01ed96d563"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 57,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-057-attack.wav",
+      "loop": "",
+      "attackFrames": 123809,
+      "loopFrames": 0,
+      "peak": 0.12924857437610626,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_A3_f_RR1.wav",
+      "sourceSha256": "8f400b390219271d04eb9fc0247493d92089f2ca982b9a23be682bec18b7972d",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "6c1a1a6339e46035032a514ce413e9920c6cdec47ef3e5b563308e46a960aa7c"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 60,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-060-attack.wav",
+      "loop": "",
+      "attackFrames": 72569,
+      "loopFrames": 0,
+      "peak": 0.32233744859695435,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_C4_f_RR1.wav",
+      "sourceSha256": "f2836918ed710f19d1e63a6884409f1c9138cdb525d6295d9cdb473f0d56be95",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "8f6a22a5f4e9c229aaa715ed461474c2f711b4d3227f9d5cfcb43840425bddbb"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 64,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-064-attack.wav",
+      "loop": "",
+      "attackFrames": 93538,
+      "loopFrames": 0,
+      "peak": 0.11086288094520569,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_E4_f_RR1.wav",
+      "sourceSha256": "96e609d2d3ad1d01f898763ee1554ce69416238d9b2c598a89f0fad2b710eab9",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "262612819617641a09afdf0c3273c952c7ba1c5e603677ba99e320e9d5fe5cd8"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 67,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-067-attack.wav",
+      "loop": "",
+      "attackFrames": 62365,
+      "loopFrames": 0,
+      "peak": 0.28774625062942505,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_G4_f_RR1.wav",
+      "sourceSha256": "006bd7c4ae323a1b2076895ca74350a3cd7e2c82acfef3fcb1fb1b6f601c40dd",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "ff62a2ea1e791a9909e0f0255ce532ed6769531707b2630528dcf8a7d402119c"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 69,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-069-attack.wav",
+      "loop": "",
+      "attackFrames": 110914,
+      "loopFrames": 0,
+      "peak": 0.16189919412136078,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_A4_f_RR1.wav",
+      "sourceSha256": "bf68ed22022538e70f6b04098a03a224dc0acb7b35334bce3af0b3196bc24455",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "53fb2f4d1468ccdd2b384b8fe06a42d23b1cd2034ba1fbda7e5d0339d37ca5c9"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 72,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-072-attack.wav",
+      "loop": "",
+      "attackFrames": 85555,
+      "loopFrames": 0,
+      "peak": 0.7135493755340576,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_C5_f_RR1.wav",
+      "sourceSha256": "df52150f00c233e6d270d7c557d90e741ef856577571f3a875b2868a5047b6a0",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "b15a96042033053c0f9651c0e915682b5d1b4afe7f15233d52a62431930a8310"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 76,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-076-attack.wav",
+      "loop": "",
+      "attackFrames": 149499,
+      "loopFrames": 0,
+      "peak": 0.26464158296585083,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_E5_f_RR1.wav",
+      "sourceSha256": "5704be5d372702464b44fecf10669c8181001ffc9ad29f63397f3634405d2f07",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "2528b6d1665d514848625474bae07afa6ca2674ffb2d7a8a04574c972feadede"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 79,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-079-attack.wav",
+      "loop": "",
+      "attackFrames": 57286,
+      "loopFrames": 0,
+      "peak": 0.3507280647754669,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_G5_f_RR1.wav",
+      "sourceSha256": "855b7dfd084573bd84189a539ffd08ce05d701d7a2fcf7df7a87ce81e90af738",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "07de0298aee494871d66d54bde027e40c84570429b76123b81bc1892930b1156"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 81,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-081-attack.wav",
+      "loop": "",
+      "attackFrames": 89732,
+      "loopFrames": 0,
+      "peak": 0.3988839387893677,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_A5_f_RR1.wav",
+      "sourceSha256": "3eba1cba37e7bb60a879474b070a4d2bf0af03d65bee9f5f45d013c67fe0e5ae",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "a2cdfd80797ccf98f5718492f8305acee66f85fa8e3ecb2ee6aa91b3106e9644"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 88,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-088-attack.wav",
+      "loop": "",
+      "attackFrames": 60298,
+      "loopFrames": 0,
+      "peak": 0.07932478934526443,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_E6_f_RR1.wav",
+      "sourceSha256": "37a372a0a56301179b2dfc3e25ccf7b3b392617d512da57214ab8b85e66d264a",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "0a1834cd6113007e1e335ac865adbeb94c8ab4452790af3e68ea08d088343db0"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 93,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-093-attack.wav",
+      "loop": "",
+      "attackFrames": 43219,
+      "loopFrames": 0,
+      "peak": 0.15941546857357025,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_A6_f_RR1.wav",
+      "sourceSha256": "667b41d61ec54a033ff1f7024cff95ba6162f4d4bdb8b595740f306fd8588460",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "6a641cce8d07cde913841dc0444b298fbd9bfb0ed541eb0e0b9c96080f067db2"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 96,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-096-attack.wav",
+      "loop": "",
+      "attackFrames": 50851,
+      "loopFrames": 0,
+      "peak": 0.18857958912849426,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_C7_f.wav",
+      "sourceSha256": "fccd76254ab12434dd3e41958b8c9f6a5058102ed9b507e5a6e5df953dd04f02",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "0a2c5addb21bed38b38b5a0eb511ed38cd2e45dbb609a00f716fb06c127650f9"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 0,
+      "root": 55,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-055-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-055-loop.wav",
+      "attackFrames": 61440,
+      "loopFrames": 48000,
+      "peak": 0.10348905622959137,
+      "releaseMs": 700,
+      "source": "Strings/Violin Section/susVib/VlnEns_susVib_G2_v2.wav",
+      "sourceSha256": "c0b06a23f0245c042f0609dc0db704adc14bfc9ea8a34cb5c97d80096715a0e6",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 57600,
+        "endFrame": 109440,
+        "crossfadeFrames": 3840,
+        "score": 0.007815495275469181,
+        "loopBoundaryStep": 0.002393580973148346
+      },
+      "attackSha256": "9bb8c18add5075e87132a5d25d524a3067193ca82edaca08c74eeb4fbc30dcce",
+      "loopSha256": "9535df191c78799ffdc4806eb72f1cdf4b56b9cdc37a1bfa589a943d391230b4"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 0,
+      "root": 57,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-057-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-057-loop.wav",
+      "attackFrames": 80640,
+      "loopFrames": 81600,
+      "peak": 0.14475393295288086,
+      "releaseMs": 700,
+      "source": "Strings/Violin Section/susVib/VlnEns_susVib_A2_v2.wav",
+      "sourceSha256": "db6bad06c78577a105f6c2a5dc5c7ac0643c36e6904742411f0506dd9d6fa84b",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 76800,
+        "endFrame": 162240,
+        "crossfadeFrames": 3840,
+        "score": 0.017824001844801197,
+        "loopBoundaryStep": 0.0012706238776445389
+      },
+      "attackSha256": "57133248fd918b3b1e539b54042fad59dc7d93ad394c9dd38c88b349a094ad46",
+      "loopSha256": "cb5c236eecdbf2f18f93f505a826950ad40819b91325444d83cd7473392d6d83"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 0,
+      "root": 59,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-059-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-059-loop.wav",
+      "attackFrames": 61440,
+      "loopFrames": 62400,
+      "peak": 0.11646515876054764,
+      "releaseMs": 700,
+      "source": "Strings/Violin Section/susVib/VlnEns_susVib_B2_v2.wav",
+      "sourceSha256": "a822fd195e60881afac5e0801d8d494b782a8f6787a08f3c711f5e00290b3fb6",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 57600,
+        "endFrame": 123840,
+        "crossfadeFrames": 3840,
+        "score": 0.016633911998279686,
+        "loopBoundaryStep": 0.004024425521492958
+      },
+      "attackSha256": "ec04cc8cc0db00012296e799df11ad671a0d0655a8f4755944fdbc320f97ce02",
+      "loopSha256": "09f14db1dff284147b3e82bdf4731c4b1e28cb3a7b504eb570b996b3e108bf39"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 0,
+      "root": 62,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-062-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-062-loop.wav",
+      "attackFrames": 128640,
+      "loopFrames": 48000,
+      "peak": 0.11971302330493927,
+      "releaseMs": 700,
+      "source": "Strings/Violin Section/susVib/VlnEns_susVib_D3_v2.wav",
+      "sourceSha256": "77893dbf1ea1be8c40ad756d16b916298e6b1b0742495e9853e020375592357c",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 124800,
+        "endFrame": 176640,
+        "crossfadeFrames": 3840,
+        "score": 0.00992362022374113,
+        "loopBoundaryStep": 0.001591300591826439
+      },
+      "attackSha256": "b889291ec7e0637f2c4d9f62b963f9eeef1b1e023118b8b64ce68bd94221ead3",
+      "loopSha256": "8ebebac55d93135234e7b1768d9d54ce7c117dc6a01e410ad04e02447e7a59c7"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 0,
+      "root": 66,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-066-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-066-loop.wav",
+      "attackFrames": 128640,
+      "loopFrames": 48000,
+      "peak": 0.16908222436904907,
+      "releaseMs": 700,
+      "source": "Strings/Violin Section/susVib/VlnEns_susVib_F#3_v2.wav",
+      "sourceSha256": "d7bc6b4c259b9543de4fe66228ee107205b8f539c8d7c1de71f5781d45a14fc7",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 124800,
+        "endFrame": 176640,
+        "crossfadeFrames": 3840,
+        "score": 0.014025122214603879,
+        "loopBoundaryStep": 7.972121238708496e-06
+      },
+      "attackSha256": "477ab0a608f6fadb0ad5addd3f87f1d0eafda4a0c3e1a91aa0154ddc73301530",
+      "loopSha256": "9f5d0b89387f863e5a276ce327e975b0994b42d2a2adeabb08a544c9e106c594"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 0,
+      "root": 69,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-069-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-069-loop.wav",
+      "attackFrames": 85440,
+      "loopFrames": 81600,
+      "peak": 0.1541394591331482,
+      "releaseMs": 700,
+      "source": "Strings/Violin Section/susVib/VlnEns_susVib_A3_v2.wav",
+      "sourceSha256": "3fc4a9e22037643fce11e755da72c61c664893f83e637c24a7b5c2d3824ab986",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 81600,
+        "endFrame": 167040,
+        "crossfadeFrames": 3840,
+        "score": 0.015103328639983291,
+        "loopBoundaryStep": 0.00016163289546966553
+      },
+      "attackSha256": "f7a2e4b4e8974d45cc6d29ce51226d3772b794fe9c6bacdcc2409e5e30194b52",
+      "loopSha256": "4c11c524097d1fe031b7e5c74d2268b8aa8a0dcfb5ad44ff0bcfdf59ffcde297"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 0,
+      "root": 72,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-072-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-072-loop.wav",
+      "attackFrames": 104640,
+      "loopFrames": 81600,
+      "peak": 0.2433536946773529,
+      "releaseMs": 700,
+      "source": "Strings/Violin Section/susVib/VlnEns_susVib_C4_v2.wav",
+      "sourceSha256": "5857387b40c412f756ef281c1171247664432a4e5078c98142d595d15cd92ef9",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 100800,
+        "endFrame": 186240,
+        "crossfadeFrames": 3840,
+        "score": 0.017367057311539483,
+        "loopBoundaryStep": 0.003856837749481201
+      },
+      "attackSha256": "37f4c94efed70beefd8ac97217db27969c0a0bbb84b614c5d6017804dfe9f5b3",
+      "loopSha256": "0c513da0836494f9a7ed128eb4278597b372b3aa8af8f07162887859512ac56e"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 0,
+      "root": 76,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-076-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-076-loop.wav",
+      "attackFrames": 104640,
+      "loopFrames": 62400,
+      "peak": 0.1515933722257614,
+      "releaseMs": 700,
+      "source": "Strings/Violin Section/susVib/VlnEns_susVib_E4_v2.wav",
+      "sourceSha256": "030c09a631ebbc7304fc0b47bb5c346cd646e7451d9fdc531870f2534c60d9e9",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 100800,
+        "endFrame": 167040,
+        "crossfadeFrames": 3840,
+        "score": 0.013807970818754721,
+        "loopBoundaryStep": 0.001301618991419673
+      },
+      "attackSha256": "3a58fa6bf65e47801621fe36810e77c0785e91b043f751607cce639cf2ef7097",
+      "loopSha256": "e0315b4b9253627cbb83075daf917068d9edc7f60f8a16d56f7aff4373b09f6a"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 0,
+      "root": 79,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-079-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-079-loop.wav",
+      "attackFrames": 80640,
+      "loopFrames": 81600,
+      "peak": 0.21305470168590546,
+      "releaseMs": 700,
+      "source": "Strings/Violin Section/susVib/VlnEns_susVib_G4_v2.wav",
+      "sourceSha256": "a1d6d5a0397541692e2f88a0cd9820eabe90407784ee631aa3bfa74772637a65",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 76800,
+        "endFrame": 162240,
+        "crossfadeFrames": 3840,
+        "score": 0.020687263422479615,
+        "loopBoundaryStep": 0.002103760838508606
+      },
+      "attackSha256": "7dde652dfe04bde55e303104eb534f60cf0f1ca769b5ca6829ddbf2b31ef5c8f",
+      "loopSha256": "bcec7f4a6feb688567a2f931550bfaa1061ab2a63383548b74a99ddac8297fe4"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 0,
+      "root": 83,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-083-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-083-loop.wav",
+      "attackFrames": 71040,
+      "loopFrames": 81600,
+      "peak": 0.1364293098449707,
+      "releaseMs": 700,
+      "source": "Strings/Violin Section/susVib/VlnEns_susVib_B4_v2.wav",
+      "sourceSha256": "bdb85532f47e4ebd681f9617a415116e7e5aeb786dce2eeab5ab9b93c1b31644",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 67200,
+        "endFrame": 152640,
+        "crossfadeFrames": 3840,
+        "score": 0.01336440298481682,
+        "loopBoundaryStep": 1.8258579075336456e-05
+      },
+      "attackSha256": "11c5226c77a7242162df141c19a1a71c121b14891686b5b0078deaddf9009967",
+      "loopSha256": "ca5fcb2b4e699285ac4bd507a35b5a27d1d498f5529ae0d80864245a0cf52c06"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 0,
+      "root": 86,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-086-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-086-loop.wav",
+      "attackFrames": 99840,
+      "loopFrames": 48000,
+      "peak": 0.2236826866865158,
+      "releaseMs": 700,
+      "source": "Strings/Violin Section/susVib/VlnEns_susVib_D5_v2.wav",
+      "sourceSha256": "0c2ca9de723bed0a0968e32126b934f778cd678b367a29e7fde91004daf84daf",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 96000,
+        "endFrame": 147840,
+        "crossfadeFrames": 3840,
+        "score": 0.030676443991943688,
+        "loopBoundaryStep": 0.0071772076189517975
+      },
+      "attackSha256": "e5f85fe3f677ed5c9375e2c891b6e5c2991b1816f3c0ebafbe26be87801d3814",
+      "loopSha256": "5009439633a6fe8ca1b46be2bd2846fc296a27cdf44ef4b8583cc2023d76b00d"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 1,
+      "root": 55,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-1-055-attack.wav",
+      "loop": "",
+      "attackFrames": 118503,
+      "loopFrames": 0,
+      "peak": 0.06985445320606232,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Spic/VlnEns_Spic_G2_v2_rr1.wav",
+      "sourceSha256": "a6bee065f0a171d3fabc42b218e941f66916a6de53a55809da724eeefeae2653",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "a74031dbc4f8fc5889434de90fbc3790def8fbaf67ffc707084251e8ca6456d7"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 1,
+      "root": 57,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-1-057-attack.wav",
+      "loop": "",
+      "attackFrames": 94428,
+      "loopFrames": 0,
+      "peak": 0.22456371784210205,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Spic/VlnEns_Spic_A2_v2_rr1.wav",
+      "sourceSha256": "e90695e2a2a3d6ba9a043c8cfa9317fb6a9e6273f50e1fabdd40f55c4b137eba",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "5f462f5ef0a9b7a2e3e730d01d739940377beac2cb280a6b26020c826c3071ad"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 1,
+      "root": 59,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-1-059-attack.wav",
+      "loop": "",
+      "attackFrames": 43750,
+      "loopFrames": 0,
+      "peak": 0.3151184320449829,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Spic/VlnEns_Spic_B2_v2_rr1.wav",
+      "sourceSha256": "ee4aa779919171e33053b71c02691f026fd0b13c299da86f84c066e52ce3a4ec",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "041d9134e9c633a7accbc7e2531a874a43bc2f3b5a34a07ce4e89444e8c473de"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 1,
+      "root": 62,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-1-062-attack.wav",
+      "loop": "",
+      "attackFrames": 84845,
+      "loopFrames": 0,
+      "peak": 0.3005061149597168,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Spic/VlnEns_Spic_D3_v2_rr1.wav",
+      "sourceSha256": "36105c7bc208181a10b41a468aab1e8ca4f31a9eae43834dd90d8d533a48e650",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "62f6f08c42ab8d08191ecd413925fe4ada434e69833f971e0a7e63a51949b2f0"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 1,
+      "root": 66,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-1-066-attack.wav",
+      "loop": "",
+      "attackFrames": 45395,
+      "loopFrames": 0,
+      "peak": 0.22415569424629211,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Spic/VlnEns_Spic_F#3_v2_rr1.wav",
+      "sourceSha256": "b24b5f833660b73c9ea8beade5faa73989a7016916cf5f1bece93bdb4938b221",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "534d3435fa2fb7ed7b68d5192dd3614960a977f6c8fc79fe5dbac042d7348c2a"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 1,
+      "root": 69,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-1-069-attack.wav",
+      "loop": "",
+      "attackFrames": 57981,
+      "loopFrames": 0,
+      "peak": 0.187666118144989,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Spic/VlnEns_Spic_A3_v2_rr1.wav",
+      "sourceSha256": "ce5d025e7c2ac71e220a3f6487c5a2ce431a150e808c93276570f19536568a5e",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "71985a9feccd302cc015ec21cf0b30c7bca336d1959ec9f13b7f0120abfb4b5e"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 1,
+      "root": 72,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-1-072-attack.wav",
+      "loop": "",
+      "attackFrames": 45554,
+      "loopFrames": 0,
+      "peak": 0.2348320037126541,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Spic/VlnEns_Spic_C4_v2_rr1.wav",
+      "sourceSha256": "a14e9795677e0c418f1e18f7b640bc27b8cb3aef4cfef766e18caf38549ffe56",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "b9133730d253d62048a8899c6fe92047ee96519947ea3035cc5492d6a40268c9"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 1,
+      "root": 76,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-1-076-attack.wav",
+      "loop": "",
+      "attackFrames": 28917,
+      "loopFrames": 0,
+      "peak": 0.19313868880271912,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Spic/VlnEns_Spic_E4_v2_rr1.wav",
+      "sourceSha256": "db063e7e21abb2d3271d0e96068601fbb48a91f2f0bfde8dea773ce1a6bacfb0",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "e6cf8df51235b2bc675f78d6629c134f1bf7254ca5b8e0b1253f72772ddaf401"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 1,
+      "root": 79,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-1-079-attack.wav",
+      "loop": "",
+      "attackFrames": 44314,
+      "loopFrames": 0,
+      "peak": 0.2920038104057312,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Spic/VlnEns_Spic_G4_v2_rr1.wav",
+      "sourceSha256": "3345451be62b9bdfbbf6bb03f22f410484abb75585992336d530215fc4df7141",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "3aa1d6a29a55e3dd5652d17f34a2873fd8b939836231364a4178e9c8a92d2e35"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 1,
+      "root": 83,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-1-083-attack.wav",
+      "loop": "",
+      "attackFrames": 54390,
+      "loopFrames": 0,
+      "peak": 0.49328386783599854,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Spic/VlnEns_Spic_B4_v2_rr1.wav",
+      "sourceSha256": "d1495f4eaff7b3e4bd8d86b886dc81ccb52b113fb93630e8f68792ed452dc822",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "8b06cccefa540abdbfa0a3d63cab9c5a151b91bae6149c7f5565f041d943b4f3"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 1,
+      "root": 86,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-1-086-attack.wav",
+      "loop": "",
+      "attackFrames": 37195,
+      "loopFrames": 0,
+      "peak": 0.37085795402526855,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Spic/VlnEns_Spic_D5_v2_rr1.wav",
+      "sourceSha256": "959a93165a9271657b4bc97c75eded62deab37b03128f71f0f1f4c8903e50b84",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "9cc972f74c7e4ab87895c6600ea28e859638e114b7df52d8697a1ed4320598e7"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 2,
+      "root": 55,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-2-055-attack.wav",
+      "loop": "",
+      "attackFrames": 144753,
+      "loopFrames": 0,
+      "peak": 0.10383307188749313,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Pizz/VlnEns_Pizz_G2_v2_rr1.wav",
+      "sourceSha256": "8de544d9df9ced1fc296d8c4589d354112339802f722361f8625a604ccfd556b",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "04f256a16049160bd6f436eda1a64d33bb2a4e4c495329ec1a4b2278c5b7bbac"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 2,
+      "root": 57,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-2-057-attack.wav",
+      "loop": "",
+      "attackFrames": 50969,
+      "loopFrames": 0,
+      "peak": 0.147069051861763,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Pizz/VlnEns_Pizz_A2_v2_rr1.wav",
+      "sourceSha256": "75a9bbd0120e03affffe89dd711e5a088507917362e0a197019ff9eff8101340",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "a57bb9b20522db97e039202940604726a2e2dc37a7e9665b694bc822eba73b94"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 2,
+      "root": 59,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-2-059-attack.wav",
+      "loop": "",
+      "attackFrames": 49004,
+      "loopFrames": 0,
+      "peak": 0.13672950863838196,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Pizz/VlnEns_Pizz_B2_v2_rr1.wav",
+      "sourceSha256": "71aaf7c111d427e76d91a58efc4cf661880cae85ec91123f8f57d421fe36cd06",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "cdba51f0b760a7cf121c96747f98ba240ff2db10aab2dc93e4d7a2cf5069fae4"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 2,
+      "root": 62,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-2-062-attack.wav",
+      "loop": "",
+      "attackFrames": 106444,
+      "loopFrames": 0,
+      "peak": 0.15008608996868134,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Pizz/VlnEns_Pizz_D3_v2_rr1.wav",
+      "sourceSha256": "772b8e3bf0f0143cd9aa73dbf64607a41776c0f124c62ef3fecb835f3510ce6a",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "b5edf6bde1804ce9c99ad1e9446e49f4d9d60e2cd3eef103abfede456566da2b"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 2,
+      "root": 66,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-2-066-attack.wav",
+      "loop": "",
+      "attackFrames": 42727,
+      "loopFrames": 0,
+      "peak": 0.16566111147403717,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Pizz/VlnEns_Pizz_F#3_v2_rr1.wav",
+      "sourceSha256": "2c6093daad3f6f7a977ac9775660b57227429651d35d489d6f98e617067e8ea6",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "683616b374b6fc2a41a0185eef1ea25f1291bde56b4aff870afe1359beb40c52"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 2,
+      "root": 69,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-2-069-attack.wav",
+      "loop": "",
+      "attackFrames": 52780,
+      "loopFrames": 0,
+      "peak": 0.4112558662891388,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Pizz/VlnEns_Pizz_A3_v2_rr1.wav",
+      "sourceSha256": "631720219cbd7b11718b393bdacf04eb512ef5071f9e5d0d73d74b3f17179ec2",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "b9d41ff595c1fac0591178566a297150465ad983ab1b503193e388c306280338"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 2,
+      "root": 72,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-2-072-attack.wav",
+      "loop": "",
+      "attackFrames": 50217,
+      "loopFrames": 0,
+      "peak": 0.4649229049682617,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Pizz/VlnEns_Pizz_C4_v2_rr1.wav",
+      "sourceSha256": "909eb79fc2c9076909680fa3c2dabdbbd15870f674a883ddab33bbcd0dac965a",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "dfecd56951edfe94c390eb8779226d7f3d1ed835f7f8e3617b1213423d979999"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 2,
+      "root": 76,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-2-076-attack.wav",
+      "loop": "",
+      "attackFrames": 39918,
+      "loopFrames": 0,
+      "peak": 0.219309464097023,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Pizz/VlnEns_Pizz_E4_v2_rr1.wav",
+      "sourceSha256": "1e1dcef99c3961a601ed0c8336fbf4819fd432ab783445fe4f44fc488e598993",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "28b9d1d5624d1d00e4c884e39238438dc2314d9b01233682ee5e4e8f25f0171b"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 2,
+      "root": 79,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-2-079-attack.wav",
+      "loop": "",
+      "attackFrames": 50084,
+      "loopFrames": 0,
+      "peak": 0.3850353956222534,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Pizz/VlnEns_Pizz_G4_v2_rr1.wav",
+      "sourceSha256": "46d42acdbfe83337f6c6775e03fa99ac99275fd357bdd2d4fa73702c4c7be542",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "bf7d2bb6836b34d47a00456224beb517f09a47c8e61326494ed33305fb84416e"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 2,
+      "root": 83,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-2-083-attack.wav",
+      "loop": "",
+      "attackFrames": 28930,
+      "loopFrames": 0,
+      "peak": 0.4396512508392334,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Pizz/VlnEns_Pizz_B4_v2_rr1.wav",
+      "sourceSha256": "ec6f6320f9403a5e0bbb1d0c534abe667a6a2093654343a389b26cf083d513d2",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "abef65647d8cd1c891107c3ff337ad4fcd8e9730e210e461db469160ebf74510"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 2,
+      "root": 86,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-2-086-attack.wav",
+      "loop": "",
+      "attackFrames": 30814,
+      "loopFrames": 0,
+      "peak": 0.3368298411369324,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Pizz/VlnEns_Pizz_D5_v2_rr1.wav",
+      "sourceSha256": "50445c5f94fe25272ed98dd03d5af1c34b555f24aa2a7803653aa3b51ed929fc",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "b742913f89fe61d6ba2d36d3d5e1e98c8da74c981e8d2031fca7672350a1c19b"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 48,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-048-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-048-loop.wav",
+      "attackFrames": 80640,
+      "loopFrames": 100800,
+      "peak": 0.26768988370895386,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_C2_v2_1.wav",
+      "sourceSha256": "09db4ed2c8eda02d1f6a27258a2292b56e65e94ecc0337265bbbac5d9978dc92",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 76800,
+        "endFrame": 181440,
+        "crossfadeFrames": 3840,
+        "score": 0.021357672287716487,
+        "loopBoundaryStep": 0.005950558930635452
+      },
+      "attackSha256": "c484274a0f4c82924b7e9b97891aeb2ad02a6ffceff39601cd158dd7d37f2f65",
+      "loopSha256": "3a214c92fe5c8a439487a4fd423ff3c764c1f153ef65297f5bf803b7850c185d"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 50,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-050-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-050-loop.wav",
+      "attackFrames": 104640,
+      "loopFrames": 62400,
+      "peak": 0.36059778928756714,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_D2_v2_1.wav",
+      "sourceSha256": "d3bf192cc03925a4da5ee626763287f85aad1dc498578abf612a97eb548736eb",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 100800,
+        "endFrame": 167040,
+        "crossfadeFrames": 3840,
+        "score": 0.028131541987690377,
+        "loopBoundaryStep": 0.010686507448554039
+      },
+      "attackSha256": "3051dc996364e36e0ba593a4c26857452d3a6310494a16cfe848a018d2a0bfe6",
+      "loopSha256": "8283889903a9b745ff36e9e3b6593b64e07422e96e50d4a959c315d6cdcdb5de"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 52,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-052-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-052-loop.wav",
+      "attackFrames": 80640,
+      "loopFrames": 81600,
+      "peak": 0.395097553730011,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_E2_v2_1.wav",
+      "sourceSha256": "bb31bed6936b5c855fceb94d829e2d3a0492f9af4ad7a2cee57e783719710ceb",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 76800,
+        "endFrame": 162240,
+        "crossfadeFrames": 3840,
+        "score": 0.03452260345177751,
+        "loopBoundaryStep": 0.02375972270965576
+      },
+      "attackSha256": "6b0eaa0a1fdb897bf5115eb234ec1e292064bcda286ebb5b06ce0caab5107628",
+      "loopSha256": "33c1c7a82681e5591ab46b681c12a170f7923b0ace12bbc00847fe746fed4b11"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 55,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-055-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-055-loop.wav",
+      "attackFrames": 66240,
+      "loopFrames": 48000,
+      "peak": 0.4541138708591461,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_G2_v2_1.wav",
+      "sourceSha256": "e3552ebd2d1ac5d089cd2424d31ea88be8d887643311cb23abf5b416838ce2ba",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 62400,
+        "endFrame": 114240,
+        "crossfadeFrames": 3840,
+        "score": 0.02512179383878463,
+        "loopBoundaryStep": 0.008860722184181213
+      },
+      "attackSha256": "536d4095c2d9e1d41690f7d360457ae2eeff4d074bbad4208980bee292573085",
+      "loopSha256": "eec5c8c81076cfe71717f47de51ee00c0d85e4ee949973d5f55fbedb16bf4bf6"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 59,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-059-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-059-loop.wav",
+      "attackFrames": 80640,
+      "loopFrames": 81600,
+      "peak": 0.47394922375679016,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_B2_v2_1.wav",
+      "sourceSha256": "edc77038a83f47cf49296c0009fdac23cb5ade3133a2beabd0d2d1f591ccf3cb",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 76800,
+        "endFrame": 162240,
+        "crossfadeFrames": 3840,
+        "score": 0.03406341762406868,
+        "loopBoundaryStep": 0.012808408588171005
+      },
+      "attackSha256": "6b78ff1a716d40c9cb77a913be1e4c5c6bf150c79db046fec8c8dc7008e892a6",
+      "loopSha256": "9d1efd832967627310e6eb4b4293b6fee3bb95dab81e550a7c67fde1d96f0d7b"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 62,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-062-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-062-loop.wav",
+      "attackFrames": 85440,
+      "loopFrames": 81600,
+      "peak": 0.4024776816368103,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_D3_v2_1.wav",
+      "sourceSha256": "f941028c5d5e854b4391669056f0f639799f80ac7c8da3939c7788b1a394d16c",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 81600,
+        "endFrame": 167040,
+        "crossfadeFrames": 3840,
+        "score": 0.020267393676674,
+        "loopBoundaryStep": 0.0034934133291244507
+      },
+      "attackSha256": "2a911efd1aff0d68fb6d9016ac777d68d065e64cd7586046d94a5af24421bff4",
+      "loopSha256": "a66c837e3648b569ecc3482846acaa6d1ca4e81f3f42c8fdbfc63f708e331ecd"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 65,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-065-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-065-loop.wav",
+      "attackFrames": 119040,
+      "loopFrames": 48000,
+      "peak": 0.3408887982368469,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_F3_v2_1.wav",
+      "sourceSha256": "d281171e60b852451deecce57a6f5e9b623eea9632916336324c52c4ada6c750",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 115200,
+        "endFrame": 167040,
+        "crossfadeFrames": 3840,
+        "score": 0.02747170410531436,
+        "loopBoundaryStep": 0.025213386863470078
+      },
+      "attackSha256": "00eade8f690da3f563e31a35d8fda254affd0f7849fd4d8dfc7afcda9d8b9674",
+      "loopSha256": "e836dc6ae1a05814e1f98297592c5b04fd4885abd1b30e22b0228906ae8e0e16"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 69,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-069-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-069-loop.wav",
+      "attackFrames": 80640,
+      "loopFrames": 100800,
+      "peak": 0.671592116355896,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_A3_v2_1.wav",
+      "sourceSha256": "35984c7bfffe781d8e33bee045f66427a827794ff5c53c3d3bb82baeee3272dd",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 76800,
+        "endFrame": 181440,
+        "crossfadeFrames": 3840,
+        "score": 0.032196451294852324,
+        "loopBoundaryStep": 0.012485317885875702
+      },
+      "attackSha256": "0763c33c34163fb325162f3aadab58f68cf24f9185a6c8cad68827c58416ed88",
+      "loopSha256": "94850397f682a087d193bcdd8c83d410069f89169e4a5e78a11b086e9e3e3695"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 72,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-072-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-072-loop.wav",
+      "attackFrames": 75840,
+      "loopFrames": 48000,
+      "peak": 0.4282079339027405,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_C4_v2_1.wav",
+      "sourceSha256": "81e1ef9109a1434974092c0165ffee44918b2553fd4afeeee42b91b8007ad263",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 72000,
+        "endFrame": 123840,
+        "crossfadeFrames": 3840,
+        "score": 0.035694582168124,
+        "loopBoundaryStep": 0.04222159832715988
+      },
+      "attackSha256": "0e60d692b0d1b9579510c0fd7f0b630e31daa2c652024f069c184488db28a874",
+      "loopSha256": "8daa7cd9d29b2b06baec8ce220755f73b27e4bb426eb6eb36d30727f30d66e42"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 76,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-076-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-076-loop.wav",
+      "attackFrames": 75840,
+      "loopFrames": 100800,
+      "peak": 0.42292094230651855,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_E4_v2_1.wav",
+      "sourceSha256": "29899afd4513761c3f1e3a4cc56f5c11cdb4de2b204f9f1467946327362e4bd7",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 72000,
+        "endFrame": 176640,
+        "crossfadeFrames": 3840,
+        "score": 0.0371928036917342,
+        "loopBoundaryStep": 0.011398281902074814
+      },
+      "attackSha256": "6201099ec0262e37daf524555ef95f1df9f91ad9e558cb96565046ee6ff6531b",
+      "loopSha256": "2fd2d8698c841e3ee138e5c917aa4acd6ee73b21e44c81aca50711c247659187"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 79,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-079-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-079-loop.wav",
+      "attackFrames": 85440,
+      "loopFrames": 48000,
+      "peak": 0.39596641063690186,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_G4_v2_1.wav",
+      "sourceSha256": "b09b8338945b814b9ce6dd8980a49323d10e55f89f1c4dcf6d58b04cd672d99c",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 81600,
+        "endFrame": 133440,
+        "crossfadeFrames": 3840,
+        "score": 0.0307365806040178,
+        "loopBoundaryStep": 0.02754935622215271
+      },
+      "attackSha256": "9769dcc371f64b84829901a13cdf77499b233adf53d0c3871aadb46248344cd1",
+      "loopSha256": "09cea2f2b78ccf3d4a80df37115db40881e2dc1e249fdf790c8caeee666a6483"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 83,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-083-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-083-loop.wav",
+      "attackFrames": 95040,
+      "loopFrames": 62400,
+      "peak": 0.29905927181243896,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_B4_v2_1.wav",
+      "sourceSha256": "cac7c5f73d9f7974156ef52c7b5202428271d8fcf9ceb11936e694c199be2f31",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 91200,
+        "endFrame": 157440,
+        "crossfadeFrames": 3840,
+        "score": 0.023900224610201075,
+        "loopBoundaryStep": 0.015728406608104706
+      },
+      "attackSha256": "002406ac432d0aff10c9c2d9ee31bb1fdacde11ee885382efb1b64c8e828e2d3",
+      "loopSha256": "5bcd7b99fe8f4d94f43c2c33694ebef49370cd5e3918f5ae5f6c026d0007e92c"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 86,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-086-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-086-loop.wav",
+      "attackFrames": 109440,
+      "loopFrames": 62400,
+      "peak": 0.33579838275909424,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_D5_v2_1.wav",
+      "sourceSha256": "d3c5d05da8f90533aa7587649f18f4e68147aa7abc7a5559d8741089bea32239",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 105600,
+        "endFrame": 171840,
+        "crossfadeFrames": 3840,
+        "score": 0.02708652939747395,
+        "loopBoundaryStep": 0.020371392369270325
+      },
+      "attackSha256": "b9583fd59b4ff100e72ea869b193446e8bccda38fd3fb1a6650d0606785493cc",
+      "loopSha256": "4358ccb9ee3a6cc86fc137b24c066f395bff954983b9e30d5c1dae2bd99c2728"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 1,
+      "root": 48,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-1-048-attack.wav",
+      "loop": "",
+      "attackFrames": 135378,
+      "loopFrames": 0,
+      "peak": 0.3417344391345978,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/spic/Violas_spic_C2_v2_rr1.wav",
+      "sourceSha256": "ca9f0a63b8ddeabd604ab9a572ea8fd87b35b27d5a940d9b6a7dfcde2092dd79",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "483303fb3848654a135fc8c147dc1322b3ae4ab4f3ad8090e2f5fc91ebda995d"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 1,
+      "root": 52,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-1-052-attack.wav",
+      "loop": "",
+      "attackFrames": 73906,
+      "loopFrames": 0,
+      "peak": 0.1512688398361206,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/spic/Violas_spic_E2_v2_rr1.wav",
+      "sourceSha256": "bb1336173a9640ffc6cc18ca4a18b7eeeb8d9128978e3ab337a863ac35a04d3b",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "7530bdf34295645c7ebc9872503c6116c8a40ff7757de3509bf806ef30231b47"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 1,
+      "root": 55,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-1-055-attack.wav",
+      "loop": "",
+      "attackFrames": 57393,
+      "loopFrames": 0,
+      "peak": 0.21167317032814026,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/spic/Violas_spic_G2_v2_rr1.wav",
+      "sourceSha256": "ebd5f73e697f3d68e263429c9ca62337bb20982316b959487c4f4c9efa44a5cf",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "afe4d1a13f86a76b10421b890c0acdee017173e2c8ea3efbb00d003b993a7398"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 1,
+      "root": 59,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-1-059-attack.wav",
+      "loop": "",
+      "attackFrames": 103772,
+      "loopFrames": 0,
+      "peak": 0.24441775679588318,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/spic/Violas_spic_B2_v2_rr1.wav",
+      "sourceSha256": "1d9b8a9047d11b06750c24bb783c8925ac300135235a94ce64c6c78934eb712f",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "6b341df5674b3c598a0e0e7b44d76220522c75a0f08c2fa7032993b0d9fe83f4"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 1,
+      "root": 62,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-1-062-attack.wav",
+      "loop": "",
+      "attackFrames": 62360,
+      "loopFrames": 0,
+      "peak": 0.2309962809085846,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/spic/Violas_spic_D3_v2_rr1.wav",
+      "sourceSha256": "7eab07c87ffc99ffed8ce111ff297e6bde95350136cf93db706d4f658c96570c",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "2856c58493ac280e36ace712526df2c81409e43205744cfda12bc0466babeb4a"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 1,
+      "root": 65,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-1-065-attack.wav",
+      "loop": "",
+      "attackFrames": 42736,
+      "loopFrames": 0,
+      "peak": 0.37214261293411255,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/spic/Violas_spic_F3_v2_rr1.wav",
+      "sourceSha256": "96f7e921c5c929d225d63a3615afa2aacd5c2901fc66ec79b26ddd56d832efb9",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "71d0749bafad8c0cf95e08d541a5f2a90e5885e55fdb01d0bf8f0b0f8c07c5b1"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 1,
+      "root": 69,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-1-069-attack.wav",
+      "loop": "",
+      "attackFrames": 57937,
+      "loopFrames": 0,
+      "peak": 0.3306936025619507,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/spic/Violas_spic_A3_v2_rr1.wav",
+      "sourceSha256": "f6baadc442ac3ae31076ff746ed2415f347e7260600ef05069ce7894cb147884",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "3c743be811def31c9e6c80bfd7e37a4fde515e86cac007f24161ef35daef35a8"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 1,
+      "root": 72,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-1-072-attack.wav",
+      "loop": "",
+      "attackFrames": 56645,
+      "loopFrames": 0,
+      "peak": 0.3110642433166504,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/spic/Violas_spic_C4_v2_rr1.wav",
+      "sourceSha256": "3b4c0644c38ec7d13e03e3de88bce2dad899eb3c94a6251ec2acc8e6531687a5",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "b8a9cd7a9381b323014237a451d5d5fea7aec33560a879ca5d774332e5bd8d96"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 1,
+      "root": 76,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-1-076-attack.wav",
+      "loop": "",
+      "attackFrames": 58937,
+      "loopFrames": 0,
+      "peak": 0.3437906503677368,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/spic/Violas_spic_E4_v2_rr1.wav",
+      "sourceSha256": "d66d31214f831ea6649d6b3584459a2ba855ed8eed8adeecbec7e7db99e882a0",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "cb39b3ccfaad75aa32eb5fcfca8f5efe9d5247a884cc7bddbc5f612caa85eb32"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 1,
+      "root": 79,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-1-079-attack.wav",
+      "loop": "",
+      "attackFrames": 37124,
+      "loopFrames": 0,
+      "peak": 0.3384004831314087,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/spic/Violas_spic_G4_v2_rr1.wav",
+      "sourceSha256": "67a6c39d014e1f630159a59e515d4c3552826114e64b1fc12e36f79cc87a5118",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "3044055aa1ac998eab1249491d0a8a7865d2778bfcd8e6b570dfdc89c58a3d8b"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 1,
+      "root": 83,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-1-083-attack.wav",
+      "loop": "",
+      "attackFrames": 52624,
+      "loopFrames": 0,
+      "peak": 0.2868524193763733,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/spic/Violas_spic_B4_v2_rr1.wav",
+      "sourceSha256": "a633475a3e6d11d81cf80e8d9e3a0f9d80239a808ea5dc9c0e09c421df70fbda",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "71bd9efb9e8037b487cea267ff7c1a484f4a9e63e411ecad6768677ed955d09e"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 1,
+      "root": 86,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-1-086-attack.wav",
+      "loop": "",
+      "attackFrames": 30396,
+      "loopFrames": 0,
+      "peak": 0.45980167388916016,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/spic/Violas_spic_D5_v2_rr1.wav",
+      "sourceSha256": "b4dfbd83b650796046d5b0f05e01ef1ccc564bd9f01523997fb7965de2c697f0",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "0a0c8cb0228a0805b75f8cc8f439dc6552d8835a34ba4b6948c35f728db55655"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 2,
+      "root": 48,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-2-048-attack.wav",
+      "loop": "",
+      "attackFrames": 114605,
+      "loopFrames": 0,
+      "peak": 0.2406855821609497,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/pizz/ViolaEns_pizz_C2_v2_rr1.wav",
+      "sourceSha256": "429885f184be27c2cd73859c38ff215330b2774a2b069ad592e3cf36a4344245",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "fe49d9da40a94a9662eb1753173f0f0528ded7bbad61c47f854b945d7c48bee7"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 2,
+      "root": 52,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-2-052-attack.wav",
+      "loop": "",
+      "attackFrames": 47975,
+      "loopFrames": 0,
+      "peak": 0.1834850013256073,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/pizz/ViolaEns_pizz_E2_v2_rr1.wav",
+      "sourceSha256": "790ed29cf4f16ca6c5dad815db0aca303bda30d545eb2fd64f48525af821dd23",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "20bc477b38f4f7b5bc071924bcf6cf0d7827f16e9194bf17c7ebed5e4e668923"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 2,
+      "root": 55,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-2-055-attack.wav",
+      "loop": "",
+      "attackFrames": 141552,
+      "loopFrames": 0,
+      "peak": 0.31329476833343506,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/pizz/ViolaEns_pizz_G2_v2_rr1.wav",
+      "sourceSha256": "bca57d39f5bd58fd9399ef3933f6a556b8ee48bb06d4b68bd361ebd6db12998a",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "1509f939ba6c0f8bf7c3a0570c967ec339881d8abfd2f81301754334e0475df2"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 2,
+      "root": 59,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-2-059-attack.wav",
+      "loop": "",
+      "attackFrames": 120389,
+      "loopFrames": 0,
+      "peak": 0.44759559631347656,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/pizz/ViolaEns_pizz_B2_v2_rr1.wav",
+      "sourceSha256": "5d4d547b983ddef69962a6b26e7d99fdc6850335b32ecac110a2af5ca74afd47",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "b307de11135c4a2f5d0b4f1464581514cf45b5993b92ee0ba8ffd75830d654c2"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 2,
+      "root": 62,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-2-062-attack.wav",
+      "loop": "",
+      "attackFrames": 132187,
+      "loopFrames": 0,
+      "peak": 0.5245639085769653,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/pizz/ViolaEns_pizz_D3_v2_rr1.wav",
+      "sourceSha256": "6ca64317cb7708942ac6375a3fbb0e6152a92d6c70206bfaeea8abd7e50992ea",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "44ebbb1cadc8f5d8bac30a4724b9c90cb1f2c18e8150023a1ad9d1602a32156c"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 2,
+      "root": 65,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-2-065-attack.wav",
+      "loop": "",
+      "attackFrames": 51903,
+      "loopFrames": 0,
+      "peak": 0.30731773376464844,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/pizz/ViolaEns_pizz_F3_v2_rr1.wav",
+      "sourceSha256": "fe2602711f7d9773e497e0d2fbf82c33da867fc77c2e570a0d2ed09a49ab8b5f",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "b78fed0b1bd53f675e6cd83bb3ec5a653ef78dd1d9cfd26518721556bf602a49"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 2,
+      "root": 69,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-2-069-attack.wav",
+      "loop": "",
+      "attackFrames": 46132,
+      "loopFrames": 0,
+      "peak": 0.3521047830581665,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/pizz/ViolaEns_pizz_A3_v2_rr1.wav",
+      "sourceSha256": "146807f0308ced113c5c568a96d646267702d79e2d250e299da3af5f41f471ca",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "621aa1dd48be7b201b93b1d6fcd1eb6e5f47b0d79bb074de7fc4cfafef1218da"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 2,
+      "root": 72,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-2-072-attack.wav",
+      "loop": "",
+      "attackFrames": 40922,
+      "loopFrames": 0,
+      "peak": 0.3949127197265625,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/pizz/ViolaEns_pizz_C4_v2_rr1.wav",
+      "sourceSha256": "ebb1b1a698604b3e95964f30b50eedba4831bf35cd5440e4d87f4e65f6d7c391",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "ecae80294a740a73935041f01f6497cb13d38c9dce03b51bf590cb4cb9946287"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 2,
+      "root": 76,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-2-076-attack.wav",
+      "loop": "",
+      "attackFrames": 55342,
+      "loopFrames": 0,
+      "peak": 0.10742051899433136,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/pizz/ViolaEns_pizz_E4_v2_rr1.wav",
+      "sourceSha256": "860cead1a1fe5d4119fad6a868d7d8531f5ae245c514172dbd3388b75fd42ece",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "ca449ad9ca153858875abd9ac106dbade2addf3fd83cdc615f75682353967c10"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 2,
+      "root": 79,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-2-079-attack.wav",
+      "loop": "",
+      "attackFrames": 51352,
+      "loopFrames": 0,
+      "peak": 0.4991018772125244,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/pizz/ViolaEns_pizz_G4_v2_rr1.wav",
+      "sourceSha256": "93605065f172f147da8d932e3220563229520a5be1c5cd1b4f5527bed3b3e25b",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "ea0eae96dde909ca70e1c1076d0880cd3ecf828fd1d5b5f529fbbb058aad8af2"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 2,
+      "root": 83,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-2-083-attack.wav",
+      "loop": "",
+      "attackFrames": 24012,
+      "loopFrames": 0,
+      "peak": 0.3203960061073303,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/pizz/ViolaEns_pizz_B4_v2_rr1.wav",
+      "sourceSha256": "8c18fa998cba0600086bf9e47170db92333fe7f5edaf52109796e6acda179b84",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "b6d1498669f544260e330f153b3480dba137b39b27aab202ca322f574736e068"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 2,
+      "root": 86,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-2-086-attack.wav",
+      "loop": "",
+      "attackFrames": 19218,
+      "loopFrames": 0,
+      "peak": 0.25235605239868164,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/pizz/ViolaEns_pizz_D5_v1_rr1.wav",
+      "sourceSha256": "5b129fe18cc33a3fa9a1999d3a7461975179356c3d3345fa66ebb3815e3ea4dc",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "f29945cc9b4e6fbbc69fe163fade2c97dc03d4820e63e977688c1c4e354aa48c"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 36,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-036-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-036-loop.wav",
+      "attackFrames": 109440,
+      "loopFrames": 100800,
+      "peak": 0.7791622877120972,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_C1_v3_1.wav",
+      "sourceSha256": "19195ab85ab71626bd11e7100febdaeeba1c237ff5887b934fd0ffd8dfad82cb",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 105600,
+        "endFrame": 210240,
+        "crossfadeFrames": 3840,
+        "score": 0.04291714363504242,
+        "loopBoundaryStep": 0.026273280382156372
+      },
+      "attackSha256": "bb55640bcb8a45950a17c6960c57fc27a027b35e529308aeb2f6c2829502ddf0",
+      "loopSha256": "3dea3a6a29b643dec4681ca7d562f4ef599447bcb76e0437e24c659a960a29cd"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 40,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-040-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-040-loop.wav",
+      "attackFrames": 80640,
+      "loopFrames": 48000,
+      "peak": 0.6031562685966492,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_E1_v3_1.wav",
+      "sourceSha256": "ee190b95be4f2416b9f41d248d255a4d7067b722f9b21482b30bc9872a9bb0d1",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 76800,
+        "endFrame": 128640,
+        "crossfadeFrames": 3840,
+        "score": 0.03564749602509487,
+        "loopBoundaryStep": 0.006955914199352264
+      },
+      "attackSha256": "753605bf5e156231acced2f360207b24901fb1977386031ba23e74065143d5bc",
+      "loopSha256": "a76c60c04115ab8d5a86896786b0398763b301f797ea99b31c0446480cd6338f"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 43,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-043-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-043-loop.wav",
+      "attackFrames": 95040,
+      "loopFrames": 48000,
+      "peak": 0.6467125415802002,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_G1_v3_1.wav",
+      "sourceSha256": "e4c61d4ab855ec20ddb69ff608a1c066ff8a779ddd08d1dfe1d534d3a4563ad0",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 91200,
+        "endFrame": 143040,
+        "crossfadeFrames": 3840,
+        "score": 0.051598445981367876,
+        "loopBoundaryStep": 0.0005161985754966736
+      },
+      "attackSha256": "777ae649d42cb6e9820ea55b2820cda09fcb9cab0c2828f214366eade9b4e212",
+      "loopSha256": "2c85c95d34f8b92bd0ca4cb0afc2198d55b965189c811295860e705ab400d744"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 47,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-047-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-047-loop.wav",
+      "attackFrames": 114240,
+      "loopFrames": 100800,
+      "peak": 0.6764118671417236,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_B1_v3_1.wav",
+      "sourceSha256": "8331a0e13f41243efab111f9b5e9185524c27ee48631269acecafc954ab7eaa8",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 110400,
+        "endFrame": 215040,
+        "crossfadeFrames": 3840,
+        "score": 0.038679591421606964,
+        "loopBoundaryStep": 0.005999267101287842
+      },
+      "attackSha256": "b25d62a8cc51c5d106ca66b524b8fa1f3b29794e7cc61eb414a9f06ccea45be1",
+      "loopSha256": "131a16e52222b68167a0d28fe3dd47bafd95f47ec4ddb8ae402329af8b644d30"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 50,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-050-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-050-loop.wav",
+      "attackFrames": 95040,
+      "loopFrames": 100800,
+      "peak": 0.7090965509414673,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_D2_v3_1.wav",
+      "sourceSha256": "fc946615cd6550570c8f05d61c0d59b9079bf9daba8bf25be7943487fea5a7ae",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 91200,
+        "endFrame": 195840,
+        "crossfadeFrames": 3840,
+        "score": 0.024761981140948037,
+        "loopBoundaryStep": 0.0028494596481323242
+      },
+      "attackSha256": "f39441729ce8a3c370985bc3d36a108a5cb3f1b6cf163dd3dd4426ac5f94c21d",
+      "loopSha256": "85c05e6ff2d2a4493eee73a8966264a88b47477529988354e73e583fa225dbf2"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 53,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-053-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-053-loop.wav",
+      "attackFrames": 61440,
+      "loopFrames": 100800,
+      "peak": 0.5152075290679932,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_F2_v3_1.wav",
+      "sourceSha256": "d965197faf2e6ab8675f1d65505e5ba934a5ab769412d314bad94133e18f24d0",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 57600,
+        "endFrame": 162240,
+        "crossfadeFrames": 3840,
+        "score": 0.03411964316906743,
+        "loopBoundaryStep": 0.001471109688282013
+      },
+      "attackSha256": "3b6e081a8c22feb846a04e00da4053cff01a678340f1a16a269df823a422e46c",
+      "loopSha256": "9c4244b698b85a1975a2682bd5a7b688568170237be6156150125a1005dde781"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 57,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-057-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-057-loop.wav",
+      "attackFrames": 133440,
+      "loopFrames": 48000,
+      "peak": 0.6039866209030151,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_A2_v3_1.wav",
+      "sourceSha256": "b7f226f19b9616abe5fa4a27ef50116667e19eb0127f30eacfa6d1a83e9149f0",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 129600,
+        "endFrame": 181440,
+        "crossfadeFrames": 3840,
+        "score": 0.021285387375518928,
+        "loopBoundaryStep": 0.008419901132583618
+      },
+      "attackSha256": "604c6ee0c8c6140f6664d692e68eafe16da27e2c135e86047727896dad9b5dad",
+      "loopSha256": "245e688166a3dcab9d3e3c6a5ff669264b96fa0efb8a7949fc38cdb537980515"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 60,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-060-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-060-loop.wav",
+      "attackFrames": 114240,
+      "loopFrames": 62400,
+      "peak": 0.5807449221611023,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_C3_v3_1.wav",
+      "sourceSha256": "51e884d54eea3bf4ba7ee35289a09f15ddb6a52cd849248d01bf18477ccbd07b",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 110400,
+        "endFrame": 176640,
+        "crossfadeFrames": 3840,
+        "score": 0.04135623111799711,
+        "loopBoundaryStep": 0.029219239950180054
+      },
+      "attackSha256": "3155107daa496f36e5fa4cad8dbb3d2104582d29dc17cdfb87b172f91c6e4f67",
+      "loopSha256": "c93c140877ab2710ba2c3679dc9b354de16a4f4010accf4fe3cd91795c006b03"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 64,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-064-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-064-loop.wav",
+      "attackFrames": 66240,
+      "loopFrames": 100800,
+      "peak": 0.621092677116394,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_E3_v3_1.wav",
+      "sourceSha256": "24a7ffdc23087026c4ef2d421441253c71490df9cf0757e93ffb14b4e61481ef",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 62400,
+        "endFrame": 167040,
+        "crossfadeFrames": 3840,
+        "score": 0.03533988882494683,
+        "loopBoundaryStep": 0.033426716923713684
+      },
+      "attackSha256": "d4e4ac0cf4486deb57afa2b98cd53910a0148038c14844c0c2998aef1446e1a0",
+      "loopSha256": "2854d77e5de449bdacd0358396a02e07c485131053991e2c55e086f5aeeddeef"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 67,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-067-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-067-loop.wav",
+      "attackFrames": 99840,
+      "loopFrames": 81600,
+      "peak": 0.5270538330078125,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_G3_v3_1.wav",
+      "sourceSha256": "17df597c259a849870aa25e9fbfa6093371851f83ba7b9deb9cb9e1ec11463a7",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 96000,
+        "endFrame": 181440,
+        "crossfadeFrames": 3840,
+        "score": 0.0318061385881368,
+        "loopBoundaryStep": 0.010446999222040176
+      },
+      "attackSha256": "7ef37f565c395bbc2c2c415e8a992b87e10b4888dc41c55ef9289fd0abece161",
+      "loopSha256": "76333bcc4201f393ae7fbdaa2dde2eb4a9d02f499fd6f74310d92c9eaab21b6f"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 71,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-071-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-071-loop.wav",
+      "attackFrames": 80640,
+      "loopFrames": 62400,
+      "peak": 0.35901641845703125,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_B3_v3_1.wav",
+      "sourceSha256": "1c8b571516ac503df871bbea74756dfc3813b4bc10a76921d231afb0175cdbf1",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 76800,
+        "endFrame": 143040,
+        "crossfadeFrames": 3840,
+        "score": 0.03080607124347045,
+        "loopBoundaryStep": 0.019740663468837738
+      },
+      "attackSha256": "9f7d71a370b66f6e4b1410b07b74cd4dc4bd8b15acc82857c809cd7425ef94f5",
+      "loopSha256": "3713d8823a1dc119deed4f900f082c5e8b6b946d67af90b7804afaddab53a561"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 74,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-074-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-074-loop.wav",
+      "attackFrames": 104640,
+      "loopFrames": 81600,
+      "peak": 0.3679542541503906,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_D4_v3_1.wav",
+      "sourceSha256": "2ea7f580738dbcf143b9c9f72703071aa7a8f6bfa33cdd2c2e5da961df1805bb",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 100800,
+        "endFrame": 186240,
+        "crossfadeFrames": 3840,
+        "score": 0.031070926851308463,
+        "loopBoundaryStep": 0.0020929574966430664
+      },
+      "attackSha256": "dd31b58e3f4b82ead6ad1bc86cb8aef3535bf63089814e7ba4134234c381599b",
+      "loopSha256": "b6c1d42bc9cc1b1883d7f74348feb70272697e6d681904ddb74f1ca0816ae4b0"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 77,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-077-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-077-loop.wav",
+      "attackFrames": 85440,
+      "loopFrames": 48000,
+      "peak": 0.3463079333305359,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_F4_v3_1.wav",
+      "sourceSha256": "24ea4a0f892cb60c4a52d6a5b1ef8281e4e9a9f78b5f938e078da7cbbfd5ba19",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 81600,
+        "endFrame": 133440,
+        "crossfadeFrames": 3840,
+        "score": 0.024601500554065417,
+        "loopBoundaryStep": 0.0020376015454530716
+      },
+      "attackSha256": "ebe9c80cd15bdc91b0ee6436b86da175309295b375fec260a7ffdab459a3c3cd",
+      "loopSha256": "5c79d1b11f2d78261070b72b6d89b5cf1f143112b6dc28ea2e1b7f847736bddb"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 36,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-036-attack.wav",
+      "loop": "",
+      "attackFrames": 154907,
+      "loopFrames": 0,
+      "peak": 0.44084781408309937,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_C1_v2_RR1.wav",
+      "sourceSha256": "92de035cdbfab6e41f94115b2c23716a9e93554a4c23c1cc4b946f7492d9c927",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "d664d2f6f3da3e577ecfcd14ae519b00d1f6a0907ae33f4a1bcf59a894d6889f"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 40,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-040-attack.wav",
+      "loop": "",
+      "attackFrames": 83283,
+      "loopFrames": 0,
+      "peak": 0.3340208828449249,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_E1_v2_RR1.wav",
+      "sourceSha256": "c7fec3551d21e326c2478ce9073cf8239485de835042c01e34c85fd692bf1ff4",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "aa5165e9755e2827b17df4df2433e39ee23fd435e0c22fedaeaa8ac72a69c06f"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 43,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-043-attack.wav",
+      "loop": "",
+      "attackFrames": 155281,
+      "loopFrames": 0,
+      "peak": 0.22614994645118713,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_G1_v2_RR1.wav",
+      "sourceSha256": "7f536c013e9e24c0cde3577416bf27111b741fd331a0d041ff75e53eaa6102fa",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "64b1a258566e947fe7cd6f834c83f12a0a0edbe1575195107a40dd2b4b3c9bc5"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 47,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-047-attack.wav",
+      "loop": "",
+      "attackFrames": 86414,
+      "loopFrames": 0,
+      "peak": 0.31422188878059387,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_B1_v2_RR1.wav",
+      "sourceSha256": "3883a65c6d301bf6f61b21d5ec6e27f9740ba219b5b022a9e5f3a67c62aeaa2a",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "4c2207155b463c58f38a2c0061d41c9ac344b4b39506a0d06416630258a4001e"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 50,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-050-attack.wav",
+      "loop": "",
+      "attackFrames": 162552,
+      "loopFrames": 0,
+      "peak": 0.38094356656074524,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_D2_v2_RR1.wav",
+      "sourceSha256": "c647723304b5f4b2d3af02739017e38bc4e85244c15355ebd6f8443c1445b5ab",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "3e1b0006aaa96d4aba530dbd8a4ced337e7e91f821d5525643a6d3be4785300f"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 53,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-053-attack.wav",
+      "loop": "",
+      "attackFrames": 61640,
+      "loopFrames": 0,
+      "peak": 0.4163464307785034,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_F2_v2_RR1.wav",
+      "sourceSha256": "840ea94753ece4334d62da823cd74a83c3fc8ff28166ff8a71f589d75fc6e591",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "e8940d946552a14d3a8bc25a8fd4787418681462b6132384b1505a42ae80e73f"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 57,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-057-attack.wav",
+      "loop": "",
+      "attackFrames": 162095,
+      "loopFrames": 0,
+      "peak": 0.4881570041179657,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_A2_v2_RR1.wav",
+      "sourceSha256": "a0f0d6a225e5a31debd902b518b96987b322e064bd38c29f891196c06ed4b7be",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "9496344dfe6c72bdebe1b17563d6e104469ab1a768476caea84f616ba83225ec"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 60,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-060-attack.wav",
+      "loop": "",
+      "attackFrames": 97291,
+      "loopFrames": 0,
+      "peak": 0.38062354922294617,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_C3_v2_RR1.wav",
+      "sourceSha256": "278a14177cd3ffffc5418e403d9583af22778a8ce8fc548f88ea707e044a62d4",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "25ab24eec28664b84c1fdb92d22e0ab86790c4cc82fbd9fc6974833964116f2d"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 64,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-064-attack.wav",
+      "loop": "",
+      "attackFrames": 87082,
+      "loopFrames": 0,
+      "peak": 0.3730425238609314,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_E3_v2_RR1.wav",
+      "sourceSha256": "1daf39c60a6c83dfa941418a2ab51328f79ae738fe7c3e302e8395774eac8681",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "28deaee87a7b583e9e2388eaf8c7aafa88c840a10bbbc1882cbb87389231681e"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 67,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-067-attack.wav",
+      "loop": "",
+      "attackFrames": 72593,
+      "loopFrames": 0,
+      "peak": 0.4431622326374054,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_G3_v2_RR1.wav",
+      "sourceSha256": "adedb635e08e72f6e06e31dc1355edca528de2753f06eea271ec004e6a3b44f5",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "329949a1e7b20485d798632a2bf21b75cc2119b5851b5855d6953f1c9f8ac7c3"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 71,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-071-attack.wav",
+      "loop": "",
+      "attackFrames": 110074,
+      "loopFrames": 0,
+      "peak": 0.3746175765991211,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_B3_v2_RR1.wav",
+      "sourceSha256": "94323b0e1489234b9d01733571404302de5b04b583f817d4ff9497fd1e6b92eb",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "293769c3da4bb5e0aa9beeb11a89053a9dc068ffb7cb6c515c9a5bdc2d8df28c"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 74,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-074-attack.wav",
+      "loop": "",
+      "attackFrames": 79426,
+      "loopFrames": 0,
+      "peak": 0.3010074198246002,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_D4_v2_RR1.wav",
+      "sourceSha256": "bbfcd62bd98a45a5f5f323e2c35d22c05aeb715b25c3e3cda87b6811c3753e73",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "cab4aa66fd77a701dcd29c5d590d10912328bb82a25fc2e3773e0465c58f0695"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 77,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-077-attack.wav",
+      "loop": "",
+      "attackFrames": 37088,
+      "loopFrames": 0,
+      "peak": 0.2013522833585739,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_F4_v2_RR1.wav",
+      "sourceSha256": "bae94c2ee8f140997542b60d0aaea722b63dfec6700ca1a783b46ae7466bc4f1",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "05eb67fd15c7e1ed98eaa6875532c6ddbbf7f8705894bab4fee356dd5084390c"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 36,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-036-attack.wav",
+      "loop": "",
+      "attackFrames": 177984,
+      "loopFrames": 0,
+      "peak": 0.2515047788619995,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_C1_v2_RR1.wav",
+      "sourceSha256": "eb757d0688c447d609e9583c3943b9b51f5dee3c8b309ef6e03cac0c36910f15",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "c22305069a6e443a19434865596fef5f42b3419ea7e79b2056e794d752589d95"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 40,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-040-attack.wav",
+      "loop": "",
+      "attackFrames": 149857,
+      "loopFrames": 0,
+      "peak": 0.16866320371627808,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_E1_v2_RR1.wav",
+      "sourceSha256": "e5dc2a92063c0d2262336239a227e686c4977b6f8aaf65a2dda13c71ffe982df",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "823a3a3a754a5dc23738663692f7390ab4d8dbd3b9df5669dff24bcf2bec98f4"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 43,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-043-attack.wav",
+      "loop": "",
+      "attackFrames": 160388,
+      "loopFrames": 0,
+      "peak": 0.2770981192588806,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_G1_v2_RR1.wav",
+      "sourceSha256": "a12366cff3dd68c4a1622bd504161caa9ed18d23f9d03ed413936a0829188cf1",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "cee96329f528e89495f75035140c3aa0b9b91126a9e60cd1649cca639d2c8d97"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 47,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-047-attack.wav",
+      "loop": "",
+      "attackFrames": 191946,
+      "loopFrames": 0,
+      "peak": 0.2486710548400879,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_B1_v2_RR1.wav",
+      "sourceSha256": "d5898f41739b4929530aa7d4a3f1660ee2bb6096b375c1f034eb6d26cbb10623",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "670a6535f2bacd12cc17d3781619e256444041987b89e3b927085c479902f07e"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 50,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-050-attack.wav",
+      "loop": "",
+      "attackFrames": 139715,
+      "loopFrames": 0,
+      "peak": 0.45022207498550415,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_D2_v2_RR1.wav",
+      "sourceSha256": "5f80f5fd2f8f3f2cc33b8e7cdba1c5984b5a8158d6d34cd03fe48ae46b335461",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "06749f6c8824cd9a87e4418c2514b8c31555ad690591ea9ea1c7ae3c5486cbc7"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 53,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-053-attack.wav",
+      "loop": "",
+      "attackFrames": 86943,
+      "loopFrames": 0,
+      "peak": 0.2892734706401825,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_F2_v2_RR1.wav",
+      "sourceSha256": "eb5b95b1f7b22370ad00713db544f2eb3cae6b70a29fcaf673c54d485e73c8a3",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "0f22c51115eb34bf528bba6dc330ff2a31ea94c41c20b7987599864667c17dfa"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 57,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-057-attack.wav",
+      "loop": "",
+      "attackFrames": 135772,
+      "loopFrames": 0,
+      "peak": 0.3143255114555359,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_A2_v2_RR1.wav",
+      "sourceSha256": "187df4d1d5621877d32cbfb3d174dcacb85aa59caf3359d9ce398bec4f7ccf56",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "8aaed5f4d8f24526696f24c718eb866d881f05b46b51a66505e48582a27b5a31"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 60,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-060-attack.wav",
+      "loop": "",
+      "attackFrames": 138246,
+      "loopFrames": 0,
+      "peak": 0.40405526757240295,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_C3_v2_RR1.wav",
+      "sourceSha256": "fbc86686ef092e92e473dce4d1ff5f1e351dcc76ed2d94b0d336c1346f314e59",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "e07811d86d0e84b74df6b92a2c90ebba0d7665d8b56aeaaebd9ac7820b349722"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 64,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-064-attack.wav",
+      "loop": "",
+      "attackFrames": 111273,
+      "loopFrames": 0,
+      "peak": 0.32638803124427795,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_E3_v2_RR1.wav",
+      "sourceSha256": "ad072009df18f24c4ae0b2fd4b8cbf803a1ba1d195fcae5ea8c882111e9555b3",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "9af5232a1945f5dbc28d2ed278602d5757d04dd8cf7846ba89813e548eeacda9"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 67,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-067-attack.wav",
+      "loop": "",
+      "attackFrames": 130713,
+      "loopFrames": 0,
+      "peak": 0.3321169316768646,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_G3_v2_RR1.wav",
+      "sourceSha256": "6c2baf71b5fd733bc8c86e7eed625f3eefae85dedd7952f0d1e9fd812c75347a",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "378275e27fd5beaec97899145b4829626c66096b6256d027e75b1482f1ed94a4"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 71,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-071-attack.wav",
+      "loop": "",
+      "attackFrames": 95782,
+      "loopFrames": 0,
+      "peak": 0.18201038241386414,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_B3_v2_RR1.wav",
+      "sourceSha256": "016e6cc084ae4e60eb52b0a60ffada2314211f1eb5bcc95c6a73b64ac0afbde8",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "a79ba17dabb99dfd9853d62c1339c8c01d20e8f4c99cacb8648fb88587b2a603"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 74,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-074-attack.wav",
+      "loop": "",
+      "attackFrames": 62688,
+      "loopFrames": 0,
+      "peak": 0.3254188895225525,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_D4_v2_RR1.wav",
+      "sourceSha256": "286d0e59972bb575c54a7be68865874908e93ed3e928637905308f5b6d0a531f",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "64257029c558a1ee40774cb350b557c972a7f0a3a7a3d84423f5ce7d788322e1"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 77,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-077-attack.wav",
+      "loop": "",
+      "attackFrames": 48543,
+      "loopFrames": 0,
+      "peak": 0.38334107398986816,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_F4_v2_RR1.wav",
+      "sourceSha256": "a0d172b71a6f33890ba5212485e9a23dcc8982bf8ba78b1031c97f3cd419c2a3",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "88e4d036bca606f829e1f43f229c4d07aea23995096c7e0eace3eeab90b320cc"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 30,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-030-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-030-loop.wav",
+      "attackFrames": 119040,
+      "loopFrames": 48000,
+      "peak": 0.10837969183921814,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_F#0_v3_rr1.wav",
+      "sourceSha256": "bc9070ac281edf964d9feac92b153325fec22e6a88b53a73acf2aa7850d1b9c3",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 115200,
+        "endFrame": 167040,
+        "crossfadeFrames": 3840,
+        "score": 0.0052917217005847925,
+        "loopBoundaryStep": 0.00012112408876419067
+      },
+      "attackSha256": "f9facad1eaa661bd2f6324a824b9febc1d332ee2e20d8f71113d0503d819fcc1",
+      "loopSha256": "015ebad148466576ad409b67d2cad3f700aca5739e89d9c020ed1f75dee910c8"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 31,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-031-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-031-loop.wav",
+      "attackFrames": 80640,
+      "loopFrames": 81600,
+      "peak": 0.06546436250209808,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_G0_v3_rr1.wav",
+      "sourceSha256": "6d841bd02829835078fc968ffd30ad2c01e458390e2723dac916b1a1115bd666",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 76800,
+        "endFrame": 162240,
+        "crossfadeFrames": 3840,
+        "score": 0.0029910960123954175,
+        "loopBoundaryStep": 0.0003369385376572609
+      },
+      "attackSha256": "8249ca42a58b62a57b0b3953fa009da1c65885d7eaf389ff45ec4a92ce66a7e6",
+      "loopSha256": "83295feb920b7fa45238894d000db1fef1e1fe0a3d8bef65e6b35b2c5fbc036b"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 34,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-034-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-034-loop.wav",
+      "attackFrames": 75840,
+      "loopFrames": 81600,
+      "peak": 0.16882842779159546,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_A#0_v3_rr1.wav",
+      "sourceSha256": "f5fca51ec4a3c1d03fcd6a9d94784bf84384c05e309838d6d8929d076762f991",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 72000,
+        "endFrame": 157440,
+        "crossfadeFrames": 3840,
+        "score": 0.0026721551632541284,
+        "loopBoundaryStep": 0.0027528032660484314
+      },
+      "attackSha256": "ca4ca6232f47783e78648e51544d62b355ce1d7f407c98885417214206d79159",
+      "loopSha256": "92626ce986c636179e29dd6ef57c4281ba9502997c6ab06830a7c2d9a3ebc963"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 36,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-036-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-036-loop.wav",
+      "attackFrames": 99840,
+      "loopFrames": 62400,
+      "peak": 0.1308644413948059,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_C1_v3_rr1.wav",
+      "sourceSha256": "21749ba7c5dc3d7655ce1dde97a0c51daeaa8eb1bbe5d822b32c4b159f3f89e8",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 96000,
+        "endFrame": 162240,
+        "crossfadeFrames": 3840,
+        "score": 0.0033151809165537925,
+        "loopBoundaryStep": 3.6559998989105225e-05
+      },
+      "attackSha256": "b64b8d2c51933d9f9a963f6373945ccee06e82be9d4a99ed8a3dccf916842654",
+      "loopSha256": "444df9c1eaef9d3d196e46ae11fc2c002431e70149c930c71fbef6b49cb74731"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 38,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-038-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-038-loop.wav",
+      "attackFrames": 66240,
+      "loopFrames": 48000,
+      "peak": 0.09369174391031265,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_D1_v3_rr1.wav",
+      "sourceSha256": "c554aa070923f478cda513f67b6677c453405cdbdf38c1af681d029b3640ada1",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 62400,
+        "endFrame": 114240,
+        "crossfadeFrames": 3840,
+        "score": 0.003307072183257636,
+        "loopBoundaryStep": 0.00034478306770324707
+      },
+      "attackSha256": "4b99dc1d8c5841abe684c085b33b8cfb3e86034b4d2f7feef6e1389a42c7dc7e",
+      "loopSha256": "babbe2e5a90d4c076f5a0ace16d52da3baefd537bd808ba50aeb4f660745d50c"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 40,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-040-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-040-loop.wav",
+      "attackFrames": 66240,
+      "loopFrames": 81600,
+      "peak": 0.07903989404439926,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_E1_v3_rr1.wav",
+      "sourceSha256": "aab357aa26c66c89024d241de02570095ad439a9850b98832811f9983a072af3",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 62400,
+        "endFrame": 147840,
+        "crossfadeFrames": 3840,
+        "score": 0.003178199016166426,
+        "loopBoundaryStep": 0.00016505643725395203
+      },
+      "attackSha256": "02711f85fe9c9c83ea0560b82a1ea7ed7b2b6389b48b18e44157ef26e6a5be0c",
+      "loopSha256": "2ec8cb391988a0a4cff6a1881d9d90337f618a329fc943da146aafbb23886d12"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 42,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-042-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-042-loop.wav",
+      "attackFrames": 99840,
+      "loopFrames": 81600,
+      "peak": 0.06928406655788422,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_F#1_v3_rr1.wav",
+      "sourceSha256": "ee6701e62ce18dbf4c20f758e8e164e4334ea0078157df0a7b5afa75be6f36a3",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 96000,
+        "endFrame": 181440,
+        "crossfadeFrames": 3840,
+        "score": 0.0034057741956650617,
+        "loopBoundaryStep": 0.0004875287413597107
+      },
+      "attackSha256": "f2eaed5ad690da30486df92942f8a6c96491d6c3ac93e6dffd1fdd6ae8b07893",
+      "loopSha256": "52809a29c1f3136361affbef3098a5f1f3f6d98a4b6ff982d956773e454b02b7"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 44,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-044-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-044-loop.wav",
+      "attackFrames": 128640,
+      "loopFrames": 48000,
+      "peak": 0.28857457637786865,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_G#1_v3_rr1.wav",
+      "sourceSha256": "93ffb027fc3725c7da5d80783a81332c5baedd16b3039899a0cb85b96e7b6079",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 124800,
+        "endFrame": 176640,
+        "crossfadeFrames": 3840,
+        "score": 0.004176472712104299,
+        "loopBoundaryStep": 0.0027513056993484497
+      },
+      "attackSha256": "04475a4ef4b20e31514e3e43a4e61eec0a3eaac4155defdb20b52c1844ed2599",
+      "loopSha256": "bef9ec632e4978e329231b37e7869d1978432650aff42e31247c58e8bacf676d"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 45,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-045-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-045-loop.wav",
+      "attackFrames": 114240,
+      "loopFrames": 81600,
+      "peak": 0.25805771350860596,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_A1_v3_rr1.wav",
+      "sourceSha256": "1abfc2d6bddeabe86b3195e9c4361991ec759b572baac2364ba8072b27903b40",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 110400,
+        "endFrame": 195840,
+        "crossfadeFrames": 3840,
+        "score": 0.0028513904636599803,
+        "loopBoundaryStep": 4.143267869949341e-05
+      },
+      "attackSha256": "1c19cdaee3dda1ccc1b10b1829f00f3fef2d49bf12eb1afbb97c67732f48b340",
+      "loopSha256": "1bec43c4053a98645196e2a6ed113466a557370d6138c5f2d91b95944f1c19cf"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 49,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-049-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-049-loop.wav",
+      "attackFrames": 99840,
+      "loopFrames": 62400,
+      "peak": 0.06685620546340942,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_C#2_v3_rr1.wav",
+      "sourceSha256": "7be4df2b55ed12b796b84575f88d714155b68340a7f667006e5edb84910ef4f3",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 96000,
+        "endFrame": 162240,
+        "crossfadeFrames": 3840,
+        "score": 0.0019155250670996316,
+        "loopBoundaryStep": 0.0007682288996875286
+      },
+      "attackSha256": "a8c62a222cb4505b50d957326ef32ae373e4554438b7a69330ba86caad194c9c",
+      "loopSha256": "d8209e6d90bd5e7062615797faa8f2832425816d7918612520da5fcc5efa1fe9"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 52,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-052-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-052-loop.wav",
+      "attackFrames": 95040,
+      "loopFrames": 100800,
+      "peak": 0.07623498141765594,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_E2_v3_rr1.wav",
+      "sourceSha256": "b21c1861b57c6b7b54270406c6050e20b10a243792595417c7905c44e719ba80",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 91200,
+        "endFrame": 195840,
+        "crossfadeFrames": 3840,
+        "score": 0.0022492281593176214,
+        "loopBoundaryStep": 0.0004646703600883484
+      },
+      "attackSha256": "94e5709f78b018511bd2eac62d1337bcaf8edb8cae12cd63e9c463feba88038b",
+      "loopSha256": "09921fd5ec0d9745fabf4f8da9ab073fe4cca9219d0f4b3489c8911eaae5183d"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 56,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-056-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-056-loop.wav",
+      "attackFrames": 66240,
+      "loopFrames": 62400,
+      "peak": 0.13917669653892517,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_G#2_v3_rr1.wav",
+      "sourceSha256": "fefc88c63020db273d4ed7a27b48f00b70945b680e0c64ad7036969b44bf8274",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 62400,
+        "endFrame": 128640,
+        "crossfadeFrames": 3840,
+        "score": 0.004542487210907071,
+        "loopBoundaryStep": 0.002973116934299469
+      },
+      "attackSha256": "4dcaff9563ac61298206989178d05b8beb54887c80c0022fe8035349db812f06",
+      "loopSha256": "67d7dc3e3040bc79c1cf166355ebfa572250a89fc5dcbb98bc9adda6b048858d"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 59,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-059-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-059-loop.wav",
+      "attackFrames": 66240,
+      "loopFrames": 62400,
+      "peak": 0.22909370064735413,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_B2_v3_rr1.wav",
+      "sourceSha256": "31b343087d55a947c0d7e13a9ac8cdeaf438da1115dcfd96f829ca0d2261ba52",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 62400,
+        "endFrame": 128640,
+        "crossfadeFrames": 3840,
+        "score": 0.004427629573818717,
+        "loopBoundaryStep": 0.0009717494249343872
+      },
+      "attackSha256": "30078fc218cc65c1d63e71c80946250052a9b29b329b21d6abd8be944adbd47e",
+      "loopSha256": "4b5b192d3e4a845178a07eaf155e5c5b8b7fc1d2070932e2f313eb46be7c131d"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 28,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-028-attack.wav",
+      "loop": "",
+      "attackFrames": 157605,
+      "loopFrames": 0,
+      "peak": 0.13899114727973938,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_E0_v3_rr1.wav",
+      "sourceSha256": "c15c0e4c51a0c7da1f23c84ab103203125cc069a59a077cd77af035975fa856c",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "37fb965c8933aa5b8459f9e763e6a0afecbfdd819dcf11facba7528dc0c9370c"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 30,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-030-attack.wav",
+      "loop": "",
+      "attackFrames": 97580,
+      "loopFrames": 0,
+      "peak": 0.11662288010120392,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_F#0_v3_rr1.wav",
+      "sourceSha256": "738f8354b1c08fb9036ae2de9a2f3c65ef4762a955a97b72b1213eec3fa9b4e4",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "71ef1d60a6203b80587e2ae1efce96da31000e11b947dee6df20d1d95956e416"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 31,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-031-attack.wav",
+      "loop": "",
+      "attackFrames": 76720,
+      "loopFrames": 0,
+      "peak": 0.11384566128253937,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_G0_v3_rr1.wav",
+      "sourceSha256": "239a927ce98a3135e8325d91ef1ee462b5217587fb745c8f64a7951398d0fe79",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "7d5dd94bb08b604dd6232de6c75f0f0a8246cbe604a3ec33adffb502ed747108"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 34,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-034-attack.wav",
+      "loop": "",
+      "attackFrames": 70845,
+      "loopFrames": 0,
+      "peak": 0.20991283655166626,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_A#0_v3_rr1.wav",
+      "sourceSha256": "34280d744690957c3668e650f9c5d86a3d5a71a524c42742b34c8ec7ffb8c6eb",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "4ac076d1033f9824250564b6f5c3e49a9d3ff38831f849062b08ca86aa6cccec"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 36,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-036-attack.wav",
+      "loop": "",
+      "attackFrames": 65063,
+      "loopFrames": 0,
+      "peak": 0.15120254456996918,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_C1_v3_rr1.wav",
+      "sourceSha256": "4bca4ab782cdbddeb75069135a4a8b0e4bc4f3570a5033b7f0729b5285719ae2",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "ec88c7e5e32f5faebb2b8f59a9a190c5e6352470042c5a35aa264755ab144383"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 38,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-038-attack.wav",
+      "loop": "",
+      "attackFrames": 83068,
+      "loopFrames": 0,
+      "peak": 0.1209147721529007,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_D1_v3_rr1.wav",
+      "sourceSha256": "39b0d060f6781ed356f4b9153b1fcd96ad79b8548164ece0be5314fb8e48d21b",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "f599e06979d1511bec4f45c4036c26c51909244fb8a970e6347885479484cbcc"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 40,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-040-attack.wav",
+      "loop": "",
+      "attackFrames": 103720,
+      "loopFrames": 0,
+      "peak": 0.07942958921194077,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_E1_v3_rr1.wav",
+      "sourceSha256": "08209aecd7ab8d6de7f3f4a442f12b108327f6c95ceb7fdff2657e149de03040",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "5caff4940ea5dd42663edf74045d79decc4f2e2176864ecfe507ea3f5cc328f9"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 42,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-042-attack.wav",
+      "loop": "",
+      "attackFrames": 71276,
+      "loopFrames": 0,
+      "peak": 0.04953466355800629,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_F#1_v1_rr1.wav",
+      "sourceSha256": "e410c1f3115cf0f8d5b2f75f4ccae558bc43460b6832c63807505d186df4d428",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "e5c6474315081c52bb5706a03c8be4b57871929aa691622212789b796c4b403c"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 44,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-044-attack.wav",
+      "loop": "",
+      "attackFrames": 117825,
+      "loopFrames": 0,
+      "peak": 0.14331141114234924,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_G#1_v1_rr1.wav",
+      "sourceSha256": "5d8548ca2673b10dd78b7c644f0a488f4170e333b528630af757b34abd41f814",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "48fbe3a75e4ea9c0fd6ba15cd1a5c6934a5c9f8b7ef697f639f4fb56ccea8fe5"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 45,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-045-attack.wav",
+      "loop": "",
+      "attackFrames": 114609,
+      "loopFrames": 0,
+      "peak": 0.11712076514959335,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_A1_v1_rr1.wav",
+      "sourceSha256": "32111c59f0e40962564221f9f9f003466c369fe18051f4ffaad3d8cd205ee23d",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "d5f365d34128f52e331803b6f9aa7e93c82746e2c7179b4c9f04524f96f00fbe"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 49,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-049-attack.wav",
+      "loop": "",
+      "attackFrames": 68140,
+      "loopFrames": 0,
+      "peak": 0.059232719242572784,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_C#2_v1_rr1.wav",
+      "sourceSha256": "22fc17a5c7d55805fe689b329b08eaaf47ea0134d7e144f25c93594b6713b692",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "2c5adbd29fb686b7fc87fd44d02ff850ca21322658d04c115d6314aded013112"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 52,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-052-attack.wav",
+      "loop": "",
+      "attackFrames": 71931,
+      "loopFrames": 0,
+      "peak": 0.03808059170842171,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_E2_v1_rr1.wav",
+      "sourceSha256": "747c4e51164d6582c9e253d3fa37aea939be691e95f1573f66b660137c0adcf5",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "3a50186e1623ed3a3dc33d02f8a235d820bb32c27b0361af28162560f57e28f2"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 56,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-056-attack.wav",
+      "loop": "",
+      "attackFrames": 85712,
+      "loopFrames": 0,
+      "peak": 0.05484594404697418,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_G#2_v1_rr1.wav",
+      "sourceSha256": "ec3aa1973906ddad82d83ed5e54a32299c3f413147d97c16f6602340bc9af2f2",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "890e54b69eba665c834e0fed73b3957e5aff4d2837ffc918f4eff51c5de11e4f"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 59,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-059-attack.wav",
+      "loop": "",
+      "attackFrames": 75881,
+      "loopFrames": 0,
+      "peak": 0.04866674542427063,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_B2_v1_rr1.wav",
+      "sourceSha256": "8d3be1969f10820373ed4853d81604d3f3cb074a77ef0b3381d2016251d7e890",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "3eea3e43a40ee547a1080c11aa7db338a66c576b0e15113d0c9f1b3043284b17"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 28,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-028-attack.wav",
+      "loop": "",
+      "attackFrames": 245345,
+      "loopFrames": 0,
+      "peak": 0.14304235577583313,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_E0_v3_rr1.wav",
+      "sourceSha256": "790d1a480a0f38216d30ad6e9152bd26a744d9d651a7e822e1fe58883a9c673f",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "d82814e693ee96a8e07eff22302d4f6a4d4b482a3bc39d560bfca5b87ad78bad"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 30,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-030-attack.wav",
+      "loop": "",
+      "attackFrames": 225534,
+      "loopFrames": 0,
+      "peak": 0.06449978798627853,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_F#0_v3_rr1.wav",
+      "sourceSha256": "4bfdab1976e121136ab5d0bfb1e4b79523d5b0c7adf0d35704c98f5cb26713d1",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "8160219b62673a23491a3d5569321d600e415c1c5a69c6b388616cfe05591103"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 31,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-031-attack.wav",
+      "loop": "",
+      "attackFrames": 173273,
+      "loopFrames": 0,
+      "peak": 0.0681418851017952,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_G0_v3_rr1.wav",
+      "sourceSha256": "9dc3c010e20999e524a7694abf27c12fb55296f2d9946d70917fa82b1d076136",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "209904388f70b88461dac4a67a9aa001c0d5cb28508c20049183b530b4f6175a"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 34,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-034-attack.wav",
+      "loop": "",
+      "attackFrames": 113540,
+      "loopFrames": 0,
+      "peak": 0.1333627998828888,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_A#0_v3_rr1.wav",
+      "sourceSha256": "ffdcf783332627d78bb09c348ce5bbf64e833d529a1cfd48e05362f27a857c0a",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "95c0032fed4d41575488fdcac31f7ce2aeb5d940143e85b2a0c09acde31b50a6"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 36,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-036-attack.wav",
+      "loop": "",
+      "attackFrames": 108923,
+      "loopFrames": 0,
+      "peak": 0.09844347089529037,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_C1_v3_rr1.wav",
+      "sourceSha256": "706d82ca773408bb6cd6f22466d5d017c1d36a9055f3a6b6af864407b26c5a0d",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "d5e6ce7f95e1725de10aae7387224f91b07966a06746d7e6a972c8b50ef457b5"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 38,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-038-attack.wav",
+      "loop": "",
+      "attackFrames": 232966,
+      "loopFrames": 0,
+      "peak": 0.03150124475359917,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_D1_v1_rr1.wav",
+      "sourceSha256": "c4db29ae6949cb6c0d24201bb444c1d5b3806505bae47785cb199f5f0f4f02d2",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "d637ea3de8486a87f2c33fed725eff6320a8eb7de999da0fb9ea80e2aa6825e3"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 40,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-040-attack.wav",
+      "loop": "",
+      "attackFrames": 141163,
+      "loopFrames": 0,
+      "peak": 0.1111813336610794,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_E1_v3_rr1.wav",
+      "sourceSha256": "7628daebe4a9f8524d46e6d58eee811f437e73c77eb6c21396152af58a062506",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "67dfd47cecd249ab2fb392b40be3a1b7cc5c2408ea9b025aa5eea2569252ad33"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 42,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-042-attack.wav",
+      "loop": "",
+      "attackFrames": 236335,
+      "loopFrames": 0,
+      "peak": 0.03287230432033539,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_F#1_v1_rr1.wav",
+      "sourceSha256": "6f91a2747ce3cea061c670f7bf5dc8611eef1c3af8d6e2dca75b6dac5a65bfc6",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "825e1bf3accb79c4e371ff6dc285c7017e08b47db47776cf5b1155cc65dc58d9"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 44,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-044-attack.wav",
+      "loop": "",
+      "attackFrames": 163714,
+      "loopFrames": 0,
+      "peak": 0.08711536973714828,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_G#1_v1_rr1.wav",
+      "sourceSha256": "bf377a41759c17794901957edc89ff48fb405f98879549916d9b228492f7f8d1",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "3a8fc68a7a2c2604f3f1f2fa719c41145d85aa4e975f97b859fd40505595c22c"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 45,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-045-attack.wav",
+      "loop": "",
+      "attackFrames": 169567,
+      "loopFrames": 0,
+      "peak": 0.08504647761583328,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_A1_v1_rr1.wav",
+      "sourceSha256": "c88e632ac4f716d4e85112d6ea5bbe2d27d67019296787c25d27178a9e5f18ac",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "ab5f45dd5fe62c37da9ad733a9132697e57352ea1cba9e0070d6db10c1873bb8"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 49,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-049-attack.wav",
+      "loop": "",
+      "attackFrames": 139788,
+      "loopFrames": 0,
+      "peak": 0.06034431606531143,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_C#2_v1_rr1.wav",
+      "sourceSha256": "41804fc70cf82bd1c475611e315b14b1adf5effbd3369028302a681b54064b3f",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "891dcc0f12da5abb3d4e54d58abc1c0e05bd12d7e8b87692d1f1845a19eedee1"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 52,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-052-attack.wav",
+      "loop": "",
+      "attackFrames": 119167,
+      "loopFrames": 0,
+      "peak": 0.03735391050577164,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_E2_v1_rr1.wav",
+      "sourceSha256": "b5c3dd4943ea9a3f1aa23ed07c827ec8851e28a7254bab7811b706c09fceb231",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "87c1152acfb57562463c0fc0817fcacde91fb4fed4398b64080c8aab455e6f37"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 56,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-056-attack.wav",
+      "loop": "",
+      "attackFrames": 102298,
+      "loopFrames": 0,
+      "peak": 0.025654777884483337,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_G#2_v1_rr1.wav",
+      "sourceSha256": "f5d495c2184e6dacec7783719fbe3f6c1254995abb95ccf307026ef3dd7d5439",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "94790d05d15b35ae4e1c7c326e2f07dcf0bc5d623a0dfe5318d576ab60c3afc6"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 59,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-059-attack.wav",
+      "loop": "",
+      "attackFrames": 113570,
+      "loopFrames": 0,
+      "peak": 0.020909283310174942,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_B2_v1_rr1.wav",
+      "sourceSha256": "58d70398829e87b9bd3b43fb3d384d9bc3e0aa9bfe70175ec2f4e7a914226c8b",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "attackSha256": "44ff0631c6a06e91daef2609dc51f969173fcda651d358a5cafe2389ade10a76"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 108,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-108-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-108-loop.wav",
+      "attackFrames": 54720,
+      "loopFrames": 40800,
+      "peak": 0.16958589851856232,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_C7_f.wav",
+      "sourceSha256": "f8223aed62911ef3f6937111bf3cdcc36fc25a636d4f99480b97029c4d28f393",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 105600,
+        "endFrame": 191040,
+        "crossfadeFrames": 3840,
+        "score": 0.015716876166841746,
+        "loopBoundaryStep": 0.011209113523364067
+      },
+      "derivedFrom": 96,
+      "attackSha256": "d8cc174aca938cfd5b90947056792bf0ee6ce917ace65802704cfbfee2cba760",
+      "loopSha256": "37a4101ac72b9c4e34f776f6512c900ee26d5e9914b4c22928dfc6596c6ecfd4"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 0,
+      "root": 120,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-120-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-0-120-loop.wav",
+      "attackFrames": 27360,
+      "loopFrames": 20400,
+      "peak": 0.16958589851856232,
+      "releaseMs": 700,
+      "source": "Strings/Solo Violin/Arco Vib/LLVln_ArcoVib_C7_f.wav",
+      "sourceSha256": "f8223aed62911ef3f6937111bf3cdcc36fc25a636d4f99480b97029c4d28f393",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 105600,
+        "endFrame": 191040,
+        "crossfadeFrames": 3840,
+        "score": 0.015716876166841746,
+        "loopBoundaryStep": 0.011209113523364067
+      },
+      "derivedFrom": 96,
+      "attackSha256": "7d33dcdb76a5293f1cf497bb932f0455eb8735e13b98e38744a439383fcbe997",
+      "loopSha256": "753df1f3ee30c67d6531fe6d8d0552738064dabd7ff50d839ac53e2d452a78ee"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 108,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-108-attack.wav",
+      "loop": "",
+      "attackFrames": 26787,
+      "loopFrames": 0,
+      "peak": 0.07486367970705032,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_C6_v2_rr1.wav",
+      "sourceSha256": "4e854001e15c23bb42e1f9dd8ca276e54d279423c6dd94db9bab6385cd9641c2",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 96,
+      "attackSha256": "e512d3b2ab4222a20811cb8a866232a4bc3a94d0346a33b464c5bdbd0a516dc9"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 1,
+      "root": 120,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-1-120-attack.wav",
+      "loop": "",
+      "attackFrames": 13393,
+      "loopFrames": 0,
+      "peak": 0.07486367970705032,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/spic/LLVln_spic_C6_v2_rr1.wav",
+      "sourceSha256": "4e854001e15c23bb42e1f9dd8ca276e54d279423c6dd94db9bab6385cd9641c2",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 96,
+      "attackSha256": "82ae6ca98ebd82c8f6aa40f04e8ef9d73c3c75117ba8ccb01f239cbfaf30f48c"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 108,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-108-attack.wav",
+      "loop": "",
+      "attackFrames": 25426,
+      "loopFrames": 0,
+      "peak": 0.18857958912849426,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_C7_f.wav",
+      "sourceSha256": "fccd76254ab12434dd3e41958b8c9f6a5058102ed9b507e5a6e5df953dd04f02",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 96,
+      "attackSha256": "7687d0312126944433f9a4aa0b1949ca586129cfa49d99ad9cda0b364ce02baa"
+    },
+    {
+      "bank": "SoloViolin",
+      "articulation": 2,
+      "root": 120,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/SoloViolin/SoloViolin-2-120-attack.wav",
+      "loop": "",
+      "attackFrames": 12713,
+      "loopFrames": 0,
+      "peak": 0.18857958912849426,
+      "releaseMs": 180,
+      "source": "Strings/Solo Violin/Pizz/LLVln_Pizz_C7_f.wav",
+      "sourceSha256": "fccd76254ab12434dd3e41958b8c9f6a5058102ed9b507e5a6e5df953dd04f02",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 96,
+      "attackSha256": "056725b9af3a0755f08f1c282ba988c70a405bffe9d77118e9ee76f40e539289"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 0,
+      "root": 98,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-098-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-098-loop.wav",
+      "attackFrames": 49920,
+      "loopFrames": 24000,
+      "peak": 0.2236826866865158,
+      "releaseMs": 700,
+      "source": "Strings/Violin Section/susVib/VlnEns_susVib_D5_v2.wav",
+      "sourceSha256": "0c2ca9de723bed0a0968e32126b934f778cd678b367a29e7fde91004daf84daf",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 96000,
+        "endFrame": 147840,
+        "crossfadeFrames": 3840,
+        "score": 0.030676443991943688,
+        "loopBoundaryStep": 0.0071772076189517975
+      },
+      "derivedFrom": 86,
+      "attackSha256": "7491ee727dd8f5606efe907efd0bed6601cc3cc1e71cd2c3774adfc7cbfd635d",
+      "loopSha256": "e9a201c2f267d9d7ffb4e5d7ff9243f1dd5aa19d37f2e5c878f1ea176eeb1dff"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 0,
+      "root": 110,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-110-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-0-110-loop.wav",
+      "attackFrames": 24960,
+      "loopFrames": 12000,
+      "peak": 0.2236826866865158,
+      "releaseMs": 700,
+      "source": "Strings/Violin Section/susVib/VlnEns_susVib_D5_v2.wav",
+      "sourceSha256": "0c2ca9de723bed0a0968e32126b934f778cd678b367a29e7fde91004daf84daf",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 96000,
+        "endFrame": 147840,
+        "crossfadeFrames": 3840,
+        "score": 0.030676443991943688,
+        "loopBoundaryStep": 0.0071772076189517975
+      },
+      "derivedFrom": 86,
+      "attackSha256": "b95c448ce4a73198e34a15d943446ccb727f3354a729a4636052e5e0b35647c9",
+      "loopSha256": "bd39ed294775f61951f20d4578ff7eb9b85fada54afcadd79bf681df523143be"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 1,
+      "root": 98,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-1-098-attack.wav",
+      "loop": "",
+      "attackFrames": 18598,
+      "loopFrames": 0,
+      "peak": 0.37085795402526855,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Spic/VlnEns_Spic_D5_v2_rr1.wav",
+      "sourceSha256": "959a93165a9271657b4bc97c75eded62deab37b03128f71f0f1f4c8903e50b84",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 86,
+      "attackSha256": "a42be492a5b6c00f2373c065da30d1032b8aa105c584f733132d84513bf9a656"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 1,
+      "root": 110,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-1-110-attack.wav",
+      "loop": "",
+      "attackFrames": 9299,
+      "loopFrames": 0,
+      "peak": 0.37085795402526855,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Spic/VlnEns_Spic_D5_v2_rr1.wav",
+      "sourceSha256": "959a93165a9271657b4bc97c75eded62deab37b03128f71f0f1f4c8903e50b84",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 86,
+      "attackSha256": "3a52f279ab02ec9c32372a7e2046a026eb0edf4d154ebab15a0125a0c3f63022"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 2,
+      "root": 98,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-2-098-attack.wav",
+      "loop": "",
+      "attackFrames": 15407,
+      "loopFrames": 0,
+      "peak": 0.3368298411369324,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Pizz/VlnEns_Pizz_D5_v2_rr1.wav",
+      "sourceSha256": "50445c5f94fe25272ed98dd03d5af1c34b555f24aa2a7803653aa3b51ed929fc",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 86,
+      "attackSha256": "6d8cac285c0a8dd623ebd53798c1b95d3f0e38e75e00a91d8eac82ee6b92f6fc"
+    },
+    {
+      "bank": "ViolinSection",
+      "articulation": 2,
+      "root": 110,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolinSection/ViolinSection-2-110-attack.wav",
+      "loop": "",
+      "attackFrames": 7704,
+      "loopFrames": 0,
+      "peak": 0.3368298411369324,
+      "releaseMs": 180,
+      "source": "Strings/Violin Section/Pizz/VlnEns_Pizz_D5_v2_rr1.wav",
+      "sourceSha256": "50445c5f94fe25272ed98dd03d5af1c34b555f24aa2a7803653aa3b51ed929fc",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 86,
+      "attackSha256": "c86638ae3d5619cf2c33b0b3062ad9bec48f24ef8dca64b05ffa8be452f146fa"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 98,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-098-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-098-loop.wav",
+      "attackFrames": 54720,
+      "loopFrames": 31200,
+      "peak": 0.33579838275909424,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_D5_v2_1.wav",
+      "sourceSha256": "d3c5d05da8f90533aa7587649f18f4e68147aa7abc7a5559d8741089bea32239",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 105600,
+        "endFrame": 171840,
+        "crossfadeFrames": 3840,
+        "score": 0.02708652939747395,
+        "loopBoundaryStep": 0.020371392369270325
+      },
+      "derivedFrom": 86,
+      "attackSha256": "2616151216de46f9a4dee0fd353a50f5c55797b4ea85f0f6f697dababb20148e",
+      "loopSha256": "b4e809b95de83ff024ea2da92f4f654f17d0815569cdb3459c6a3d59605045e9"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 0,
+      "root": 110,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-110-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-0-110-loop.wav",
+      "attackFrames": 27360,
+      "loopFrames": 15600,
+      "peak": 0.33579838275909424,
+      "releaseMs": 700,
+      "source": "Strings/Viola Section/susvib/ViolaEns_susvib_D5_v2_1.wav",
+      "sourceSha256": "d3c5d05da8f90533aa7587649f18f4e68147aa7abc7a5559d8741089bea32239",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 105600,
+        "endFrame": 171840,
+        "crossfadeFrames": 3840,
+        "score": 0.02708652939747395,
+        "loopBoundaryStep": 0.020371392369270325
+      },
+      "derivedFrom": 86,
+      "attackSha256": "635a0a4e8ea5485629ae9d2e72b6da1fffb805bba9bdb1c6e455f9aaae9b4dcc",
+      "loopSha256": "d03f78bc9297fb4726747f884027b4f9ffca76eb4a0b06ab3c80f1195795fba8"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 1,
+      "root": 98,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-1-098-attack.wav",
+      "loop": "",
+      "attackFrames": 15198,
+      "loopFrames": 0,
+      "peak": 0.45980167388916016,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/spic/Violas_spic_D5_v2_rr1.wav",
+      "sourceSha256": "b4dfbd83b650796046d5b0f05e01ef1ccc564bd9f01523997fb7965de2c697f0",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 86,
+      "attackSha256": "3f6ae596694a794d4ccb5716ff4635f11c5d8c707ac66e64ee8ef82b69f7be4f"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 1,
+      "root": 110,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-1-110-attack.wav",
+      "loop": "",
+      "attackFrames": 7599,
+      "loopFrames": 0,
+      "peak": 0.45980167388916016,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/spic/Violas_spic_D5_v2_rr1.wav",
+      "sourceSha256": "b4dfbd83b650796046d5b0f05e01ef1ccc564bd9f01523997fb7965de2c697f0",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 86,
+      "attackSha256": "bc65723e29ec9fc90d46c1792e2d4573a3437bb800e454e5e138b23901da9ed4"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 2,
+      "root": 98,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-2-098-attack.wav",
+      "loop": "",
+      "attackFrames": 9609,
+      "loopFrames": 0,
+      "peak": 0.25235605239868164,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/pizz/ViolaEns_pizz_D5_v1_rr1.wav",
+      "sourceSha256": "5b129fe18cc33a3fa9a1999d3a7461975179356c3d3345fa66ebb3815e3ea4dc",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 86,
+      "attackSha256": "a3578ea87174939c726d067f8ea6e2057d31831fb00d6acf60ad9a06221e27f8"
+    },
+    {
+      "bank": "ViolaSection",
+      "articulation": 2,
+      "root": 110,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/ViolaSection/ViolaSection-2-110-attack.wav",
+      "loop": "",
+      "attackFrames": 4805,
+      "loopFrames": 0,
+      "peak": 0.25235605239868164,
+      "releaseMs": 180,
+      "source": "Strings/Viola Section/pizz/ViolaEns_pizz_D5_v1_rr1.wav",
+      "sourceSha256": "5b129fe18cc33a3fa9a1999d3a7461975179356c3d3345fa66ebb3815e3ea4dc",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 86,
+      "attackSha256": "905e9d4b2c0af91e4c2ae32dcc975ec2c9415a005e5865d669efdf8d93761ef4"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 89,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-089-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-089-loop.wav",
+      "attackFrames": 42720,
+      "loopFrames": 24000,
+      "peak": 0.3463079333305359,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_F4_v3_1.wav",
+      "sourceSha256": "24ea4a0f892cb60c4a52d6a5b1ef8281e4e9a9f78b5f938e078da7cbbfd5ba19",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 81600,
+        "endFrame": 133440,
+        "crossfadeFrames": 3840,
+        "score": 0.024601500554065417,
+        "loopBoundaryStep": 0.0020376015454530716
+      },
+      "derivedFrom": 77,
+      "attackSha256": "78efbf3bcdf488d756a06ce5228a23e7133841bf10f50b1c6faeb19a95f1e7f2",
+      "loopSha256": "50e00f54e59b1dc29c00016fcd9492b090690422ba7380cc8fe18e88da18827a"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 101,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-101-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-101-loop.wav",
+      "attackFrames": 21360,
+      "loopFrames": 12000,
+      "peak": 0.3463079333305359,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_F4_v3_1.wav",
+      "sourceSha256": "24ea4a0f892cb60c4a52d6a5b1ef8281e4e9a9f78b5f938e078da7cbbfd5ba19",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 81600,
+        "endFrame": 133440,
+        "crossfadeFrames": 3840,
+        "score": 0.024601500554065417,
+        "loopBoundaryStep": 0.0020376015454530716
+      },
+      "derivedFrom": 77,
+      "attackSha256": "3269bf55a50130f974b0d429d3faa41b396cb17be3cf464fc834f49f7c54db12",
+      "loopSha256": "82ea4d82885e3acfa6a35ec98d61a5af5645f1c0274b94530b30dd77eda8a97d"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 0,
+      "root": 113,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-113-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-0-113-loop.wav",
+      "attackFrames": 10680,
+      "loopFrames": 6000,
+      "peak": 0.3463079333305359,
+      "releaseMs": 700,
+      "source": "Strings/Cello Section/susvib/susvib_F4_v3_1.wav",
+      "sourceSha256": "24ea4a0f892cb60c4a52d6a5b1ef8281e4e9a9f78b5f938e078da7cbbfd5ba19",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 81600,
+        "endFrame": 133440,
+        "crossfadeFrames": 3840,
+        "score": 0.024601500554065417,
+        "loopBoundaryStep": 0.0020376015454530716
+      },
+      "derivedFrom": 77,
+      "attackSha256": "089d416ddf8323c1c9e6e50dc6d70e810768b3482449ff47b193c0f1063b6d07",
+      "loopSha256": "33c6077b8f97ace02f899486713163e1e04134e4ed242f25117c083352d23c00"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 89,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-089-attack.wav",
+      "loop": "",
+      "attackFrames": 18544,
+      "loopFrames": 0,
+      "peak": 0.2013522833585739,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_F4_v2_RR1.wav",
+      "sourceSha256": "bae94c2ee8f140997542b60d0aaea722b63dfec6700ca1a783b46ae7466bc4f1",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 77,
+      "attackSha256": "6b3f40fc682cb2b9355faabb2a928b1ad2b91b7e976600512577406fd1478a52"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 101,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-101-attack.wav",
+      "loop": "",
+      "attackFrames": 9272,
+      "loopFrames": 0,
+      "peak": 0.2013522833585739,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_F4_v2_RR1.wav",
+      "sourceSha256": "bae94c2ee8f140997542b60d0aaea722b63dfec6700ca1a783b46ae7466bc4f1",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 77,
+      "attackSha256": "bc90361a5388eb4ebf6a4055987e6b0e21c2fcc73547b42999df46ff28da262e"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 1,
+      "root": 113,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-1-113-attack.wav",
+      "loop": "",
+      "attackFrames": 4636,
+      "loopFrames": 0,
+      "peak": 0.2013522833585739,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/spic/spic_F4_v2_RR1.wav",
+      "sourceSha256": "bae94c2ee8f140997542b60d0aaea722b63dfec6700ca1a783b46ae7466bc4f1",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 77,
+      "attackSha256": "8f46d778ef62a9980feb4552ed87f7f4df540ded8e43cec080cce428d619d609"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 89,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-089-attack.wav",
+      "loop": "",
+      "attackFrames": 24272,
+      "loopFrames": 0,
+      "peak": 0.38334107398986816,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_F4_v2_RR1.wav",
+      "sourceSha256": "a0d172b71a6f33890ba5212485e9a23dcc8982bf8ba78b1031c97f3cd419c2a3",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 77,
+      "attackSha256": "2892501dff41d7c1d58c9836538477d43ed626fe267f304eca6597f284b48a60"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 101,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-101-attack.wav",
+      "loop": "",
+      "attackFrames": 12136,
+      "loopFrames": 0,
+      "peak": 0.38334107398986816,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_F4_v2_RR1.wav",
+      "sourceSha256": "a0d172b71a6f33890ba5212485e9a23dcc8982bf8ba78b1031c97f3cd419c2a3",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 77,
+      "attackSha256": "b12ac06b4a4fa00ae8cb8cd04dca32a7b0be315a50bdc4bc440dc70732ee55ac"
+    },
+    {
+      "bank": "CelloSection",
+      "articulation": 2,
+      "root": 113,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/CelloSection/CelloSection-2-113-attack.wav",
+      "loop": "",
+      "attackFrames": 6068,
+      "loopFrames": 0,
+      "peak": 0.38334107398986816,
+      "releaseMs": 180,
+      "source": "Strings/Cello Section/pizzT/pizzT_F4_v2_RR1.wav",
+      "sourceSha256": "a0d172b71a6f33890ba5212485e9a23dcc8982bf8ba78b1031c97f3cd419c2a3",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 77,
+      "attackSha256": "a83d79b60f69394cbeda5fa2979cc19446f3064db4542d47c980983c1b16351a"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 71,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-071-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-071-loop.wav",
+      "attackFrames": 33120,
+      "loopFrames": 31200,
+      "peak": 0.22909370064735413,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_B2_v3_rr1.wav",
+      "sourceSha256": "31b343087d55a947c0d7e13a9ac8cdeaf438da1115dcfd96f829ca0d2261ba52",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 62400,
+        "endFrame": 128640,
+        "crossfadeFrames": 3840,
+        "score": 0.004427629573818717,
+        "loopBoundaryStep": 0.0009717494249343872
+      },
+      "derivedFrom": 59,
+      "attackSha256": "91b871512abf58e4bf27a798058c48a130967f28275624c0d772a98c93968f7a",
+      "loopSha256": "623d4167364ab97e7e5934efd6a4fbc3c5d4a7cd8fff3ef9ab06768c011cfa3c"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 83,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-083-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-083-loop.wav",
+      "attackFrames": 16560,
+      "loopFrames": 15600,
+      "peak": 0.22909370064735413,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_B2_v3_rr1.wav",
+      "sourceSha256": "31b343087d55a947c0d7e13a9ac8cdeaf438da1115dcfd96f829ca0d2261ba52",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 62400,
+        "endFrame": 128640,
+        "crossfadeFrames": 3840,
+        "score": 0.004427629573818717,
+        "loopBoundaryStep": 0.0009717494249343872
+      },
+      "derivedFrom": 59,
+      "attackSha256": "952c3981d6f684248f9d4724d067950aa94071e1f7cf8b696168dafac39f08a1",
+      "loopSha256": "e35514e85bd07c57fcea005b29da997adedc3db42280731e973a542a4284d62f"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 95,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-095-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-095-loop.wav",
+      "attackFrames": 8280,
+      "loopFrames": 7800,
+      "peak": 0.22909370064735413,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_B2_v3_rr1.wav",
+      "sourceSha256": "31b343087d55a947c0d7e13a9ac8cdeaf438da1115dcfd96f829ca0d2261ba52",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 62400,
+        "endFrame": 128640,
+        "crossfadeFrames": 3840,
+        "score": 0.004427629573818717,
+        "loopBoundaryStep": 0.0009717494249343872
+      },
+      "derivedFrom": 59,
+      "attackSha256": "6feaf04bdc76ab935280950816fc70633e19d7bd78710d8dcc09d90f54c2713d",
+      "loopSha256": "03ca9c91609126d2583036ab11ac7ada20382ca5864ea2e41ca00cfec6ed577d"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 107,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-107-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-107-loop.wav",
+      "attackFrames": 4140,
+      "loopFrames": 3900,
+      "peak": 0.22909370064735413,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_B2_v3_rr1.wav",
+      "sourceSha256": "31b343087d55a947c0d7e13a9ac8cdeaf438da1115dcfd96f829ca0d2261ba52",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 62400,
+        "endFrame": 128640,
+        "crossfadeFrames": 3840,
+        "score": 0.004427629573818717,
+        "loopBoundaryStep": 0.0009717494249343872
+      },
+      "derivedFrom": 59,
+      "attackSha256": "0835b2f7429afda52bddfe1db57c55e6d9bd740c61fc9d8fb6a795ce7545432e",
+      "loopSha256": "294cb693a74ed62f57981498c8f90e99adaa16b287c7b8e8e325dee03e40294e"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 0,
+      "root": 119,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-119-attack.wav",
+      "loop": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-0-119-loop.wav",
+      "attackFrames": 2070,
+      "loopFrames": 1950,
+      "peak": 0.22909370064735413,
+      "releaseMs": 700,
+      "source": "Strings/Solo Contrabass/SusVib/BKCtbss_SusVib_B2_v3_rr1.wav",
+      "sourceSha256": "31b343087d55a947c0d7e13a9ac8cdeaf438da1115dcfd96f829ca0d2261ba52",
+      "sourceVelocity": [
+        63,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": {
+        "startFrame": 62400,
+        "endFrame": 128640,
+        "crossfadeFrames": 3840,
+        "score": 0.004427629573818717,
+        "loopBoundaryStep": 0.0009717494249343872
+      },
+      "derivedFrom": 59,
+      "attackSha256": "9f1a9afd7f05b59ab2f07c19e0e750ed96d40524ae084d5be9828933d39eb8ae",
+      "loopSha256": "e8e48830cc2553242baa63151718f52dc95acb0a4ac3f4138ea40fce39de0e95"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 71,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-071-attack.wav",
+      "loop": "",
+      "attackFrames": 37941,
+      "loopFrames": 0,
+      "peak": 0.04866674542427063,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_B2_v1_rr1.wav",
+      "sourceSha256": "8d3be1969f10820373ed4853d81604d3f3cb074a77ef0b3381d2016251d7e890",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 59,
+      "attackSha256": "c732c9cd5913e4d3cca14eb8fdc2f09fdb95a1b379be81a06e6d65dd0e1e9b20"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 83,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-083-attack.wav",
+      "loop": "",
+      "attackFrames": 18970,
+      "loopFrames": 0,
+      "peak": 0.04866674542427063,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_B2_v1_rr1.wav",
+      "sourceSha256": "8d3be1969f10820373ed4853d81604d3f3cb074a77ef0b3381d2016251d7e890",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 59,
+      "attackSha256": "f40c24db6f608cc59e6b6860a173cf9777ef7bf7509348456b94de9b6875237d"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 95,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-095-attack.wav",
+      "loop": "",
+      "attackFrames": 9485,
+      "loopFrames": 0,
+      "peak": 0.04866674542427063,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_B2_v1_rr1.wav",
+      "sourceSha256": "8d3be1969f10820373ed4853d81604d3f3cb074a77ef0b3381d2016251d7e890",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 59,
+      "attackSha256": "8dfd9bb51929580c7fc3f7790c6261e7edf272a8aea43ef4182ea5f043e121b6"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 107,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-107-attack.wav",
+      "loop": "",
+      "attackFrames": 4743,
+      "loopFrames": 0,
+      "peak": 0.04866674542427063,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_B2_v1_rr1.wav",
+      "sourceSha256": "8d3be1969f10820373ed4853d81604d3f3cb074a77ef0b3381d2016251d7e890",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 59,
+      "attackSha256": "1c265897f33263140c4722b767d14a47e76728f8324a1df5c5f372ae2a7e49dc"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 1,
+      "root": 119,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-1-119-attack.wav",
+      "loop": "",
+      "attackFrames": 2372,
+      "loopFrames": 0,
+      "peak": 0.04866674542427063,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Spic/BKCtbss_Spic_B2_v1_rr1.wav",
+      "sourceSha256": "8d3be1969f10820373ed4853d81604d3f3cb074a77ef0b3381d2016251d7e890",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 59,
+      "attackSha256": "40352dc9e821ece70f3c5de4a0cbc4c855dc92f527504e4785065f890330dd4e"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 71,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-071-attack.wav",
+      "loop": "",
+      "attackFrames": 56785,
+      "loopFrames": 0,
+      "peak": 0.020909283310174942,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_B2_v1_rr1.wav",
+      "sourceSha256": "58d70398829e87b9bd3b43fb3d384d9bc3e0aa9bfe70175ec2f4e7a914226c8b",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 59,
+      "attackSha256": "1b2d6ce9d5b5d956ba69db6ce8722885574d1f180c53e3fdc259528e75944d86"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 83,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-083-attack.wav",
+      "loop": "",
+      "attackFrames": 28393,
+      "loopFrames": 0,
+      "peak": 0.020909283310174942,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_B2_v1_rr1.wav",
+      "sourceSha256": "58d70398829e87b9bd3b43fb3d384d9bc3e0aa9bfe70175ec2f4e7a914226c8b",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 59,
+      "attackSha256": "109f1029397534775905add62bb1e0ca33cc2dc4126a546a82c3952e545ee9c2"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 95,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-095-attack.wav",
+      "loop": "",
+      "attackFrames": 14197,
+      "loopFrames": 0,
+      "peak": 0.020909283310174942,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_B2_v1_rr1.wav",
+      "sourceSha256": "58d70398829e87b9bd3b43fb3d384d9bc3e0aa9bfe70175ec2f4e7a914226c8b",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 59,
+      "attackSha256": "a490a9c8e69055d6fe5e7fc3583f57ea797e76e8e2f25753d4cc7c9ddf09fcf7"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 107,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-107-attack.wav",
+      "loop": "",
+      "attackFrames": 7098,
+      "loopFrames": 0,
+      "peak": 0.020909283310174942,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_B2_v1_rr1.wav",
+      "sourceSha256": "58d70398829e87b9bd3b43fb3d384d9bc3e0aa9bfe70175ec2f4e7a914226c8b",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 59,
+      "attackSha256": "27eff3b6e3961711620a383220339cb2eaf23c1468e53ec222591099986b2265"
+    },
+    {
+      "bank": "Contrabass",
+      "articulation": 2,
+      "root": 119,
+      "attack": "Assets/UdonMidiPlayer/Audio/Strings/Contrabass/Contrabass-2-119-attack.wav",
+      "loop": "",
+      "attackFrames": 3549,
+      "loopFrames": 0,
+      "peak": 0.020909283310174942,
+      "releaseMs": 180,
+      "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_B2_v1_rr1.wav",
+      "sourceSha256": "58d70398829e87b9bd3b43fb3d384d9bc3e0aa9bfe70175ec2f4e7a914226c8b",
+      "sourceVelocity": [
+        0,
+        127
+      ],
+      "trimmedFrames": 0,
+      "loopAnalysis": null,
+      "derivedFrom": 59,
+      "attackSha256": "d4407823fa22be4642eb0ed8331d74af390c8200485a2b9ff75c26c35356d2dd"
+    }
+  ],
+  "note": "Single strong recorded layer; auxiliary roots are derived, not extra recordings. Loop joins require listening approval."
+}

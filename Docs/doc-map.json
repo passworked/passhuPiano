@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "updated_on": "2026-11-02",
+  "implementation_baseline": { "commit": "21c05930f4562aac1fbb1f8df62d2bf45fc06524", "source_version": "1.0.0-rc.2", "evidence": "static_source_inspection_not_runtime_acceptance" },
+  "entrypoints": {
+    "users": "Docs/GETTING_STARTED.md",
+    "agents": "Docs/Developer/AI_GUIDE.md",
+    "current_implementation": "Docs/Developer/CURRENT_STATE.md",
+    "instrument_contributors": "Docs/Contributing/README.md",
+    "instrument_policy": "Docs/Contributing/instrument-policy.json"
+  },
+  "documents": [
+    { "path": "AGENTS.md", "status": "current_operational_constraints", "purpose": "Core constraints and navigation" },
+    { "path": "CONTRIBUTING.md", "status": "current", "purpose": "Contribution entry and approval scope" },
+    { "path": "Docs/GETTING_STARTED.md", "status": "current", "purpose": "Setup and usage without implied acceptance" },
+    { "path": "Docs/Developer/AI_GUIDE.md", "status": "current", "purpose": "Agent workflow, evidence and task routing" },
+    { "path": "Docs/Developer/CURRENT_STATE.md", "status": "current_baseline_facts", "purpose": "Source map and explicit unpublished differences" },
+    { "path": "Docs/Contributing/instrument-policy.json", "status": "maintainer_confirmed_policy", "purpose": "Machine-readable instrument requirements and resource limits" },
+    { "path": "Docs/Contributing/README.md", "status": "maintainer_confirmed_policy", "purpose": "Human-readable contribution policy" },
+    { "path": "Docs/Contributing/BUDGETS.md", "status": "maintainer_confirmed_policy", "purpose": "Measurement scope, units and formulas" },
+    { "path": "Docs/Contributing/INSTRUMENT_SUBMISSION_TEMPLATE.md", "status": "template_not_acceptance", "purpose": "Submission and evidence record" },
+    { "path": "Docs/Contributing/instrument-submission.template.json", "status": "template_not_acceptance", "purpose": "Nullable machine-readable contribution record" },
+    { "path": "Docs/UdonMidiPlayer/CONTRACTS.md", "status": "mixed_historical_and_dated_updates", "purpose": "Read current code before reusing old interfaces and budgets" },
+    { "path": "Docs/UdonMidiPlayer/18-adding-instruments.md", "status": "historical_technical_matrix_with_current_entry", "purpose": "Integration change locations; old review questions are not new policy" },
+    { "path": "Docs/UdonMidiPlayer/19-gm-program-fallback.md", "status": "current_rules_with_historical_context", "purpose": "Six active targets, GM routing and preserved retired identity" },
+    { "path": "Docs/UdonMidiPlayer/17-maintenance-conventions.md", "status": "current_maintenance_rules", "purpose": "Scope, preservation and verification boundaries" },
+    { "path": "Docs/UdonMidiPlayer/22-release-implementation.md", "status": "dated_release_evidence", "purpose": "Release/source operations, not global runtime sign-off" }
+  ],
+  "authoring_only_changes": [
+    { "path": "Assets/UdonMidiPlayer/Editor/Baking/AudioEnergyBaker.cs", "exists_in_implementation_baseline": false, "status": "not_shipped_by_this_documentation_change" },
+    { "path": "Assets/UdonMidiPlayer/Editor/Prefab/MidiBuildValidator.cs", "exists_in_implementation_baseline": true, "change_in_implementation_baseline": false, "status": "non_blocking_world_build_callback_is_authoring_only" },
+    { "path": "Assets/UdonMidiPlayer/Runtime/Audio/PianoVoicePool.cs", "exists_in_implementation_baseline": true, "change_in_implementation_baseline": false, "status": "energy_compression_and_default_balance_are_authoring_only" }
+  ],
+  "unmeasured_values": "Use null / not_run / not_verified; never infer passed or zero.",
+  "automation": { "resource_budget_enforcement_implemented": false, "required_review_configuration_changed_by_this_work": false }
+}

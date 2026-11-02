@@ -12,6 +12,9 @@
 
 ## 文档索引
 
+- [AI / 开发者工作入口](Docs/Developer/AI_GUIDE.md) · [当前实现与源码地图](Docs/Developer/CURRENT_STATE.md)
+- [乐器贡献规则](Docs/Contributing/README.md) · [机器可读政策](Docs/Contributing/instrument-policy.json) · [资源预算](Docs/Contributing/BUDGETS.md)
+
 - [文档总览](Docs/UdonMidiPlayer/README.md) · [详细维护约定](Docs/UdonMidiPlayer/17-maintenance-conventions.md)
 - [UI 层级与绘制顺序](Docs/UdonMidiPlayer/15-ui-hierarchy.md) · [控制与 UI](Docs/UdonMidiPlayer/07-controls-and-ui.md)
 - [架构](Docs/UdonMidiPlayer/01-architecture.md) · [同步](Docs/UdonMidiPlayer/04-multiplayer-sync.md)

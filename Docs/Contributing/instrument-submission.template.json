@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "policy_id": "passhupiano-instrument-contributions-v1",
+  "name": null,
+  "contributor": null,
+  "base_commit": null,
+  "submission_commit": null,
+  "stage": "partial",
+  "provided": [],
+  "remaining_work": [],
+  "target_assets": [],
+  "platforms": { "PC": "not_verified", "mobile": "not_declared" },
+  "inputs": { "midi_file_playback": "not_verified", "hardware_midi": "not_declared", "pc_keyboard": "not_declared", "vr_performance": "not_declared" },
+  "sound_semantics": { "range": null, "velocity": null, "release_and_pedals": null, "loops_and_articulations": null, "physical_sources_per_note": null },
+  "resources": [
+    { "path": null, "guid": null, "kind": null, "creator": null, "source_url": null, "license": null, "license_file": null, "sha256": null, "modifications": null, "derived_from": [] }
+  ],
+  "audio_format_proposal": null,
+  "resource_measurements": {
+    "model_triangles": null,
+    "distinct_concurrent_materials": null,
+    "renderers": null,
+    "texture_width_max": null,
+    "texture_height_max": null,
+    "texture_rgba32_full_mip_estimate_bytes": null,
+    "source_audio_bytes": null,
+    "audio_float32_pcm_estimate_bytes": null,
+    "scope_and_method": null,
+    "evidence": []
+  },
+  "integration_changes": [],
+  "synchronization_changes": [],
+  "ai_assistance": { "used": null, "scope": [], "inputs_and_rights": null, "human_review": null },
+  "verification": { "editor_compile": "not_run", "PC_VRChat_single_client": "not_run", "other_declared_inputs": "not_run", "multi_client": "not_run", "environment": null, "evidence": [] },
+  "known_limitations": [],
+  "maintainer_decision": "pending",
+  "maintainer_confirmation_url": null
+}

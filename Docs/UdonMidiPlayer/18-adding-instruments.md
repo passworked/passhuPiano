@@ -1,4 +1,10 @@
-# 新乐器追加规范（审阅草案）
+# 乐器接入技术矩阵与历史草案
+
+## 当前贡献入口（2026-11-02）
+
+正式贡献政策已由维护者确认，见[乐器贡献规则](../Contributing/README.md)、[资源预算](../Contributing/BUDGETS.md)和[机器可读政策](../Contributing/instrument-policy.json)。允许直接 PR 和分阶段贡献，正式收录由 passhu 决定；音源格式不统一锁定为现有某种规格。新贡献必须满足已确认硬上限并提供 PC VRChat 单客户端实测。
+
+本页以下内容保留为分日期的技术接入位置与历史快照，**不是另一份准入政策**。旧“待审阅”问题、七目标 / 弦乐组有效槽、3 / 8 固定长度等说明不可直接作为当前实现；先核对[当前源码地图](../Developer/CURRENT_STATE.md)与实际 checkout。第 9 节之后记录的能量烘焙属于作者工程后续变化，不能据此推断私仓 rc.2 已有相应代码。
 
 ## 2026-11-01 路由实现补充
 
@@ -78,7 +84,7 @@
 - 每次起音固定实际 bank、region、奏法、根音、增益与释放；后续 Program / 菜单变化不能让旧音松键时访问新音源的数据。手动切换是否迁移按住音沿用当前 Facade 的捕获 / 恢复策略。
 - 鼓为 one-shot，NoteOff / CC64 不截断自然尾音，开镲被闭镲 / 脚镲收音；定位恢复不能复活已 choke 的尾音。轮替使用稳定事件身份，不能各端独立随机。
 - 长音按实际年龄恢复循环相位，释放与曲终按所用音源计算。若扩展表达、Program 或 Bank Select，同步核对导入、编码、解码、恢复与实时快照。当前静态代码已见 CC11 导入时间线、压缩扩展 / 解码、`ExpressionAt`、弦乐音量表达及实时快照接点；本次没有验证运行效果。CC1 和完整 Program 自动路由不能由此推定已完成。
-- 保留本地音量、静音、3D / 2D、可选峰值保护及既定空间落点；不让表现层修改播放权威状态或新增逐音网络广播。
+- 保留本地音量、静音、3D / 2D、默认开启且可本地关闭的音量平衡及既定空间落点；不让表现层修改播放权威状态或新增逐音网络广播。
 
 ## 5. 追加时必须检查的代码位置
 
@@ -120,7 +126,7 @@
 
 交付记录建议包含：本次音源与目标对象、受影响 Program / 回退、变更文件、实际执行的工具与检查、预算测量口径、仍待审阅 / 验证项。场景曲库和分发曲库继续分开维护，不因追加乐器自动 Apply 实例覆盖或同步歌曲。
 
-## 8. 本次审阅重点
+## 8. 2026-10-31 历史审阅问题（不再作为当前决策入口）
 
 1. 是否采用“保持手选模式，GM 自动路由作为单独后续能力”的边界。
 2. 是否接受第 19 册按现有音源制定的近似替代，以及无原效果的占位项。
@@ -134,3 +140,5 @@
 - 音源与发声：[PianoBankData](../../Assets/UdonMidiPlayer/Runtime/Data/PianoBankData.cs)、[PianoVoicePool](../../Assets/UdonMidiPlayer/Runtime/Audio/PianoVoicePool.cs)、[StringsVoicePool](../../Assets/UdonMidiPlayer/Runtime/Audio/StringsVoicePool.cs)、[PercussionVoicePool](../../Assets/UdonMidiPlayer/Runtime/Audio/PercussionVoicePool.cs)。
 - 当前准备清单：[钢琴 / 马林巴](../../Assets/UdonMidiPlayer/Audio/SelectedQ4/BANK-MAPPING.json)、[弦乐](../../Assets/UdonMidiPlayer/Audio/Strings/BANK-MAPPING.json)、[鼓组](../../Assets/UdonMidiPlayer/Audio/VirtuosityDrums/BANK-MAPPING.json)。
 - 烘焙与边界：[MidiStringsBuilder](../../Assets/UdonMidiPlayer/Editor/Prefab/MidiStringsBuilder.cs)、[MidiPercussionBuilder](../../Assets/UdonMidiPlayer/Editor/Prefab/MidiPercussionBuilder.cs)、[MidiInstrumentMigration](../../Assets/UdonMidiPlayer/Editor/Prefab/MidiInstrumentMigration.cs)、[MidiBuildValidator](../../Assets/UdonMidiPlayer/Editor/Prefab/MidiBuildValidator.cs)。
+
+2026-11-02：新增或重导入音源须通过 `AudioEnergyBaker` 生成 20 ms 的 `energyStarts/energyCounts/energyValues`，在实际源时间轴上取能量，并接入现有共享压缩系数。包络纳入 bank 哈希与构建前 backing Udon 数组校验，不新增逐帧 PCM 读取；持续音循环、变调、释放和未来预约分别按第 13 册处理。

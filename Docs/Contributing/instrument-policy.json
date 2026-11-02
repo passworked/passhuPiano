@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "policy_id": "passhupiano-instrument-contributions-v1",
+  "status": "maintainer_confirmed",
+  "confirmed_on": "2026-11-02",
+  "maintainer": { "name": "passhu", "github": "passworked" },
+  "governance": {
+    "direct_pull_requests_allowed": true,
+    "issue_required": false,
+    "phased_contributions_allowed": true,
+    "official_inclusion_requires": ["model", "sound_source", "integration", "documentation", "maintainer_acceptance"],
+    "final_decision": "maintainer",
+    "automatic_acceptance": false,
+    "enforcement": "documented_review_policy_not_an_implemented_ci_gate"
+  },
+  "platforms": { "required": ["PC"], "mobile": "separately_declared_and_verified" },
+  "inputs": { "midi_file_playback": "required", "hardware_midi": "declare_per_instrument", "pc_keyboard": "declare_per_instrument", "vr_performance": "declare_per_instrument" },
+  "art_style": "unrestricted_style_subject_to_maintainer_review",
+  "audio_format": "contributor_proposes_maintainer_reviews",
+  "audio_quality": "evidence_and_listening_review_required",
+  "licenses": {
+    "project_owned_code": "MIT",
+    "project_owned_art": "CC-BY-4.0",
+    "scores_and_samples_allowed": ["CC0-1.0", "LicenseRef-Public-Domain", "CC-BY-3.0", "CC-BY-4.0", "reviewed_unrestricted_permission"],
+    "scores_and_samples_rejected": ["ShareAlike", "NonCommercial", "NoDerivatives", "unknown_permission"],
+    "third_party_terms_retained": true
+  },
+  "resource_limits": {
+    "scope": "one_complete_new_instrument_worst_visible_and_supported_configuration",
+    "shared_physical_audio_sources": 64,
+    "model_triangles_max": 50000,
+    "distinct_concurrent_materials_max": 8,
+    "renderers_max": 128,
+    "texture_width_max": 2048,
+    "texture_height_max": 2048,
+    "texture_rgba32_full_mip_estimate_bytes_max": 67108864,
+    "source_audio_bytes_max": 33554432,
+    "audio_float32_pcm_estimate_bytes_max": 671088640,
+    "existing_assets_automatically_reworked": false,
+    "automatic_exceptions": false
+  },
+  "verification": {
+    "before_official_inclusion": ["PC_VRChat_single_client_evidence", "resource_measurement_evidence", "maintainer_review"],
+    "report_commit_and_environment": true,
+    "unknown_is_not_passed": true,
+    "synchronization_changes": "declare_changes_and_unverified_multi_client_behavior_for_maintainer_review"
+  },
+  "ai_assistance": { "allowed": true, "disclose_scope": true, "submitter_responsible_for_quality_and_rights": true },
+  "companion_documents": ["README.md", "BUDGETS.md", "INSTRUMENT_SUBMISSION_TEMPLATE.md", "instrument-submission.template.json"]
+}

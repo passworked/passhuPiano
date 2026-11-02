@@ -1,4 +1,17 @@
-# Udon MIDI Player v0.1 技术方案与实现索引
+# passhuPiano 文档索引
+
+## 当前阅读入口
+
+| 读者 / 任务 | 先读 | 状态 |
+| --- | --- | --- |
+| 安装与使用 | [快速开始](../GETTING_STARTED.md) | 当前入口，不表示验收通过 |
+| AI / 程序修改 | [AI 工作指南](../Developer/AI_GUIDE.md)、[当前实现](../Developer/CURRENT_STATE.md) | 明确源码基线与证据边界 |
+| 提交乐器 | [贡献政策](../Contributing/README.md)、[预算](../Contributing/BUDGETS.md)、[模板](../Contributing/INSTRUMENT_SUBMISSION_TEMPLATE.md) | 2026-11-02 维护者已确认 |
+| 工具检索 | [文档地图](../doc-map.json)、[政策 JSON](../Contributing/instrument-policy.json) | 机器可读；未测值用 null |
+
+下面技术分册包含当前规则、分日期更新及历史设计。旧段落中的“当前”仅指其记录日期；v0.1 的初始范围、单层音源或“尚未实现”不能覆盖新入口、维护者确认政策和实际源码。细粒度修改时再按任务读取相应分册。
+
+## 技术分册与历史说明
 
 面向 VRChat World 的钢琴 MIDI 播放器：开发者批量导入 MIDI、配置曲库并拖入 Prefab，即可获得多人共享播放和实时 88 键瀑布流。
 
@@ -47,7 +60,7 @@
 | [21 v1.0 发布与开源规划](21-v1-release-and-open-source.md) | 两份钢琴 Prefab、完整项目 monorepo、MIT / CC BY 范围、第三方许可、RC 与发布维护 | 项目负责人、分发与开源维护者 |
 | [22 发布实施记录](22-release-implementation.md) | passhu 署名、曲谱 / 音源白名单、独立曲库筛选、包与源码工具、候选证据和剩余验收 | 分发与开源维护者 |
 
-## 2. 首版范围
+## 2. 历史设计：v0.1 首版范围
 
 | 优先级 | 项目 | v0.1 交付边界 |
 | --- | --- | --- |
@@ -85,7 +98,7 @@ flowchart TD
 
 所有项目自有 C# 类型显式使用 `MusicMidiPlayer.*`，编辑器类型使用 `MusicMidiPlayer.Editor.*`；运行与 Editor 程序集分开。Prefab 分发同时保持 `.meta`、程序集名和完整类型名稳定，具体约定见第 12 册。
 
-## 4. 当前资源与验证边界
+## 4. 历史资源与验证记录（2026-10-24 起）
 
 当前默认配置使用 WhiteGrandPiano 白色三角钢琴 FBX，按 `Key_021_…`～`Key_108_…` 绑定独立琴键。Editor 从真实键的几何烘焙瀑布流横坐标与宽度，保留原材质及导入根变换；模型模式关闭原型键和实体背景墙，控制 UI 独立置侧。模型与音源可在 `MusicMidiPlayer.Editor.Assets.MidiPlayerConfigurationAsset` 中选择，运行侧不读取该 Editor 源资产。
 

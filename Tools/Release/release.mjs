@@ -116,7 +116,7 @@ export function sourceSnapshot() {
       if (fs.existsSync(path.join(root, parent + '.meta'))) files.add(parent + '.meta');
   }
   // Authoring sources and documentation are copied as source, not caches or bundles.
-  for (const directory of ['ArtSource', 'Docs', 'Licenses', 'Tools']) for (const p of walk(directory)) {
+  for (const directory of ['ArtSource', 'Docs', 'Licenses', 'Tools', '.github']) for (const p of walk(directory)) {
     if (excludedPublicFile(p)) continue;
     if (/(?:^|\/)(?:__pycache__|python_packages|Extracted|Layout|Payload|Portable|References)(?:\/|$)/.test(p) || /\.(?:pyc|exe|dll|zip|7z|wav|mp3|mid|midi)$/i.test(p)) continue;
     if (!/\.(?:blend|fbx|glb|png|jpg|jpeg|otf|ttf|txt|md|json|mjs|py|ps1|cmd|yml|yaml)$/i.test(p)) continue;

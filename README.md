@@ -1,38 +1,40 @@
-# passhuPiano
+<p align="center">
+  <img src="Docs/Brand/passhuPiano-logo.png" width="160" alt="passhuPiano logo">
+</p>
+<h1 align="center">passhuPiano</h1>
+<p align="center">Bring MIDI to your VRChat world.</p>
+<p align="center">
+  <a href="Docs/GETTING_STARTED.md">开始使用</a> ·
+  <a href="Docs/Developer/AI_GUIDE.md">开发指南</a> ·
+  <a href="Docs/Contributing/README.md">贡献乐器</a>
+</p>
 
-VRChat Worlds / UdonSharp MIDI player, editable instrument art and offline authoring tools in one repository. Maintainer: **passhu**, laptop7921@gamil.com.
+为 VRChat Worlds 提供 **MIDI 播放、多人共享播放与实时演奏**。
 
-Repository: [passworked/passhuPiano](https://github.com/passworked/passhuPiano), private. Version: **1.0.0-rc.2 — source update**. No stable v1.0 download has been published. The initial stable scope is the two independent piano Prefabs; the multi-instrument main world, practice system and classroom remain separately documented modules. Internal `musicMidiPlayer` paths, `MusicMidiPlayer.*` types and Unity GUIDs are retained.
+主场景支持钢琴、马林巴、弦乐和鼓组，附可编辑美术与制作工具；两份独立钢琴 Prefab 单独维护。
 
-The November 2 update includes state-driven UI refresh, batched ensemble audio output, Shader-driven waterfall motion and incremental loading finalization. The main world also retains the updated per-instrument string-style controls and repertoire navigation. These are implementation changes; runtime performance, real VRChat synchronization and platform support have not been signed off. See [performance evidence and limits](Docs/UdonMidiPlayer/09-performance-and-validation.md).
+> 当前为 `1.0.0-rc.2` 开发候选，PC 优先。功能与验收边界见[当前实现](Docs/Developer/CURRENT_STATE.md)。
 
-## Documentation and instrument contributions
+## 快速开始
 
-- **使用工程 / Setup:** [安装与使用入口](Docs/GETTING_STARTED.md).
-- **AI / Developers:** [工作指南](Docs/Developer/AI_GUIDE.md), [当前实现与源码地图](Docs/Developer/CURRENT_STATE.md), [machine-readable document map](Docs/doc-map.json).
-- **提交乐器 / Contribute instruments:** [维护者确认的规则](Docs/Contributing/README.md), [资源预算与公式](Docs/Contributing/BUDGETS.md), [提交模板](Docs/Contributing/INSTRUMENT_SUBMISSION_TEMPLATE.md), [machine-readable policy](Docs/Contributing/instrument-policy.json).
+安装 Git LFS，并取得私仓访问权限后：
 
-Direct PRs and phased contributions are welcome. Official instrument inclusion requires the model, sound source, integration, documentation, PC VRChat single-client evidence and passhu's acceptance. Different visual styles and audio format proposals are reviewed individually. AI assistance is allowed with its scope disclosed; contributors remain responsible for rights and quality. These are review rules, not an automatic admission system.
+```sh
+git clone https://github.com/passworked/passhuPiano.git
+cd passhuPiano
+git lfs pull
+```
 
-New instruments share the existing 64 physical AudioSources and must meet the confirmed per-instrument caps: 50,000 triangles, 8 distinct concurrent materials, 128 Renderers; textures at most 2048×2048 and 64 MiB RGBA32 full-mip estimate; 32 MiB source audio and 640 MiB float32 PCM estimate. See the budget document for the counting boundary. Existing resources are not automatically reworked by this policy.
+通过 VCC / ALCOM 恢复 Worlds SDK，再用 **Unity 2022.3.22f1** 打开工程。记录的 SDK 基线为 **3.10.5**。打开主场景，或将钢琴 Prefab 拖入自己的世界。
 
-## Use the player
+详细步骤见[安装与使用](Docs/GETTING_STARTED.md)。[技术文档](Docs/UdonMidiPlayer/README.md) · [AI 工作指南](Docs/Developer/AI_GUIDE.md)
 
-The validation baseline is Unity **2022.3.22f1** and VRChat Worlds SDK **3.10.5**. Restore the SDK through VCC/ALCOM before opening the project. This is a recorded development baseline, not a claim of support for every newer SDK or mobile platform.
+## 参与贡献
 
-When a tested release package is available, import it into an existing Worlds project, drag either `UdonMidiPlayer.prefab` or `UdonMidiPlayer_Upright.prefab` into your world, then use **Tools → Music MIDI Player → Configure Player** for your own permitted repertoire. The release package must not replace global TMP/audio settings or install the SDK.
+欢迎乐器、音源、美术、代码和文档贡献，可直接提交 PR，也可分阶段完成。
 
-The release repertoire contains only reviewed public-domain/CC0 or attribution-only sources. The old 100-track development library is not the release library. BY-SA, NC, ND and unknown-permission MIDI/samples, including their baked derivatives, are excluded. Third-party licenses remain unchanged.
+正式收录乐器前，需补齐模型、音源、接入和说明，提供 PC VRChat 实测，并由 **passhu** 评审。来源许可、资源硬上限与 AI 披露要求见[贡献指南](Docs/Contributing/README.md)。
 
-## Work on the source
+## 许可
 
-Clone the public source snapshot with Git LFS installed, run `git lfs pull`, restore Unity/VPM dependencies, and open the repository root with the stated Unity version. `ArtSource/` holds editable art outside Unity's import tree; `Tools/` holds offline processing scripts. Unity MCP is an optional local development dependency and is removed from public project manifests.
-
-The local authoring project may contain private repertoire and an unsaved main scene. Only the sanitized source snapshot produced by the release workflow is suitable for the remote repository; do not push the local directory wholesale. The same score/sample permission filters apply to this private repository and future public distributions.
-
-- [Release workflow and current evidence](Docs/UdonMidiPlayer/22-release-implementation.md)
-- [Architecture and documentation](Docs/UdonMidiPlayer/README.md)
-- [Release plan](Docs/UdonMidiPlayer/21-v1-release-and-open-source.md)
-- [License scope](LICENSE.md) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Contributing](CONTRIBUTING.md)
-
-Project-owned code: **MIT**. Project-owned art: **CC BY 4.0**. Third-party resources retain their individual licenses.
+自有代码采用 [MIT](Licenses/MIT.txt)，自有美术采用 [CC BY 4.0](Licenses/CC-BY-4.0.txt)。第三方内容保留原许可与署名，详见[许可范围](LICENSE.md)及[来源清单](THIRD_PARTY_NOTICES.md)。

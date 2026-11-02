@@ -1,0 +1,18 @@
+passhuPiano logo — AI generation provenance
+Owner/credit: passhu
+License: CC BY 4.0
+Date: 2026-11-02
+Tool: built-in image_gen.imagegen (no CLI fallback)
+Final asset: Docs/Brand/passhuPiano-logo.png
+
+INITIAL GENERATION PROMPT
+Use-case: logo-design.
+Create one original, exceptionally polished brand SYMBOL for passhuPiano, an open-source VRChat MIDI piano and instrument player. It will be the GitHub repository's avatar and a centered small README logo.
+Design a distinctive compact geometric lowercase-p-inspired mark that merges a small piano keyboard with a MIDI piano-roll motif. Three broad, clean key-like vertical shapes form the lower stem/foot, while an elegant curved geometric upper bowl suggests a p and the outline of a piano. One short detached MIDI note bar may echo the same rhythm above. The meaning should emerge from one integrated silhouette, not multiple unrelated pictograms.
+Style: confident minimalist contemporary software identity, precision geometry, generous negative space, optically balanced proportions, softly controlled corners, strong small-size recognition at 32 pixels. Flat vector-like graphic rendered as a crisp raster image. Use solid aquatic cobalt/teal blue as the primary ink and one restrained bright cyan accent, consistent with a cool crystal piano visual. Use no white opaque tile or background.
+Composition: one centered standalone symbol on a truly transparent square canvas, occupying about 72 percent of the canvas, comfortable equal breathing room. No typography, no letters printed as text, no wordmark, no caption, no surrounding frame, no app-tile rounded-square background, no gradients, no shadows, no mockup, no photograph, no 3D, no glossy effects, no staff lines or scattered musical decorations. Do not include star counts, badges, GitHub mascots, VRChat logos, or existing brand marks. Deliver only the finished original logo symbol with genuine alpha transparency.
+
+FINISHING EDIT PROMPT
+Edit the supplied passhuPiano logo as a finishing pass. Preserve its overall silhouette and composition exactly: the geometric blue p/piano-shaped outline, two lower key-shaped cutouts, and three ascending horizontal MIDI bars inside the upper bowl. Do not redesign it or add text.
+Change only the rendering quality and color fills: make the blue shapes a crisp perfectly flat solid #176DB5 and the top MIDI bar a crisp perfectly flat cyan #28D3DE. Remove gradients, all texture, faint blue speckles, glow, fringe, smudges and stray semi-transparent pixels from the negative spaces and outside the silhouette. Make the interior cutouts and surrounding canvas genuinely fully transparent. Preserve clean smooth antialiased boundaries, consistent geometric curves, confident thick forms and comfortable square-canvas margins. No background tile, no shadow, no wordmark, no mockup. Deliver one finished production logo, transparent PNG.
+

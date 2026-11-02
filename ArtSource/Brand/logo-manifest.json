@@ -1,0 +1,14 @@
+{
+  "name": "passhuPiano logo",
+  "author": "passhu",
+  "license": "CC-BY-4.0",
+  "generated_on": "2026-11-02",
+  "tool": "image_gen.imagegen",
+  "ai_assistance": "AI-generated symbol with a rendering-cleanup edit; no third-party logo used",
+  "asset": "Docs/Brand/passhuPiano-logo.png",
+  "prompt": "ArtSource/Brand/logo-prompt.txt",
+  "width": 1254,
+  "height": 1254,
+  "color_type": "RGBA",
+  "sha256": "391704be35f108984e24e659fa53b295df0685a7b8b2083284ca13f93cb603e3"
+}

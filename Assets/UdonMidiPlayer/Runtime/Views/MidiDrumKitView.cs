@@ -46,9 +46,15 @@ namespace MusicMidiPlayer.Views
         }
         public void BindSong(MidiSongData song)
         {
-            Initialize();_song=song;Clear(_generation);if(lanes!=null)lanes.BindSong(song);
+            BeginBindSong(song);
+            while(!BindStep(512)) { }
+        }
+        public void BeginBindSong(MidiSongData song)
+        {
+            Initialize();_song=song;Clear(_generation);if(lanes!=null)lanes.BeginBindSong(song);
             ApplySongPalette();
         }
+        public bool BindStep(int budget) { return lanes==null || lanes.BindStep(budget); }
         private void ApplySongPalette()
         {
             // Same canonical source-MIDI palette as PianoKeyboardView, including strings-only presentation.

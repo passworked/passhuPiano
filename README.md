@@ -1,8 +1,10 @@
-# musicMidiPlayer
+# passhuPiano
 
 VRChat Worlds / UdonSharp MIDI player, editable instrument art and offline authoring tools in one repository. Maintainer: **passhu**, laptop7921@gamil.com.
 
-Version: **1.0.0-rc.1 — release preparation**. No stable v1.0 download has been published. The initial stable scope is the two independent piano Prefabs; the multi-instrument main world, practice system and classroom remain separately documented modules.
+Repository: [passworked/passhuPiano](https://github.com/passworked/passhuPiano), private. Version: **1.0.0-rc.2 — source update**. No stable v1.0 download has been published. The initial stable scope is the two independent piano Prefabs; the multi-instrument main world, practice system and classroom remain separately documented modules. Internal `musicMidiPlayer` paths, `MusicMidiPlayer.*` types and Unity GUIDs are retained.
+
+The November 2 update includes state-driven UI refresh, batched ensemble audio output, Shader-driven waterfall motion and incremental loading finalization. The main world also retains the updated per-instrument string-style controls and repertoire navigation. These are implementation changes; runtime performance, real VRChat synchronization and platform support have not been signed off. See [performance evidence and limits](Docs/UdonMidiPlayer/09-performance-and-validation.md).
 
 ## Use the player
 
@@ -16,7 +18,7 @@ The release repertoire contains only reviewed public-domain/CC0 or attribution-o
 
 Clone the public source snapshot with Git LFS installed, run `git lfs pull`, restore Unity/VPM dependencies, and open the repository root with the stated Unity version. `ArtSource/` holds editable art outside Unity's import tree; `Tools/` holds offline processing scripts. Unity MCP is an optional local development dependency and is removed from public project manifests.
 
-The local authoring project may contain private repertoire and an unsaved main scene. Only the sanitized source snapshot produced by the release workflow is suitable for publication; do not push the local directory wholesale. No repository URL is assumed or configured by these instructions.
+The local authoring project may contain private repertoire and an unsaved main scene. Only the sanitized source snapshot produced by the release workflow is suitable for the remote repository; do not push the local directory wholesale. The same score/sample permission filters apply to this private repository and future public distributions.
 
 - [Release workflow and current evidence](Docs/UdonMidiPlayer/22-release-implementation.md)
 - [Architecture and documentation](Docs/UdonMidiPlayer/README.md)

@@ -62,6 +62,8 @@ namespace MusicMidiPlayer.Views
         private int _generation = -1;
         private int _lastPositionMs;
         private int _worstSlot = -1;
+        private Material _gpuMaterial;
+        private MaterialPropertyBlock _noteProperties;
 
         public void Initialize()
         {
@@ -70,6 +72,16 @@ namespace MusicMidiPlayer.Views
             int count = barTransforms == null ? 0 : Mathf.Min(512, barTransforms.Length);
             if (_slotNote != null && _capacity == count) return;
             _capacity = count;
+            if (_noteProperties == null) _noteProperties = new MaterialPropertyBlock();
+            if (_gpuMaterial == null && volumeNoteMaterial != null && volumeNoteMaterial.HasProperty("_GpuAnimation"))
+                for (int i = 0; i < count; i++)
+                    if (barRenderers != null && i < barRenderers.Length && barRenderers[i] != null)
+                    {
+                        barRenderers[i].sharedMaterial = volumeNoteMaterial;
+                        _gpuMaterial = barRenderers[i].material;
+                        _gpuMaterial.SetFloat("_GpuAnimation", 1f);
+                        break;
+                    }
             _liveId = new int[count];
             _livePitch = new int[count];
             _liveStart = new float[count];
@@ -89,6 +101,7 @@ namespace MusicMidiPlayer.Views
                     barRenderers[i].GetPropertyBlock(noteProperties);
                     noteProperties.SetFloat("_NoteOrder", (i + 1f) / Mathf.Max(1, count));
                     barRenderers[i].SetPropertyBlock(noteProperties);
+                    if (_gpuMaterial != null) barRenderers[i].sharedMaterial = _gpuMaterial;
                 }
                 _slotNote[i] = -1;
                 _freeSlots[i] = count - 1 - i;
@@ -154,7 +167,7 @@ namespace MusicMidiPlayer.Views
             BuildBarPalette();
             int count = data == null || data.startMs == null ? 0 : data.startMs.Length;
             _noteSlot = new int[count];
-            for (int i = 0; i < count; i++) _noteSlot[i] = -1;
+            // Zero is unassigned; encoded slot+1 avoids an O(song notes) Udon fill.
             if (changed && effects != null) effects.BindSong(data);
         }
 
@@ -192,6 +205,11 @@ namespace MusicMidiPlayer.Views
                 RebuildAt(positionMs, generation);
                 return;
             }
+            if (_gpuMaterial != null && positionMs == _lastPositionMs)
+            {
+                if (effects != null) effects.Refresh(positionMs, generation);
+                return;
+            }
             for (int i = 0; i < _capacity; i++)
                 if (_slotNote[i] >= 0 && !Candidate(_slotNote[i], positionMs)) ReleaseSlot(i);
             _worstSlot = -1;
@@ -217,7 +235,7 @@ namespace MusicMidiPlayer.Views
             for (int i = 0; i < _capacity; i++)
             {
                 int note = _slotNote[i];
-                if (_noteSlot != null && note >= 0 && note < _noteSlot.Length) _noteSlot[note] = -1;
+                if (_noteSlot != null && note >= 0 && note < _noteSlot.Length) _noteSlot[note] = 0;
                 _liveId[i] = -1;
                 _slotNote[i] = -1;
                 _slotHit[i] = false;
@@ -276,7 +294,7 @@ namespace MusicMidiPlayer.Views
 
         private void OfferNote(int note, int positionMs)
         {
-            if (_capacity == 0 || _noteSlot[note] >= 0) return;
+            if (_capacity == 0 || _noteSlot[note] != 0) return;
             int slot;
             if (_freeCount > 0)
             {
@@ -288,10 +306,10 @@ namespace MusicMidiPlayer.Views
                 if (_worstSlot < 0) FindWorst(positionMs);
                 slot = _worstSlot;
                 if (slot < 0 || !BetterVisual(note, _slotNote[slot], positionMs)) return;
-                _noteSlot[_slotNote[slot]] = -1;
+                _noteSlot[_slotNote[slot]] = 0;
             }
             _slotNote[slot] = note;
-            _noteSlot[note] = slot;
+            _noteSlot[note] = slot + 1;
             _slotHit[slot] = false;
             if (barTransforms[slot] != null) barTransforms[slot].gameObject.SetActive(true);
             SetMaterial(slot, note, false);
@@ -302,7 +320,7 @@ namespace MusicMidiPlayer.Views
         {
             int note = _slotNote[slot];
             if (note < 0) return;
-            _noteSlot[note] = -1;
+            _noteSlot[note] = 0;
             _slotNote[slot] = -1;
             _freeSlots[_freeCount] = slot;
             _freeCount++;
@@ -331,6 +349,7 @@ namespace MusicMidiPlayer.Views
 
         private void UpdateGeometry(int positionMs)
         {
+            if (_gpuMaterial != null) { UpdateGpuClock(positionMs * 0.001f); return; }
             float height = Mathf.Max(0.001f, viewHeight);
             float unitsPerMs = height / Mathf.Max(1, windowMs);
             for (int i = 0; i < _capacity; i++)
@@ -370,6 +389,13 @@ namespace MusicMidiPlayer.Views
             _livePitch[slot] = pitch;
             _liveStart[slot] = Time.realtimeSinceStartup;
             _liveEnd[slot] = -1f;
+            if (_gpuMaterial != null)
+            {
+                ConfigureGpuSlot(slot, pitch, _liveStart[slot], -1f, true);
+                if (barTransforms[slot] != null) barTransforms[slot].gameObject.SetActive(true);
+                UpdateGpuClock(_liveStart[slot]);
+                return;
+            }
             if (barRenderers != null && slot < barRenderers.Length && barRenderers[slot] != null)
                 barRenderers[slot].sharedMaterial = GetBarMaterial(pitch);
             RefreshLive();
@@ -379,13 +405,18 @@ namespace MusicMidiPlayer.Views
         {
             Initialize();
             for (int i = 0; i < _capacity; i++)
-                if (_liveId[i] == identity && _liveEnd[i] < 0f) _liveEnd[i] = Time.realtimeSinceStartup;
+                if (_liveId[i] == identity && _liveEnd[i] < 0f)
+                {
+                    _liveEnd[i] = Time.realtimeSinceStartup;
+                    if (_gpuMaterial != null) ConfigureGpuSlot(i, _livePitch[i], _liveStart[i], _liveEnd[i], true);
+                }
         }
 
         public void RefreshLive()
         {
             Initialize();
             float now = Time.realtimeSinceStartup;
+            if (_gpuMaterial != null) UpdateGpuClock(now);
             float height = Mathf.Max(0.001f, viewHeight);
             float speed = height * 1000f / Mathf.Max(1, windowMs);
             visibleRenderedCount = 0;
@@ -400,6 +431,7 @@ namespace MusicMidiPlayer.Views
                     bar.gameObject.SetActive(false);
                     continue;
                 }
+                if (_gpuMaterial != null) { visibleRenderedCount++; continue; }
                 float high = Mathf.Min(height, (now - _liveStart[i]) * speed);
                 float length = Mathf.Min(height - low, Mathf.Max(minimumBarHeight, high - low));
                 int pitch = _livePitch[i];
@@ -428,6 +460,9 @@ namespace MusicMidiPlayer.Views
             Initialize();
             landAtKeyRoot = enabled;
             BuildPitchLayout();
+            if (_gpuMaterial != null)
+                for (int i = 0; i < _capacity; i++) if (_liveId[i] >= 0)
+                    ConfigureGpuSlot(i, _livePitch[i], _liveStart[i], _liveEnd[i], true);
             for (int i = 0; i < _capacity; i++)
                 if (_liveId[i] >= 0) { RefreshLive(); return; }
             // Reposition visible notes and retire effects at the old landing line locally.
@@ -437,6 +472,11 @@ namespace MusicMidiPlayer.Views
         private void SetMaterial(int slot, int note, bool hit)
         {
             if (barRenderers == null || slot >= barRenderers.Length || barRenderers[slot] == null) return;
+            if (_gpuMaterial != null)
+            {
+                ConfigureGpuSlot(slot, _song.pitch[note], _song.startMs[note] * 0.001f, _song.keyUpMs[note] * 0.001f, false);
+                return;
+            }
             Material noteMaterial = GetBarMaterial(_song.pitch[note]);
             int key = _pitchKeys[_song.pitch[note]];
             if (hit && _barHitMaterials[key] != null) noteMaterial = _barHitMaterials[key];
@@ -456,6 +496,7 @@ namespace MusicMidiPlayer.Views
         {
             Initialize();
             if (midiPitch < 0 || midiPitch > 127) return null;
+            if (_gpuMaterial != null) return keyboard == null ? null : keyboard.GetNoteMaterial(midiPitch);
             int key = _pitchKeys[midiPitch];
             if (!_barPaletteReady) BuildBarPalette();
             return _barMaterials[key];
@@ -463,6 +504,7 @@ namespace MusicMidiPlayer.Views
 
         private void BuildBarPalette()
         {
+            if (_gpuMaterial != null) { _barPaletteReady = true; return; }
             for (int key = 0; key < 88; key++)
             {
                 if (_barMaterials[key] == null && barRenderers != null && barRenderers.Length > 0)
@@ -515,6 +557,33 @@ namespace MusicMidiPlayer.Views
                 if (hitMaterial.HasProperty("_EmissionColor")) hitMaterial.SetColor("_EmissionColor", hitColor * Mathf.Max(1f, noteEmissionIntensity * 2.5f));
             }
             _barPaletteReady = true;
+        }
+
+        private void UpdateGpuClock(float seconds)
+        {
+            _gpuMaterial.SetFloat("_VisualTime", seconds);
+            _gpuMaterial.SetFloat("_WindowSeconds", Mathf.Max(1, windowMs) * 0.001f);
+            _gpuMaterial.SetFloat("_MinimumFraction", Mathf.Clamp01(Mathf.Max(0.001f, minimumBarHeight) / Mathf.Max(0.001f, viewHeight)));
+            _gpuMaterial.SetFloat("_NoteEmission", noteEmissionIntensity);
+        }
+
+        private void ConfigureGpuSlot(int slot, int pitch, float start, float end, bool live)
+        {
+            if (barTransforms[slot] == null || barRenderers[slot] == null) return;
+            int key = _pitchKeys[pitch];
+            float height = Mathf.Max(0.001f, viewHeight);
+            float width = Mathf.Max(0.001f, keyWidth[key] * (1f - Mathf.Clamp01(barGapRatio)));
+            // Assign once per note, never per frame. The full-height Transform
+            // provides conservative CPU culling without a runtime bounds override.
+            barTransforms[slot].localPosition = _pitchHitPositions[pitch] + Vector3.up * (height * 0.5f);
+            barTransforms[slot].localScale = new Vector3(width, height, Mathf.Max(0.001f, barDepth));
+            Material palette = keyboard == null ? null : keyboard.GetNoteMaterial(pitch);
+            _noteProperties.Clear();
+            _noteProperties.SetColor("_Color", palette == null ? Color.white : palette.color);
+            _noteProperties.SetVector("_NoteTiming", new Vector4(start, end, live ? 1f : 0f, 0f));
+            _noteProperties.SetFloat("_NoteOrder", (slot + 1f) / Mathf.Max(1, _capacity));
+            barRenderers[slot].sharedMaterial = _gpuMaterial;
+            barRenderers[slot].SetPropertyBlock(_noteProperties);
         }
 
         private int UpperBoundStart(int timeMs)

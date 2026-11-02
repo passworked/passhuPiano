@@ -163,7 +163,14 @@ namespace MusicMidiPlayer.Audio
 
         public void BindSong(MidiSongData data, MidiSequencer sequencer)
         {
-            if (ensemble != null) { ensemble.BindSong(data); return; }
+            BeginBindSong(data, sequencer);
+            if (drums != null) drums.BindSong(data);
+        }
+
+        // Loading drives the drum index separately under the Facade's time budget.
+        public void BeginBindSong(MidiSongData data, MidiSequencer sequencer)
+        {
+            if (ensemble != null) { ensemble.BeginBindSong(data); return; }
             if (strings != null) strings.BindSong(data, sequencer);
             Initialize();
             if (_generation >= 0) CancelGeneration(_generation);
@@ -173,10 +180,9 @@ namespace MusicMidiPlayer.Audio
             int count = data == null || data.startMs == null ? 0 : data.startMs.Length;
             _noteGeneration = new int[count];
             _noteState = new int[count];
-            for (int i = 0; i < count; i++) _noteGeneration[i] = -1;
+            // Facade generations are positive, so zero-initialized entries are unseen.
             _pendingCount = 0;
             pendingStartCount = 0;
-            if (drums != null) drums.BindSong(data);
         }
 
         public void SetPeakProtection(bool enabled)

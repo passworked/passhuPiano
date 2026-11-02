@@ -75,7 +75,7 @@ namespace MusicMidiPlayer.Audio
         {
             StopAll(); _song = song; _sequencer = sequencer;
             _seenGeneration = new int[song == null ? 0 : song.startMs.Length];
-            for (int i = 0; i < _seenGeneration.Length; i++) _seenGeneration[i] = -1;
+            // Facade generations are positive, so zero-initialized entries are unseen.
         }
 
         public void RebuildAt(int ms, int nextGeneration)

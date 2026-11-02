@@ -19,13 +19,31 @@ namespace MusicMidiPlayer.Views
         private int[] _livePitch=new int[64];
         private float[] _liveStart=new float[64];
         private int _liveCursor;
+        private int _bindStage=-1, _bindCursor, _bindCount, _bindWrite;
         public void BindSong(MidiSongData song)
         {
-            _song=song;int count=0;
-            if(song!=null && bank!=null)for(int n=0;n<song.channel.Length;n++)if(song.channel[n]==9 && bank.Lane(song.pitch[n])>=0)count++;
-            noteIds=new int[count];int cursor=0;
-            if(song!=null && bank!=null)for(int n=0;n<song.channel.Length;n++)if(song.channel[n]==9 && bank.Lane(song.pitch[n])>=0)noteIds[cursor++]=n;
-            Clear();
+            BeginBindSong(song);
+            while(!BindStep(512)) { }
+        }
+        public void BeginBindSong(MidiSongData song)
+        {
+            _song=song; _bindStage=0; _bindCursor=0; _bindCount=0; _bindWrite=0; Clear();
+        }
+        public bool BindStep(int budget)
+        {
+            while(budget-- > 0 && _bindStage>=0)
+            {
+                if(_song!=null && bank!=null && _bindCursor<_song.channel.Length)
+                {
+                    int n=_bindCursor++;
+                    if(_song.channel[n]==9 && bank.Lane(_song.pitch[n])>=0)
+                    { if(_bindStage==0)_bindCount++; else noteIds[_bindWrite++]=n; }
+                }
+                else if(_bindStage==0)
+                { noteIds=new int[_bindCount]; _bindStage=1; _bindCursor=0; }
+                else _bindStage=-1;
+            }
+            return _bindStage<0;
         }
         public void SetPalette(Color color)
         {

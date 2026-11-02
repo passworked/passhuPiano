@@ -69,6 +69,7 @@ namespace MusicMidiPlayer.Logic
         private bool _naturalEnded;
         private int _lastFrameMs;
         private bool _networkBlocked;
+        private int _songLoadStage, _songLoadView, _songLoadPart;
 
         private void Start()
         {
@@ -117,7 +118,7 @@ namespace MusicMidiPlayer.Logic
             }
             int positionMs = (int)(clock.GetPositionSeconds() * 1000.0);
             int state = clock.GetState();
-            if (instrumentRouter != null) instrumentRouter.RefreshKeyCounts(positionMs, CanReceiveLiveMidi());
+            bool viewsRebuilt = false;
             if (state == 1 && !_naturalEnded)
             {
                 if (clock.GetPositionSeconds() >= clock.GetPlaybackEndSeconds())
@@ -129,38 +130,52 @@ namespace MusicMidiPlayer.Logic
                 else
                 {
                     // Reclaim ended samples before allocating this frame's new attacks.
-                    voicePool.UpdateVoices(positionMs, applyGeneration);
+                    if (voicePool.ensemble != null)
+                    {
+                        voicePool.ensemble.BeginOutputBatch();
+                        voicePool.ensemble.ReclaimEndedVoices(positionMs, applyGeneration);
+                    }
+                    else voicePool.UpdateVoices(positionMs, applyGeneration);
                     sequencer.AdvanceTo(positionMs);
-                    if (sequencer.rebuildRequested) RebuildCurrent(positionMs);
-                    if (instrumentRouter != null) instrumentRouter.RefreshKeyCounts(positionMs, false);
-                    voicePool.UpdateVoices(positionMs, applyGeneration);
+                    if (sequencer.rebuildRequested) { RebuildCurrent(positionMs); viewsRebuilt = true; }
                     voicePool.PrepareWindow(positionMs, positionMs + 150, applyGeneration, clock.GetPositionSeconds(), clock.GetFrameDspSeconds());
-                    if (keyboard != null) keyboard.Refresh(positionMs, applyGeneration, false);
-                    if (pedals != null) pedals.Refresh(positionMs, applyGeneration, false);
-                    if (waterfall != null) waterfall.Refresh(positionMs, applyGeneration);
+                    voicePool.UpdateVoices(positionMs, applyGeneration);
+                    if (voicePool.ensemble != null) voicePool.ensemble.EndOutputBatch();
                 }
             }
             else
             {
                 voicePool.UpdateVoices(positionMs, applyGeneration);
-                if (state == 2)
+            }
+            bool live = CanReceiveLiveMidi();
+            if (!viewsRebuilt && instrumentRouter != null)
+            {
+                // Routed views own presentation in ensemble mode, including the selected view.
+                instrumentRouter.RefreshKeyCounts(positionMs, live);
+                RefreshRoutedViews(positionMs);
+            }
+            else if (!viewsRebuilt)
+            {
+                if (live)
+                {
+                    if (keyboard != null) keyboard.RefreshLive((int)(Time.realtimeSinceStartup * 1000f), applyGeneration);
+                    if (waterfall != null) waterfall.RefreshLive();
+                    if (waterfall != null && waterfall.effects != null) waterfall.effects.RefreshLive(applyGeneration);
+                }
+                else if (state == 2 || (state == 1 && !_naturalEnded))
                 {
                     if (keyboard != null) keyboard.Refresh(positionMs, applyGeneration, false);
                     if (pedals != null) pedals.Refresh(positionMs, applyGeneration, false);
                     if (waterfall != null) waterfall.Refresh(positionMs, applyGeneration);
                 }
+                StringsView stringsView = GetStringsView(selectedInstrument);
+                if (stringsView != null) stringsView.Refresh(positionMs);
             }
-            if (CanReceiveLiveMidi())
+            if (live)
             {
                 if (drumView != null) drumView.RefreshLive();
-                if (keyboard != null) keyboard.RefreshLive((int)(Time.realtimeSinceStartup * 1000f), applyGeneration);
-                if (waterfall != null) waterfall.RefreshLive();
-                if (waterfall != null && waterfall.effects != null) waterfall.effects.RefreshLive(applyGeneration);
             }
-            StringsView stringsView = GetStringsView(selectedInstrument);
-            if (stringsView != null) stringsView.Refresh(positionMs);
-            if (drumView != null && (state == 1 || state == 2)) drumView.Refresh(positionMs, applyGeneration);
-            if (instrumentRouter != null) RefreshRoutedViews(positionMs);
+            if (!viewsRebuilt && drumView != null && (state == 1 || state == 2)) drumView.Refresh(positionMs, applyGeneration);
             _lastFrameMs = positionMs;
             if (playerUI != null) playerUI.RefreshState();
         }
@@ -498,7 +513,12 @@ namespace MusicMidiPlayer.Logic
 
         private void ClearLiveMidi()
         {
-            if (instrumentRouter != null) ClearRoutedViews();
+            ClearLiveMidiState(true);
+        }
+
+        private void ClearLiveMidiState(bool clearViews)
+        {
+            if (clearViews && instrumentRouter != null) ClearRoutedViews();
             if (voicePool != null) voicePool.LiveAllSoundOff(-1);
             for (int i = 0; i < 2048; i++) { _liveHeld[i] = false; _liveSustained[i] = false; }
             for (int i = 0; i < 16; i++) _livePedal[i] = false;
@@ -805,38 +825,75 @@ namespace MusicMidiPlayer.Logic
             _song = next;
             selectedSongId = id;
             clock.BindSong(next, voicePool.bank);
-            isSongLoading = !next.isDecoded || (instrumentRouter != null && !instrumentRouter.IsSongReady(next));
+            isSongLoading = true;
+            _songLoadStage = 0; _songLoadView = 0; _songLoadPart = 0;
             if (isSongLoading && !next.isDecoded && !next.BeginDecode())
             {
                 isSongLoading = false;
                 SetNetworkError("曲目加载失败：" + next.decodeError);
                 return false;
             }
-            if (!isSongLoading) BindDecodedSong();
             return true;
         }
 
-        private void BindDecodedSong()
+        private bool BindDecodedSongStep()
         {
             MidiSongData next = _song;
-            sequencer.BindSong(next);
-            voicePool.BindSong(next, sequencer);
-            clock.BindSong(next, voicePool.bank);
-            if (drumView != null) drumView.BindSong(next);
-            if (keyboard != null) keyboard.BindSong(next);
-            if (pedals != null) pedals.BindSong(next);
-            if (waterfall != null) waterfall.BindSong(next, sequencer);
-            StringsView stringsView = GetStringsView(selectedInstrument);
-            if (stringsView != null) stringsView.BindSong(next);
-            if (practice != null) practice.BindSong(next);
-            if (instrumentRouter != null)
-                for (int i = 0; i < instrumentRoots.Length; i++)
+            if (_songLoadStage == 2)
+            {
+                sequencer.BindSong(next);
+                _songLoadStage = 3;
+            }
+            else if (_songLoadStage == 3)
+            {
+                voicePool.BeginBindSong(next, sequencer);
+                if (voicePool.drums != null) voicePool.drums.BeginBindSong(next);
+                _songLoadStage = 4;
+            }
+            else if (_songLoadStage == 4)
+            {
+                if (voicePool.drums != null && !voicePool.drums.BindStep(16)) return false;
+                if (drumView != null) drumView.BeginBindSong(next);
+                _songLoadStage = 5;
+            }
+            else if (_songLoadStage == 5)
+            {
+                if (drumView != null && !drumView.BindStep(16)) return false;
+                _songLoadStage = 6;
+            }
+            else if (_songLoadStage == 6)
+            {
+                int count = instrumentRouter == null ? 1 : instrumentRoots.Length;
+                if (_songLoadView < count)
                 {
-                    if (instrumentKeyboards[i] != null) { instrumentKeyboards[i].BindSequencer(sequencer); instrumentKeyboards[i].BindSong(next); }
-                    if (instrumentPedals[i] != null) instrumentPedals[i].BindSong(next);
-                    if (instrumentWaterfalls[i] != null) instrumentWaterfalls[i].BindSong(next, sequencer);
-                    if (GetStringsView(i) != null) GetStringsView(i).BindSong(next);
+                    int i = _songLoadView;
+                    PianoKeyboardView keys = instrumentRouter == null ? keyboard : instrumentKeyboards[i];
+                    PianoPedalView pedal = instrumentRouter == null ? pedals : instrumentPedals[i];
+                    MidiWaterfallView fall = instrumentRouter == null ? waterfall : instrumentWaterfalls[i];
+                    if (_songLoadPart == 0 && keys != null)
+                    {
+                        keys.BindSequencer(sequencer);
+                        // Waterfall.BindSong binds its own keyboard before building its palette.
+                        if (fall == null || fall.keyboard != keys) keys.BindSong(next);
+                    }
+                    else if (_songLoadPart == 1 && pedal != null) pedal.BindSong(next);
+                    else if (_songLoadPart == 2 && fall != null) fall.BindSong(next, sequencer);
+                    else if (_songLoadPart == 3)
+                    {
+                        StringsView stringsView = GetStringsView(instrumentRouter == null ? selectedInstrument : i);
+                        if (stringsView != null) stringsView.BindSong(next);
+                    }
+                    if (++_songLoadPart == 4) { _songLoadPart = 0; _songLoadView++; }
                 }
+                else _songLoadStage = 7;
+            }
+            else
+            {
+                if (practice != null) practice.BindSong(next);
+                clock.BindSong(next, voicePool.bank);
+                return true;
+            }
+            return false;
         }
 
         private void AdvanceSongLoad()
@@ -844,37 +901,43 @@ namespace MusicMidiPlayer.Logic
             if (_song == null) return;
             double started = Time.realtimeSinceStartupAsDouble;
             double budget = Mathf.Clamp(decodeFrameBudgetMs, 0.25f, 8f) * 0.001;
-            // Decode until completion or the elapsed-time budget is reached.
+            // Decoding, routing, drum scans and view binding share the elapsed-time budget.
+            // Each step is bounded; a replacement song discards this cursor immediately.
             while (true)
             {
-                bool complete = _song.DecodeStep(16);
-                if (!string.IsNullOrEmpty(_song.decodeError))
+                if (_songLoadStage == 0)
                 {
-                    isSongLoading = false;
-                    SetNetworkError("曲目加载失败：" + _song.decodeError);
-                    return;
-                }
-                if (complete)
-                {
-                    if ((instrumentRouter == null || !instrumentRouter.IsBoundSong(_song)) && !_song.IsValid())
+                    bool complete = _song.DecodeStep(16);
+                    if (!string.IsNullOrEmpty(_song.decodeError))
                     {
                         isSongLoading = false;
-                        SetNetworkError("曲目解码数据无效");
+                        SetNetworkError("曲目加载失败：" + _song.decodeError);
                         return;
                     }
+                    if (complete)
+                    {
+                        if (!_song.IsValid())
+                        {
+                            isSongLoading = false;
+                            SetNetworkError("曲目解码数据无效");
+                            return;
+                        }
+                        _songLoadStage = 1;
+                    }
+                }
+                else if (_songLoadStage == 1)
+                {
                     if (instrumentRouter != null && !instrumentRouter.IsSongReady(_song))
                     {
                         if (!instrumentRouter.IsBoundSong(_song)) instrumentRouter.BeginBindSong(_song);
-                        if (!instrumentRouter.BindStep(32))
-                        {
-                            if (Time.realtimeSinceStartupAsDouble - started >= budget) return;
-                            continue;
-                        }
+                        if (instrumentRouter.BindStep(32)) _songLoadStage = 2;
                     }
-                    BindDecodedSong();
+                    else _songLoadStage = 2;
+                }
+                else if (BindDecodedSongStep())
+                {
                     isSongLoading = false;
-                    // The transport kept accepting the latest remote/local anchor during loading.
-                    // Resume at server time now, including elapsed loading time for playing songs.
+                    // Resume against the latest anchor, including time spent loading.
                     double now = clock.GetServerSeconds();
                     clock.ResyncLocalPhase(now, AudioSettings.dspTime);
                     if (clock.GetState() != 0) RebuildCurrent((int)(clock.GetPositionSeconds() * 1000.0));
@@ -890,13 +953,16 @@ namespace MusicMidiPlayer.Logic
                 && _song != null && id == selectedSongId
                 && System.Math.Abs(position - clock.GetPositionSeconds()) <= 0.002
                 && ((clock.GetState() == 1 && state == 2) || (clock.GetState() == 2 && state == 1));
-            ClearLiveMidi();
+            ClearLiveMidiState(!preservePose);
             int old = applyGeneration++;
             voicePool.CancelGeneration(old);
             sequencer.Clear(applyGeneration);
-            if (!preservePose && keyboard != null) keyboard.Clear(applyGeneration);
-            if (!preservePose && pedals != null) pedals.Clear(applyGeneration);
-            if (!preservePose && waterfall != null) waterfall.Clear(applyGeneration);
+            if (!preservePose && instrumentRouter == null)
+            {
+                if (keyboard != null) keyboard.Clear(applyGeneration);
+                if (pedals != null) pedals.Clear(applyGeneration);
+                if (waterfall != null) waterfall.Clear(applyGeneration);
+            }
             if (!preservePose && drumView != null) drumView.Clear(applyGeneration);
             if (_song == null || id != selectedSongId || (!isSongLoading && !_song.isDecoded))
                 if (!BindSong(id)) return false;
@@ -912,12 +978,16 @@ namespace MusicMidiPlayer.Logic
                 if (instrumentRouter != null) instrumentRouter.RefreshKeyCounts(ms, false);
                 voicePool.RebuildAt(ms, applyGeneration);
                 if (drumView != null) drumView.RebuildAt(ms, applyGeneration);
-                if (keyboard != null) keyboard.Refresh(ms, applyGeneration, !preservePose);
-                if (pedals != null) pedals.Refresh(ms, applyGeneration, !preservePose);
-                if (waterfall != null)
+                if (instrumentRouter != null) RefreshRoutedViewsAt(ms, true, preservePose);
+                else
                 {
-                    if (preservePose) waterfall.RebuildGeometryAt(ms, applyGeneration);
-                    else waterfall.RebuildAt(ms, applyGeneration);
+                    if (keyboard != null) keyboard.Refresh(ms, applyGeneration, !preservePose);
+                    if (pedals != null) pedals.Refresh(ms, applyGeneration, !preservePose);
+                    if (waterfall != null)
+                    {
+                        if (preservePose) waterfall.RebuildGeometryAt(ms, applyGeneration);
+                        else waterfall.RebuildAt(ms, applyGeneration);
+                    }
                 }
             }
             _lastFrameMs = ms;
@@ -933,24 +1003,30 @@ namespace MusicMidiPlayer.Logic
             if (instrumentRouter != null) instrumentRouter.RefreshKeyCounts(ms, false);
             voicePool.RebuildAt(ms, applyGeneration);
             if (drumView != null) drumView.RebuildAt(ms, applyGeneration);
-            if (keyboard != null) keyboard.Refresh(ms, applyGeneration, true);
-            if (pedals != null) pedals.Refresh(ms, applyGeneration, true);
-            if (waterfall != null) waterfall.RebuildAt(ms, applyGeneration);
+            if (instrumentRouter != null) RefreshRoutedViewsAt(ms, true, false);
+            else
+            {
+                if (keyboard != null) keyboard.Refresh(ms, applyGeneration, true);
+                if (pedals != null) pedals.Refresh(ms, applyGeneration, true);
+                if (waterfall != null) waterfall.RebuildAt(ms, applyGeneration);
+            }
         }
 
         private void ClearOutput()
         {
-            if (instrumentRouter != null) ClearRoutedViews();
             if (drumView != null) drumView.Clear(applyGeneration + 1);
-            StringsView stringsView = GetStringsView(selectedInstrument);
-            if (stringsView != null) stringsView.Clear();
             ClearLiveMidi();
             int old = applyGeneration++;
             voicePool.CancelGeneration(old);
             sequencer.Clear(applyGeneration);
-            if (keyboard != null) keyboard.Clear(applyGeneration);
-            if (pedals != null) pedals.Clear(applyGeneration);
-            if (waterfall != null) waterfall.Clear(applyGeneration);
+            if (instrumentRouter == null)
+            {
+                StringsView stringsView = GetStringsView(selectedInstrument);
+                if (stringsView != null) stringsView.Clear();
+                if (keyboard != null) keyboard.Clear(applyGeneration);
+                if (pedals != null) pedals.Clear(applyGeneration);
+                if (waterfall != null) waterfall.Clear(applyGeneration);
+            }
         }
 
         public void _ApplyInstrumentSelection(int mask, int appearance)
@@ -1048,7 +1124,10 @@ namespace MusicMidiPlayer.Logic
         }
         private void RefreshRoutedViews(int ms)
         {
-            bool rebuild = _routedViewGeneration != applyGeneration;
+            RefreshRoutedViewsAt(ms, _routedViewGeneration != applyGeneration, false);
+        }
+        private void RefreshRoutedViewsAt(int ms, bool rebuild, bool preservePose)
+        {
             bool live = CanReceiveLiveMidi();
             for (int i = 0; i < instrumentRoots.Length; i++)
             {
@@ -1059,11 +1138,16 @@ namespace MusicMidiPlayer.Logic
                     if (keys != null) keys.RefreshLive((int)(Time.realtimeSinceStartup * 1000), applyGeneration);
                     if (fall != null) { fall.RefreshLive(); if (fall.effects != null) fall.effects.RefreshLive(applyGeneration); }
                 }
-                else if (clock.GetState() != 0)
+                else if (clock.GetState() != 0 && !_naturalEnded)
                 {
-                    if (keys != null) keys.Refresh(ms, applyGeneration, rebuild);
-                    if (pedal != null) pedal.Refresh(ms, applyGeneration, rebuild);
-                    if (fall != null) { if (rebuild) fall.RebuildAt(ms, applyGeneration); else fall.Refresh(ms, applyGeneration); }
+                    if (keys != null) keys.Refresh(ms, applyGeneration, rebuild && !preservePose);
+                    if (pedal != null) pedal.Refresh(ms, applyGeneration, rebuild && !preservePose);
+                    if (fall != null)
+                    {
+                        if (!rebuild) fall.Refresh(ms, applyGeneration);
+                        else if (preservePose) fall.RebuildGeometryAt(ms, applyGeneration);
+                        else fall.RebuildAt(ms, applyGeneration);
+                    }
                 }
                 if (GetStringsView(i) != null) GetStringsView(i).Refresh(ms);
             }

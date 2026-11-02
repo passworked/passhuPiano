@@ -38,6 +38,22 @@ namespace MusicMidiPlayer.Audio
         private bool _ready;
         private float _normalization = 1f;
         private double _gainDsp;
+        private int _outputBatchDepth;
+        private bool _outputDirty;
+        private int[] _expressionFrame = new int[16], _expressionMs = new int[16];
+        private float[] _expressionValue = new float[16];
+
+        public void BeginOutputBatch() { _outputBatchDepth++; }
+        public void EndOutputBatch()
+        {
+            _outputBatchDepth = Mathf.Max(0, _outputBatchDepth - 1);
+            if (_outputBatchDepth == 0 && _outputDirty) UpdateOutput();
+        }
+        private void RequestOutputUpdate()
+        {
+            if (_outputBatchDepth > 0) _outputDirty = true;
+            else UpdateOutput();
+        }
 
         public void Initialize()
         {
@@ -58,11 +74,16 @@ namespace MusicMidiPlayer.Audio
         }
         public void BindSong(MidiSongData song)
         {
-            Initialize(); StopAll(); _song = song; _generation = -1;
-            _seen = new int[song == null ? 0 : song.pitch.Length];
-            for (int i = 0; i < _seen.Length; i++) _seen[i] = -1;
-            router.BindSong(song);
+            BeginBindSong(song);
             if (output.drums != null) output.drums.BindSong(song);
+        }
+        public void BeginBindSong(MidiSongData song)
+        {
+            Initialize(); StopAll(); _song = song; _generation = -1;
+            for (int i = 0; i < 16; i++) _expressionFrame[i] = -1;
+            _seen = new int[song == null ? 0 : song.pitch.Length];
+            // Facade generations start above zero; fresh arrays are already unseen.
+            router.BindSong(song);
         }
         public void CancelGeneration()
         {
@@ -90,6 +111,7 @@ namespace MusicMidiPlayer.Audio
         public void RecoverAt(int ms, int generation)
         {
             if (_song == null || generation != _generation || output.clock.GetState() != 1) return;
+            BeginOutputBatch();
             // Include long held notes, then recent released tails; never replay history.
             for (int i = 0; i < router.facade.sequencer.activeNoteCount; i++)
                 StartNote(router.facade.sequencer.activeNoteIds[i], ms, false);
@@ -97,18 +119,23 @@ namespace MusicMidiPlayer.Audio
             for (; e < _song.eventMs.Length && _song.eventMs[e] <= ms; e++)
                 if (_song.eventKind[e] == 2) StartNote(_song.eventNoteId[e], ms, false);
             if (output.drums != null) output.drums.RecoverAt(ms, generation);
+            EndOutputBatch();
         }
         public void PrepareWindow(int from, int to, int generation)
         {
             if (_song == null || generation != _generation || output.clock.GetState() != 1) return;
+            BeginOutputBatch();
             if (output.drums != null) output.drums.PrepareWindow(from, to, generation);
             for (int n = LowerStart(from + 1); n < _song.startMs.Length && _song.startMs[n] <= to; n++) StartNote(n, from, true);
+            EndOutputBatch();
         }
         public void CatchUpRecentNotes(int from, int ms, int generation)
         {
             if (_song == null || generation != _generation) return;
+            BeginOutputBatch();
             for (int n = LowerStart(from + 1); n < _song.startMs.Length && _song.startMs[n] <= ms; n++) StartNote(n, ms, true);
             if (output.drums != null) output.drums.CatchUpRecentNotes(from, ms, generation);
+            EndOutputBatch();
         }
         public void NoteDown(int note, int ms, int generation)
         {
@@ -162,6 +189,7 @@ namespace MusicMidiPlayer.Audio
             Initialize();
             if (output.clock.GetState() == 2) return;
             double dsp = output.clock.GetFrameDspSeconds();
+            BeginOutputBatch();
             for (int i = 0; i < 64; i++) if (active[i] && targets[i] == target)
             {
                 int id = identities[i], channel = _channel[i], pitch = pitches[i], velocity = velocities[i];
@@ -175,6 +203,7 @@ namespace MusicMidiPlayer.Audio
                 int slot = StartVoice(target, pitch, velocity, channel, style, id, track, isLive, age, dsp - release, ahead, false);
                 if (slot >= 0) { _release[slot] = release; ApplyLevel(slot, dsp); }
             }
+            EndOutputBatch();
         }
         public void LiveNoteRelease(int id)
         {
@@ -258,7 +287,9 @@ namespace MusicMidiPlayer.Audio
                     b.PlayScheduled(System.Math.Max(start, start + clip.length / ratio - sampleAge));
                 }
             }
-            ApplyLevel(slot, dsp); UpdateOutput(); return slot;
+            ApplyLevel(slot, dsp);
+            ApplySlotVolume(slot);
+            RequestOutputUpdate(); return slot;
         }
         private void ConfigureSource(int index, int slot, AudioClip clip, float ratio, bool loop)
         {
@@ -301,7 +332,20 @@ namespace MusicMidiPlayer.Audio
             bool aa = dsp - starts[a] < .12, ba = dsp - starts[b] < .12;
             if (aa != ba) return !aa;
             if (System.Math.Abs(starts[a] - starts[b]) > .12) return starts[a] < starts[b];
-            return levels[a] < levels[b];
+            // Output is batched, but stealing still compares the current envelope.
+            return EvaluateLevel(a, dsp) < EvaluateLevel(b, dsp);
+        }
+        // The pre-attack pass only frees expired sources. Envelopes and output are
+        // evaluated once after all due events and look-ahead reservations are applied.
+        public void ReclaimEndedVoices(int ms, int generation)
+        {
+            Initialize();
+            if (output.drums != null) output.drums.ReclaimEndedVoices();
+            double dsp = output.clock.GetFrameDspSeconds();
+            int limit = Limit();
+            for (int i = 0; i < 64; i++) if (active[i])
+                if ((!live[i] && (generation != _generation || output.clock.GetState() != 1)) || _a[i] >= limit || _b[i] >= limit
+                    || dsp >= _end[i] || dsp >= _release[i] + _releaseSeconds[i]) StopSlot(i);
         }
         public void UpdateVoices(int ms, int generation)
         {
@@ -314,23 +358,30 @@ namespace MusicMidiPlayer.Audio
                     || dsp >= _end[i] || dsp >= _release[i] + _releaseSeconds[i]) { StopSlot(i); continue; }
                 ApplyLevel(i, dsp); activeVoiceCount++;
             }
-            UpdateOutput();
+            RequestOutputUpdate();
             output.activeVoiceCount = activeVoiceCount + (output.drums == null ? 0 : output.drums.activeVoiceCount);
             output.stolenVoiceCount = stolenVoiceCount; output.effectiveVoiceLimit = Limit(); output.pendingStartCount = 0;
         }
         private void ApplyLevel(int slot, double dsp)
         {
             float phase = Mathf.Clamp01((float)((dsp - _release[slot]) / _releaseSeconds[slot]));
-            float expression = live[slot] ? router.facade.LiveExpression(_channel[slot]) / 127f : _song.ExpressionAt(_channel[slot], (int)(output.clock.GetPositionSeconds() * 1000)) / 127f;
-            float onset = targets[slot] >= 2 ? Mathf.Clamp01((float)((dsp - starts[slot]) / .008)) : 1;
-            if (dsp < _scheduled[slot]) onset = 1;
-            levels[slot] = _gain[slot] * (1 - phase) * (1 - phase) * expression * onset;
+            levels[slot] = EvaluateLevel(slot, dsp);
             int priority = dsp - starts[slot] < .12 ? 32 + (127 - velocities[slot]) / 4 : phase > 0 ? 200 : 96 + Mathf.Clamp((int)((dsp - starts[slot]) * 4), 0, 63);
             output.voiceSources[_a[slot]].priority = priority;
             if (_b[slot] >= 0) output.voiceSources[_b[slot]].priority = priority;
         }
+        private float EvaluateLevel(int slot, double dsp)
+        {
+            float phase = Mathf.Clamp01((float)((dsp - _release[slot]) / _releaseSeconds[slot]));
+            float expression = live[slot] ? router.facade.LiveExpression(_channel[slot]) / 127f
+                : SongExpression(_channel[slot], (int)(output.clock.GetPositionSeconds() * 1000));
+            float onset = targets[slot] >= 2 ? Mathf.Clamp01((float)((dsp - starts[slot]) / .008)) : 1;
+            if (dsp < _scheduled[slot]) onset = 1;
+            return _gain[slot] * (1 - phase) * (1 - phase) * expression * onset;
+        }
         public void UpdateOutput()
         {
+            _outputDirty = false;
             double dsp = output.clock.GetFrameDspSeconds();
             float total = output.drums == null ? 0 : output.drums.PeakSum();
             for (int i = 0; i < 64; i++) if (active[i]) total += levels[i] * _peak[i];
@@ -339,12 +390,23 @@ namespace MusicMidiPlayer.Audio
             else _normalization = Mathf.Lerp(_normalization, target, 1 - Mathf.Exp(-(float)System.Math.Max(0, dsp - _gainDsp) / .08f));
             _gainDsp = dsp;
             for (int i = 0; i < 64; i++) if (active[i])
-            {
-                float volume = output.muted ? 0 : Mathf.Clamp01(output.localVolume * levels[i] * _normalization);
-                output.voiceSources[_a[i]].volume = volume;
-                if (_b[i] >= 0) output.voiceSources[_b[i]].volume = volume;
-            }
+                ApplySlotVolume(i);
             if (output.drums != null) output.drums.ApplyOutputGains(_normalization);
+        }
+        private void ApplySlotVolume(int slot)
+        {
+            float volume = output.muted ? 0 : Mathf.Clamp01(output.localVolume * levels[slot] * _normalization);
+            output.voiceSources[_a[slot]].volume = volume;
+            if (_b[slot] >= 0) output.voiceSources[_b[slot]].volume = volume;
+        }
+        private float SongExpression(int channel, int ms)
+        {
+            if (_expressionFrame[channel] != Time.frameCount || _expressionMs[channel] != ms)
+            {
+                _expressionValue[channel] = _song.ExpressionAt(channel, ms) / 127f;
+                _expressionFrame[channel] = Time.frameCount; _expressionMs[channel] = ms;
+            }
+            return _expressionValue[channel];
         }
         private void StopSlot(int slot)
         {

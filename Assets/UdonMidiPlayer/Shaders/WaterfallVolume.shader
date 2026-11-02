@@ -14,6 +14,12 @@ Shader "MusicMidiPlayer/WaterfallVolume"
         _EndBevelRatio ("End Bevel / Note Width", Range(0.02,0.3)) = 0.12
         _BreathAmount ("Hit Breathing", Range(0,1)) = 0
         [HideInInspector] _NoteOrder ("Stable Note Order", Float) = 0
+        [HideInInspector] _GpuAnimation ("Time Driven Notes", Float) = 0
+        [HideInInspector] _VisualTime ("Local Music Seconds", Float) = 0
+        [HideInInspector] _WindowSeconds ("Visible Seconds", Float) = 3
+        [HideInInspector] _MinimumFraction ("Minimum Visible Length", Float) = 0.005
+        [HideInInspector] _NoteEmission ("Note Emission", Float) = 3
+        [HideInInspector] _NoteTiming ("Start End Live", Vector) = (0,0,0,0)
     }
     SubShader
     {
@@ -32,12 +38,16 @@ Shader "MusicMidiPlayer/WaterfallVolume"
         #pragma multi_compile_instancing
         #include "UnityCG.cginc"
 
-        fixed4 _Color;
+        UNITY_INSTANCING_BUFFER_START(NoteData)
+            UNITY_DEFINE_INSTANCED_PROP(float4, _Color)
+            UNITY_DEFINE_INSTANCED_PROP(float4, _NoteTiming)
+            UNITY_DEFINE_INSTANCED_PROP(float, _NoteOrder)
+        UNITY_INSTANCING_BUFFER_END(NoteData)
         half4 _EmissionColor;
         half _Metallic, _Smoothness, _EdgeStrength, _Saturation, _BodyGlow, _FacetStrength;
         float _EndBevelRatio;
         half _BreathAmount;
-        float _NoteOrder;
+        float _GpuAnimation, _VisualTime, _WindowSeconds, _MinimumFraction, _NoteEmission;
         struct v2f
         {
             float4 noteLocal : TEXCOORD0;  // xyz: deformed local position, w: normalized cap depth
@@ -58,10 +68,32 @@ Shader "MusicMidiPlayer/WaterfallVolume"
             UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
             float width = max(length(mul((float3x3)unity_ObjectToWorld, float3(1,0,0))), 0.000001);
             float height = max(length(mul((float3x3)unity_ObjectToWorld, float3(0,1,0))), 0.000001);
+            float lengthFraction = 1.0, centerFraction = 0.5;
+            if (_GpuAnimation > 0.5)
+            {
+                float4 timing = UNITY_ACCESS_INSTANCED_PROP(NoteData, _NoteTiming);
+                float window = max(_WindowSeconds, 0.001);
+                float low, high;
+                if (timing.z > 0.5)
+                {
+                    low = timing.y < 0.0 ? 0.0 : saturate((_VisualTime - timing.y) / window);
+                    high = saturate((_VisualTime - timing.x) / window);
+                    lengthFraction = min(1.0 - low, max(_MinimumFraction, high - low));
+                    centerFraction = low + lengthFraction * 0.5;
+                }
+                else
+                {
+                    low = saturate((timing.x - _VisualTime) / window);
+                    high = saturate((timing.y - _VisualTime) / window);
+                    lengthFraction = min(1.0, max(_MinimumFraction, high - low));
+                    centerFraction = clamp((low + high) * 0.5, lengthFraction * 0.5, 1.0 - lengthFraction * 0.5);
+                }
+                height *= max(lengthFraction, 0.000001);
+            }
             // Local, bounded sizing: no CPU overlap search or per-vertex note list.
             // Equal-height bars use their pool order to avoid identical depth surfaces.
             float shortness = rcp(1.0 + height / width);
-            float sizeBoost = shortness + saturate(_NoteOrder) * 0.02;
+            float sizeBoost = shortness + saturate(UNITY_ACCESS_INSTANCED_PROP(NoteData, _NoteOrder)) * 0.02;
             float widen = 1.0 + 0.18 * sizeBoost;
             float deepen = 1.0 + 0.8 * sizeBoost;
             width *= widen;
@@ -83,6 +115,9 @@ Shader "MusicMidiPlayer/WaterfallVolume"
             v.normal = normalize(v.normal);
             o.noteLocal = float4(v.vertex.xyz, cap);
             o.noteNormal = float4(v.normal, height / width);
+            // The CPU Transform covers the complete visible column. All animated
+            // vertices remain inside its vertical bounds, including long held notes.
+            v.vertex.y = v.vertex.y * lengthFraction + centerFraction - 0.5;
             v.vertex.x *= widen;
             v.vertex.z *= deepen;
             o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
@@ -132,8 +167,18 @@ Shader "MusicMidiPlayer/WaterfallVolume"
             half innerGlint = pow(saturate(dot(reflection, normalize(half3(-0.35h, 0.60h, normal.z)))), 20.0h);
             half bevel = 1.0h - front;
             half facetTone = 0.52h - shoulder * sign(p.x) * 0.10h + endCut * sign(p.y) * 0.08h;
-            half3 hue = SaturatePreservingHueValue(_Color.rgb);
-            half3 emissionHue = SaturatePreservingHueValue(_EmissionColor.rgb);
+            half3 noteColor = UNITY_ACCESS_INSTANCED_PROP(NoteData, _Color).rgb;
+            half hit = _BreathAmount;
+            half3 emissionColor = _EmissionColor.rgb;
+            if (_GpuAnimation > 0.5)
+            {
+                float4 timing = UNITY_ACCESS_INSTANCED_PROP(NoteData, _NoteTiming);
+                hit = timing.z < 0.5 ? step(timing.x, _VisualTime) : 0.0;
+                noteColor = lerp(noteColor, lerp(noteColor, half3(1,1,1), 0.25h), hit);
+                emissionColor = noteColor * lerp(max(0.0, _NoteEmission), max(1.0, _NoteEmission * 2.5), hit);
+            }
+            half3 hue = SaturatePreservingHueValue(noteColor);
+            half3 emissionHue = SaturatePreservingHueValue(emissionColor);
             // Fixed studio shading and one static cubemap sample replace real lights.
             half studio = 0.48h + 0.32h * saturate(dot(cutNormal, normalize(half3(-0.35h, 0.6h, 0.72h))));
             half3 worldNormal = normalize(
@@ -150,7 +195,7 @@ Shader "MusicMidiPlayer/WaterfallVolume"
                 + _EdgeStrength * (0.40h * bevel + 0.45h * fresnel));
             half4 color = half4(body + glow + reflected * lerp(0.035h, 0.18h, _Metallic) * (0.35h + fresnel) * lerp(half3(1,1,1), hue, _Metallic), 1);
             half breath = 0.825h + 0.175h * cos(_Time.y * 5.235987756);
-            color.rgb *= lerp(1.0h, breath, _BreathAmount);
+            color.rgb *= lerp(1.0h, breath, hit);
             UNITY_APPLY_FOG(i.fogCoord, color);
             return color;
         }

@@ -1,5 +1,9 @@
 # UI 层级与绘制顺序
 
+## 2026-11-02 曲库目录归类
+
+uaaaak 的 425 首归入 `游戏音乐/uaaaak`；主场景复用原目录按钮对象，更新其路径、父目录索引、对象名称、游戏音乐子目录计数及搜索关键词，并同步 proxy / backing Udon 数据。进入、返回与搜索沿用既有逻辑。《Patchwork Staccato（ツギハギスタッカート）》与用户再次提供的文件哈希一致，已在 `VOCALOID/初音ミク`，保持唯一曲目及原 ID。完整曲库仍为 547 首，分发 Prefab 不变。本次核对 Editor 序列化数据与源 MIDI，未进行真实 VRChat 验收。
+
 ## 2026-11-01 四把提琴独立奏法入口
 
 弓法入口已移到各自提琴行右侧：`InstrumentPanel/Content/Viewport/Options/Violin/Entry`、`Viola/EntryViola`、`Cello/EntryCello`、`Contrabass/EntryContrabass`。复用原对象、引用及回调，各有 Label / Chevron；标签只显示当前奏法。未勾选提琴的入口可见但禁用。每行左侧 146 单位为复选输入，右侧 108 单位为奏法按钮，两者不重叠。

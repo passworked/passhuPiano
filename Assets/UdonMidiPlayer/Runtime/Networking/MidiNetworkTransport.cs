@@ -230,6 +230,8 @@ namespace MusicMidiPlayer.Networking
         public void _NotifyNaturalEnd()
         {
             if (NetworkCalling.InNetworkCall || _applyingSnapshot || !_DependenciesReady() || lastError != "") return;
+            // Drum tail indices and the final playback end are committed after loading.
+            if (facade.isSongLoading) return;
             if (_naturalEndSubmitted || clock.GetState() != Playing) return;
             if (clock.GetPositionSeconds() + 0.001 < clock.GetPlaybackEndSeconds()) return;
             if (!_localFallback && !_IsLocalOwner()) return;
@@ -601,6 +603,8 @@ namespace MusicMidiPlayer.Networking
             }
             int first = revision - events.Length + 1;
             if (first > _liveRevision + 1) _requestSnapshot = true;
+            var ensemble = facade.voicePool.ensemble;
+            if (ensemble != null) ensemble.BeginOutputBatch();
             for (int i = 0; i < events.Length; i++)
             {
                 int sequence = first + i;
@@ -608,6 +612,7 @@ namespace MusicMidiPlayer.Networking
                 facade._ApplyLiveMidiEvent(events[i], sequence);
                 _liveRevision = sequence;
             }
+            if (ensemble != null) ensemble.EndOutputBatch();
             _liveActive = true;
             _liveOwner = _CurrentOwnerId();
         }

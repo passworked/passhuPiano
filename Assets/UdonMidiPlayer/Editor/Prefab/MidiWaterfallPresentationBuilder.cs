@@ -38,6 +38,7 @@ namespace MusicMidiPlayer.Editor.Prefab
             view.volumeNoteMaterial = volume;
             view.noteEmissionIntensity = 3f;
             volume.renderQueue = (int)RenderQueue.Geometry;
+            volume.enableInstancing = true;
             volume.SetFloat("_Saturation", 1.25f);
             volume.SetFloat("_Metallic", 0.12f);
             volume.SetFloat("_Smoothness", 0.91f);

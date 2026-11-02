@@ -36,33 +36,59 @@ namespace MusicMidiPlayer.Audio
             for(int i=0;i<Capacity;i++) _rest[i]=Source(i).transform.localPosition;
             _initialized=true;
         }
+        private int _bindStage = -1, _bindCursor, _bindCount, _bindWrite, _bindNextClose;
         public void BindSong(MidiSongData song)
         {
+            BeginBindSong(song);
+            while(!BindStep(512)) { }
+        }
+        public void BeginBindSong(MidiSongData song)
+        {
             Initialize(); StopAll(); _song=song; _generation=-1; playbackEndMs=0; unmappedNoteCount=0;
-            int count=0;
-            if(song!=null) for(int n=0;n<song.channel.Length;n++) if(song.channel[n]==9) count++;
-            hasSongDrums=count>0 && bank!=null;
-            _ids=new int[count]; _regions=new int[count]; _ends=new int[count]; _chokes=new int[count]; _seen=new int[count];
-            int cursor=0;
-            if(song!=null && bank!=null)
-                for(int n=0;n<song.channel.Length;n++) if(song.channel[n]==9)
-                {
-                    int r=bank.SelectRegion(song.pitch[n],song.velocity[n],n);
-                    _ids[cursor]=n; _regions[cursor]=r; _seen[cursor]=-1; _chokes[cursor]=int.MaxValue;
-                    _ends[cursor]=r<0?song.startMs[n]:song.startMs[n]+Mathf.CeilToInt(bank.clips[r].length*1000f);
-                    if(r<0) unmappedNoteCount++;
-                    cursor++;
-                }
-            int nextClose=int.MaxValue;
-            for(int i=count-1;i>=0;i--)
+            hasSongDrums=false;
+            _bindStage=0; _bindCursor=0; _bindCount=0; _bindWrite=0; _bindNextClose=int.MaxValue;
+        }
+        public bool BindStep(int budget)
+        {
+            while(budget-- > 0 && _bindStage>=0)
             {
-                int pitch=song.pitch[_ids[i]];
-                if(pitch==46 && nextClose<int.MaxValue)
-                { _chokes[i]=nextClose; _ends[i]=Mathf.Min(_ends[i],nextClose+25); }
-                if(pitch==42 || pitch==44) nextClose=song.startMs[_ids[i]];
-                playbackEndMs=Mathf.Max(playbackEndMs,_ends[i]);
+                if(_bindStage==0)
+                {
+                    if(_song!=null && bank!=null && _bindCursor<_song.channel.Length)
+                    { if(_song.channel[_bindCursor++]==9)_bindCount++; continue; }
+                    int count=_bindCount;
+                    _ids=new int[count]; _regions=new int[count]; _ends=new int[count]; _chokes=new int[count]; _seen=new int[count];
+                    hasSongDrums=count>0; _bindCursor=0; _bindStage=1;
+                }
+                else if(_bindStage==1)
+                {
+                    if(_song!=null && bank!=null && _bindCursor<_song.channel.Length)
+                    {
+                        int n=_bindCursor++;
+                        if(_song.channel[n]!=9)continue;
+                        int r=bank.SelectRegion(_song.pitch[n],_song.velocity[n],n), cursor=_bindWrite++;
+                        _ids[cursor]=n; _regions[cursor]=r; _seen[cursor]=-1; _chokes[cursor]=int.MaxValue;
+                        _ends[cursor]=r<0?_song.startMs[n]:_song.startMs[n]+Mathf.CeilToInt(bank.clips[r].length*1000f);
+                        if(r<0)unmappedNoteCount++;
+                        continue;
+                    }
+                    _bindStage=2; _bindCursor=_bindCount-1;
+                }
+                else if(_bindCursor>=0)
+                {
+                    int i=_bindCursor--, pitch=_song.pitch[_ids[i]];
+                    if(pitch==46 && _bindNextClose<int.MaxValue)
+                    { _chokes[i]=_bindNextClose; _ends[i]=Mathf.Min(_ends[i],_bindNextClose+25); }
+                    if(pitch==42 || pitch==44)_bindNextClose=_song.startMs[_ids[i]];
+                    playbackEndMs=Mathf.Max(playbackEndMs,_ends[i]);
+                }
+                else
+                {
+                    _bindStage=-1;
+                    if(hasSongDrums)output.ClaimPercussionSources();
+                }
             }
-            if(hasSongDrums) output.ClaimPercussionSources();
+            return _bindStage<0;
         }
         private int Upper(int ms)
         {
@@ -160,6 +186,13 @@ namespace MusicMidiPlayer.Audio
             _active[slot]=true;source.priority=40;
             source.volume=output.muted?0:Mathf.Clamp01(output.localVolume*_level[slot]);
             source.PlayScheduled(start);source.SetScheduledEndTime(end);
+        }
+        public void ReclaimEndedVoices()
+        {
+            if(!_initialized)return;
+            double dsp=AudioSettings.dspTime;
+            int limit=Limit();
+            for(int i=0;i<Capacity;i++)if(_active[i] && (i>=limit || dsp>=_end[i]))StopSlot(i);
         }
         public void UpdateVoices(int ms,int generation)
         {

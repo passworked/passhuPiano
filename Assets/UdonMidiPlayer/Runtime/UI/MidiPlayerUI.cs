@@ -504,6 +504,11 @@ namespace MusicMidiPlayer.UI
         private string _clientLanguage;
         private int _openFolder = -1;
         private float _nextTextUpdate;
+        private bool _controlsRefreshed, _controlsCan, _controlsReady, _controlsLoading, _controlsPracticeRunning;
+        private int _controlsState, _controlsMask, _controlsInstrument, _controlsLanguage, _controlsArticulation, _controlsOverrides, _controlsStyleTarget;
+        private bool _songButtonsRefreshed, _songButtonsCan;
+        private string _songButtonsSong;
+        private int _selectedSongButton = -1;
         private float _volume = 0.65f;
         private bool _muted;
         private bool _progressPreview;
@@ -968,6 +973,65 @@ namespace MusicMidiPlayer.UI
             int state = facade.GetState();
             RefreshOpening(state);
             bool can = facade.isReady && (facade.practice != null || (facade.gate != null && facade.gate.CanControl() && facade.network != null && facade.network.CanAcceptCommands()));
+            RefreshControls(state, can);
+            if (_progressPreview && (!can || _progressSongId != facade.selectedSongId))
+            {
+                _progressDragging = false;
+                _progressPreview = false;
+            }
+            RefreshSongButtons(can);
+            if (progressSlider != null && facade.clock != null)
+            {
+                double duration = facade.clock.GetPlaybackEndSeconds();
+                progressSlider.interactable = can && duration > 0;
+                if (!_progressPreview)
+                    progressSlider.SetValueWithoutNotify(duration > 0 ? (float)(facade.clock.GetPositionSeconds() / duration) : 0);
+            }
+            if (Time.unscaledTime < _nextTextUpdate) return;
+            _nextTextUpdate = Time.unscaledTime + 0.2f;
+            bool live = facade.network != null && facade.network.IsLiveMidiActive();
+            for (int i = 0; i < localizedKeys.Length && i < localizedLabels.Length; i++)
+                if (localizedKeys[i] == "player.now_playing" && localizedLabels[i] != null)
+                    localizedLabels[i].text = Tr(live ? "player.now_performing" : "player.now_playing");
+            if (titleLabel != null)
+            {
+                string author = facade.GetSongAuthor();
+                titleLabel.text = live ? facade.network.GetLiveMidiPlayerName()
+                    : facade.library != null && facade.library.FindSong(facade.selectedSongId) != null
+                        ? facade.GetSongTitle() + (string.IsNullOrWhiteSpace(author) ? "" : " · " + author)
+                        : Tr("player.no_songs");
+            }
+            if (stateLabel != null)
+            {
+                string status = Tr(live ? "status.performing" : state == 1 ? "status.playing" : state == 2 ? "status.paused" : "status.stopped");
+                if (!string.IsNullOrEmpty(facade.lastError)) status = LocalizeRuntimeError(facade.lastError);
+                else if (facade.isSongLoading) status = Tr("status.loading");
+                else if (!facade.isReady || facade.network == null || !facade.network.CanAcceptCommands()) status = Tr("status.preparing");
+                else if (facade.gate == null || !facade.gate.CanControl()) status += " / " + Tr("status.locked");
+                stateLabel.text = status;
+            }
+            if (timeLabel != null && facade.clock != null)
+            {
+                double duration = facade.clock.GetPlaybackEndSeconds();
+                double position = _progressPreview && progressSlider != null ? progressSlider.normalizedValue * duration : facade.clock.GetPositionSeconds();
+                timeLabel.text = FormatTime(position) + " / " + FormatTime(duration);
+            }
+        }
+
+        private void RefreshControls(int state, bool can)
+        {
+            int mask = facade.InstrumentMask();
+            int articulation = facade.voicePool != null && facade.voicePool.strings != null ? facade.voicePool.strings.articulation : -1;
+            int overrides = facade.StringArticulationOverrides();
+            bool running = facade.practice != null && facade.practice.running;
+            if (_controlsRefreshed && _controlsCan == can && _controlsReady == facade.isReady
+                && _controlsLoading == facade.isSongLoading && _controlsState == state && _controlsPracticeRunning == running
+                && _controlsMask == mask && _controlsInstrument == facade.selectedInstrument && _controlsLanguage == _loadedLanguage
+                && _controlsArticulation == articulation && _controlsOverrides == overrides && _controlsStyleTarget == _stringStyleTarget) return;
+            _controlsRefreshed = true; _controlsCan = can; _controlsReady = facade.isReady;
+            _controlsLoading = facade.isSongLoading; _controlsState = state; _controlsPracticeRunning = running;
+            _controlsMask = mask; _controlsInstrument = facade.selectedInstrument; _controlsLanguage = _loadedLanguage;
+            _controlsArticulation = articulation; _controlsOverrides = overrides; _controlsStyleTarget = _stringStyleTarget;
             if (fileMappingEntry != null) fileMappingEntry.interactable = facade.isReady && !facade.isSongLoading;
             if (instrumentButton != null) instrumentButton.interactable = can && !facade.isSongLoading;
             if (instrumentTitle != null) instrumentTitle.text = Tr("instrument.title");
@@ -1020,48 +1084,35 @@ namespace MusicMidiPlayer.UI
             if (playButton != null) playButton.interactable = can && !facade.isSongLoading && (facade.practice != null ? !facade.practice.running : state != 1);
             if (pauseButton != null) pauseButton.interactable = can && (facade.practice != null ? facade.practice.running : state == 1);
             if (stopButton != null) stopButton.interactable = can;
-            if (_progressPreview && (!can || _progressSongId != facade.selectedSongId))
+        }
+
+        private void RefreshSongButtons(bool can)
+        {
+            string selected = facade.selectedSongId;
+            // Permission changes touch all rows once, including rows hidden by folder/search.
+            if (!_songButtonsRefreshed || _songButtonsCan != can)
             {
-                _progressDragging = false;
-                _progressPreview = false;
+                _selectedSongButton = -1;
+                for (int i = 0; i < songButtons.Length; i++) if (songButtons[i] != null)
+                {
+                    songButtons[i].Refresh(can, selected);
+                    if (songButtons[i].songId == selected) _selectedSongButton = i;
+                }
             }
-            for (int i = 0; i < songButtons.Length; i++) if (songButtons[i] != null) songButtons[i].Refresh(can, facade.selectedSongId);
-            if (progressSlider != null && facade.clock != null)
+            else if (_songButtonsSong != selected)
             {
-                double duration = facade.clock.GetPlaybackEndSeconds();
-                progressSlider.interactable = can && duration > 0;
-                if (!_progressPreview)
-                    progressSlider.SetValueWithoutNotify(duration > 0 ? (float)(facade.clock.GetPositionSeconds() / duration) : 0);
+                if (_selectedSongButton >= 0 && _selectedSongButton < songButtons.Length && songButtons[_selectedSongButton] != null)
+                    songButtons[_selectedSongButton].Refresh(can, selected);
+                _selectedSongButton = -1;
+                for (int i = 0; i < songButtons.Length; i++)
+                    if (songButtons[i] != null && songButtons[i].songId == selected)
+                    {
+                        _selectedSongButton = i;
+                        songButtons[i].Refresh(can, selected);
+                        break;
+                    }
             }
-            if (Time.unscaledTime < _nextTextUpdate) return;
-            _nextTextUpdate = Time.unscaledTime + 0.2f;
-            bool live = facade.network != null && facade.network.IsLiveMidiActive();
-            for (int i = 0; i < localizedKeys.Length && i < localizedLabels.Length; i++)
-                if (localizedKeys[i] == "player.now_playing" && localizedLabels[i] != null)
-                    localizedLabels[i].text = Tr(live ? "player.now_performing" : "player.now_playing");
-            if (titleLabel != null)
-            {
-                string author = facade.GetSongAuthor();
-                titleLabel.text = live ? facade.network.GetLiveMidiPlayerName()
-                    : facade.library != null && facade.library.FindSong(facade.selectedSongId) != null
-                        ? facade.GetSongTitle() + (string.IsNullOrWhiteSpace(author) ? "" : " · " + author)
-                        : Tr("player.no_songs");
-            }
-            if (stateLabel != null)
-            {
-                string status = Tr(live ? "status.performing" : state == 1 ? "status.playing" : state == 2 ? "status.paused" : "status.stopped");
-                if (!string.IsNullOrEmpty(facade.lastError)) status = LocalizeRuntimeError(facade.lastError);
-                else if (facade.isSongLoading) status = Tr("status.loading");
-                else if (!facade.isReady || facade.network == null || !facade.network.CanAcceptCommands()) status = Tr("status.preparing");
-                else if (facade.gate == null || !facade.gate.CanControl()) status += " / " + Tr("status.locked");
-                stateLabel.text = status;
-            }
-            if (timeLabel != null && facade.clock != null)
-            {
-                double duration = facade.clock.GetPlaybackEndSeconds();
-                double position = _progressPreview && progressSlider != null ? progressSlider.normalizedValue * duration : facade.clock.GetPositionSeconds();
-                timeLabel.text = FormatTime(position) + " / " + FormatTime(duration);
-            }
+            _songButtonsRefreshed = true; _songButtonsCan = can; _songButtonsSong = selected;
         }
 
         private string LocalizeRuntimeError(string message)

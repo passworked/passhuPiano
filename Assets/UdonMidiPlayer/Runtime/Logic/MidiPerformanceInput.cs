@@ -150,9 +150,12 @@ namespace MusicMidiPlayer.Logic
             { activeSeat.ExitLocal(); return; }
             if (!facade.CanReceiveLiveMidi() || (facade.practice == null && (facade.gate == null || !facade.gate.CanControl())))
             { ReleaseAll(); return; }
+            var ensemble = facade.voicePool.ensemble;
+            if (ensemble != null) ensemble.BeginOutputBatch();
             if (vr) ReadFingers(player);
             else if (activeSeat != null && activeSeat.gameObject.activeInHierarchy) ReadDesktop();
             else ReleaseAll();
+            if (ensemble != null) ensemble.EndOutputBatch();
         }
 
         private void ReadDesktop()

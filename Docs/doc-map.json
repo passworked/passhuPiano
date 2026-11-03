@@ -1,6 +1,14 @@
 {
   "schema_version": 1,
-  "updated_on": "2026-11-02",
+  "updated_on": "2026-11-03",
+  "readme_localization": {
+    "default_language": "en",
+    "canonical": "README.md",
+    "translations": { "zh-CN": "README.zh-CN.md", "ja": "README.ja.md" },
+    "scope": "repository_readmes_only",
+    "detailed_guides_language": "zh-CN_unless_noted",
+    "synchronize": ["features", "version", "validation_status", "Unity_SDK_baseline", "commands", "links", "licenses", "contribution_requirements"]
+  },
   "implementation_baseline": { "commit": "21c05930f4562aac1fbb1f8df62d2bf45fc06524", "source_version": "1.0.0-rc.2", "evidence": "static_source_inspection_not_runtime_acceptance" },
   "entrypoints": {
     "users": "Docs/GETTING_STARTED.md",

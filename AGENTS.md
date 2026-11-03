@@ -9,6 +9,7 @@
 - Unity 操作与截图优先 MCP；浏览器显式使用 Chrome，禁止 Edge 或自动回退。
 - 按任务范围验证，遵守构建/测试限制；如实区分 Editor 与真实客户端结果。
 - 以最新有效要求为准。AGENTS.md 只放核心约束和索引，详细约定写 docs 并同步维护。
+- 仓库 README 默认语言为英文（`README.md`）；中文、日文翻译与英文事实同步，规则见 `Docs/Developer/AI_GUIDE.md`。
 
 ## 文档索引
 

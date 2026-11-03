@@ -4,20 +4,25 @@
 <h1 align="center">passhuPiano</h1>
 <p align="center">Bring MIDI to your VRChat world.</p>
 <p align="center">
-  <a href="Docs/GETTING_STARTED.md">开始使用</a> ·
-  <a href="Docs/Developer/AI_GUIDE.md">开发指南</a> ·
-  <a href="Docs/Contributing/README.md">贡献乐器</a>
+  <strong>English</strong> ·
+  <a href="README.zh-CN.md">简体中文</a> ·
+  <a href="README.ja.md">日本語</a>
+</p>
+<p align="center">
+  <a href="Docs/GETTING_STARTED.md">Get started</a> ·
+  <a href="Docs/Developer/AI_GUIDE.md">Developer guide</a> ·
+  <a href="Docs/Contributing/README.md">Contribute instruments</a>
 </p>
 
-为 VRChat Worlds 提供 **MIDI 播放、多人共享播放与实时演奏**。
+**MIDI playback, multiplayer synchronization, and live performance for VRChat Worlds.**
 
-主场景支持钢琴、马林巴、弦乐和鼓组，附可编辑美术与制作工具；两份独立钢琴 Prefab 单独维护。
+The main scene includes piano, marimba, strings, and drums, with editable artwork and authoring tools. The two standalone piano Prefabs are maintained separately.
 
-> 当前为 `1.0.0-rc.2` 开发候选，PC 优先。功能与验收边界见[当前实现](Docs/Developer/CURRENT_STATE.md)。
+> Development candidate `1.0.0-rc.2`, with PC as the priority. See [current implementation](Docs/Developer/CURRENT_STATE.md) for features and validation status.
 
-## 快速开始
+## Quick start
 
-安装 Git LFS，并取得私仓访问权限后：
+Install Git LFS and obtain access to this private repository, then:
 
 ```sh
 git clone https://github.com/passworked/passhuPiano.git
@@ -25,16 +30,16 @@ cd passhuPiano
 git lfs pull
 ```
 
-通过 VCC / ALCOM 恢复 Worlds SDK，再用 **Unity 2022.3.22f1** 打开工程。记录的 SDK 基线为 **3.10.5**。打开主场景，或将钢琴 Prefab 拖入自己的世界。
+Restore the Worlds SDK through VCC / ALCOM and open the project with **Unity 2022.3.22f1**. The recorded SDK baseline is **3.10.5**. Open the main scene, or drag a piano Prefab into your own world.
 
-详细步骤见[安装与使用](Docs/GETTING_STARTED.md)。[技术文档](Docs/UdonMidiPlayer/README.md) · [AI 工作指南](Docs/Developer/AI_GUIDE.md)
+See [setup and usage](Docs/GETTING_STARTED.md) for details. [Technical documentation](Docs/UdonMidiPlayer/README.md) · [AI workflow guide](Docs/Developer/AI_GUIDE.md). Detailed guides are currently in Chinese.
 
-## 参与贡献
+## Contributing
 
-欢迎乐器、音源、美术、代码和文档贡献，可直接提交 PR，也可分阶段完成。
+Instrument, sound, art, code, and documentation contributions are welcome. You may submit a PR directly or contribute in stages.
 
-正式收录乐器前，需补齐模型、音源、接入和说明，提供 PC VRChat 实测，并由 **passhu** 评审。来源许可、资源硬上限与 AI 披露要求见[贡献指南](Docs/Contributing/README.md)。
+Official instrument inclusion requires the model, sound source, integration, documentation, and PC VRChat single-client test evidence, followed by **passhu**'s review. See the [contribution guide](Docs/Contributing/README.md) for source licenses, resource limits, and AI disclosure requirements.
 
-## 许可
+## License
 
-自有代码采用 [MIT](Licenses/MIT.txt)，自有美术采用 [CC BY 4.0](Licenses/CC-BY-4.0.txt)。第三方内容保留原许可与署名，详见[许可范围](LICENSE.md)及[来源清单](THIRD_PARTY_NOTICES.md)。
+Project-owned code is licensed under [MIT](Licenses/MIT.txt), and project-owned artwork under [CC BY 4.0](Licenses/CC-BY-4.0.txt). Third-party content retains its original licenses and credits; see the [license scope](LICENSE.md) and [attributions](THIRD_PARTY_NOTICES.md).

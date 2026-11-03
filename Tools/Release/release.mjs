@@ -123,7 +123,7 @@ export function sourceSnapshot() {
     files.add(p);
   }
   for (const p of walk('ProjectSettings')) files.add(p);
-  for (const p of ['Packages/manifest.json', 'Packages/packages-lock.json', 'Packages/vpm-manifest.json', '.gitignore', '.gitattributes', 'AGENTS.md', 'README.md', 'LICENSE.md', 'THIRD_PARTY_NOTICES.md', 'CONTRIBUTING.md', 'CHANGELOG.md', 'VERSION'])
+  for (const p of ['Packages/manifest.json', 'Packages/packages-lock.json', 'Packages/vpm-manifest.json', '.gitignore', '.gitattributes', 'AGENTS.md', 'README.md', 'README.zh-CN.md', 'README.ja.md', 'LICENSE.md', 'THIRD_PARTY_NOTICES.md', 'CONTRIBUTING.md', 'CHANGELOG.md', 'VERSION'])
     if (fs.existsSync(path.join(root, p))) files.add(p);
   // Remove only known withheld files from this unsealed generated snapshot;
   // authoring originals and other candidates are never touched.

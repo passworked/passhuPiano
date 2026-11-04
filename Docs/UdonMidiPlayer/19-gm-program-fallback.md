@@ -1,31 +1,31 @@
 # GM 音色分组与已选乐器回退
 
-更新：2026-11-01。当前实现为“分组＋例外＋提琴音域分配”，并支持播放器内手动音色映射；替代固定首选提琴承接全部音符的旧方案。目标为主场景，独立练习系统及分发 Prefab 沿用各自现有配置。
+更新：2026-11-04。当前实现为“分组＋例外＋提琴音域分配”，并支持播放器内按原始音色和原始音轨手动映射；替代固定首选提琴承接全部音符的旧方案。目标为主场景，独立练习系统及分发 Prefab 沿用各自现有配置。
 
 ## 选择与路由
 
 - 乐器菜单为复选框，勾选集合是共享状态；点击后菜单保持展开。两个钢琴外观互斥，共用钢琴音色位。
-- 六个目标 ID：0 钢琴、1 马林巴、2 小提琴、3 中提琴、4 大提琴、5 低音提琴。弦乐组入口和舞台显示已取消；旧 ID 6、菜单索引 7 及引用保留为停用槽，避免迁移曲目和资源身份。两种钢琴外观仍使用菜单索引 0、1。
+- 当前七个活动目标 ID：0 钢琴、1 马林巴、2 小提琴、3 中提琴、4 大提琴、5 低音提琴、7 八音盒（模型索引 8）。弦乐组入口和舞台显示已取消；旧 ID 6、菜单索引 7 及引用保留为停用槽，避免迁移曲目和资源身份。两种钢琴外观仍使用菜单索引 0、1。
 - 自动模式先查 Program 分类模板，再从左到右找第一个已勾选目标；候选是提琴时按下节音域分配。单选时全部旋律音色落到该目标；全不选时旋律静音。不会偷偷启用未勾选音源，也不自动叠音。
-- 每个模板包含全部六个目标且不重复，任意非空选择都有确定结果。复音满载执行抢占，不改换音色。
+- 每个模板包含全部七个活动目标且不重复，任意非空选择都有确定结果。复音满载执行抢占，不改换音色。
 - Program 编号为 0～127；缺省为 0。非零 Bank Select 元数据继续保存，当前仍使用相同 Program 的基础音色映射，不宣称支持 GS/XG bank。
-- 通道索引 9（第 10 通道）仍走独立鼓组，不进入旋律回退；旋律 Program 112～119 不改投鼓组。
+- 文件第 10 通道仅保留 GM 鼓组默认值，允许显式音轨 / Program 映射覆盖；可选轨名适配也可把旋律轨从该通道分配出去，或把其他通道的 Drum / Kick 等轨送入鼓组。硬件 MIDI 输入的默认鼓通道独立。旋律 Program 112～119 本身不改投鼓组。
 
 ## 唯一规则源
 
-规则维护在 Assets/UdonMidiPlayer/Editor/Prefab/MidiInstrumentRoutingBuilder.cs：11 个六项排序模板、16 个 GM 家族默认分组，以及 Program 例外。Bake() 自动生成 programGroup[128]、priorityOrder[66]，并生成规则哈希。表格是规则的审阅展开，不在运行代码中手写 128 份完整排序。
+规则维护在 Assets/UdonMidiPlayer/Editor/Prefab/MidiInstrumentRoutingBuilder.cs：12 个七项排序模板、16 个 GM 家族默认分组，以及 Program 例外。Bake() 自动生成 programGroup[128]、priorityOrder[84]，并生成规则哈希。表格是规则的审阅展开，不在运行代码中手写 128 份完整排序。
 
-运行组件 MidiInstrumentRouter 保存六位 enabledMask，选择变化时计算 resolvedPrograms[128]。音色解析与已有曲目解码共用逐帧时间预算；按音符起音的原始事件边界解析 Program，保留同 tick 和毫秒舍入后的顺序；后续 Program 变化不会改写旧音的音源身份。
+运行组件 MidiInstrumentRouter 的 enabledMask 有效位为 `447`：旋律集合仍为 `191`（跳过停用 bit 6），追加 bit 8（256）控制鼓组，默认开启。鼓组不加入七个旋律目标的回退排序；`IsFileDrum` 保留分类，声音／表现另做启用门控，避免禁用鼓组后落回钢琴。选择变化时计算 resolvedPrograms[128]。音色解析与已有曲目解码共用逐帧时间预算；按音符起音的原始事件边界解析 Program，保留同 tick 和毫秒舍入后的顺序；后续 Program 变化不会改写旧音的音源身份。
 
-弦乐各目标可独立选择奏法；手动长弓 / 跳弓 / 拨弦优先于 Program。默认自动时，Program 32～34、36～37、45 采用拨弦，55 采用跳弓，其余使用原共享默认奏法。文件与实时路由先选目标，再通过 `ArticulationForTarget` 选奏法；显式手动目标的自动模式保留原默认。规则版本为 `selected-gm-v4-independent-string-style`，独立选择进入完整快照。弦乐组不再参与主场景路由；每个音符只进入一个实际启用的目标，不叠音。音高始终保留 0～127。
+弦乐各目标可独立选择奏法；手动长弓 / 跳弓 / 拨弦优先于 Program。默认自动时，Program 32～34、36～37、45 采用拨弦，55 采用跳弓，其余使用原共享默认奏法。文件与实时路由先选目标，再通过 `ArticulationForTarget` 选奏法；显式手动目标的自动模式保留原默认。规则版本为 `selected-gm-v9-music-box`（包含可选轨名规则和自动小提琴奏法），独立选择进入完整快照。弦乐组不再参与主场景路由；每个音符只进入一个实际启用的目标，不叠音。旋律音高始终保留 0～127，开启的近似鼓轨只在路由输出时转换鼓键。
 
 ## 发声、表现与恢复
 
 MidiEnsembleVoicePool 由现有 PianoVoicePool 转发入口驱动：钢琴/马林巴每音一个源，弦乐每音一对动态分配的音头/循环源，合计仍为原有 64 个 AudioSource；鼓组保留原分区。每个活动音保存目标、region、奏法、释放及源占用，不修改旧池的单乐器练习路径。
 
-多个勾选模型同时显示并按固定舞台偏移展开，单选恢复原位置。琴键、瀑布、粒子和弦光只显示实际路由到自己的音符，声音空间原点对应乐器。钢琴仅换外观时保留正在发声的槽位。更改勾选集合保持歌曲时间和播放状态，在当前位置重建；实时按住/踏板状态按现有迁移方式恢复。暂停、停止、定位和晚加入使用统一恢复入口。
+主场景的多个勾选模型同时显示并按固定舞台偏移展开，单选恢复原位置。[钟楼第二场景](25-clockwork-second-scene.md#固定组合扇形布局2026-11-04)单独接入居中、落地、等占地净距的固定组合扇形布局，含鼓组；不回写其他场景。琴键、瀑布、粒子和弦光只显示实际路由到自己的音符，声音空间原点对应乐器。钢琴仅换外观时保留正在发声的槽位。更改勾选集合保持歌曲时间和播放状态，在当前位置重建；实时按住/踏板状态按现有迁移方式恢复。暂停、停止、定位和晚加入使用统一恢复入口。
 
-公共快照包含 enabledInstrumentMask、pianoAppearance、fileProgramMap，连同完整 pending/confirmed/flight 状态保存；所有权交接和回滚恢复完整集合。catalogHash 包含规则版本、展开分类、排序、提琴音域/文件映射语义以及现有 bank 哈希。
+公共快照包含 enabledInstrumentMask、pianoAppearance、fileProgramMap、fileTrackMap、autoTrackRouting，连同完整 pending/confirmed/flight 状态保存；所有权交接和回滚恢复完整集合。catalogHash 包含规则版本、展开分类、排序、提琴音域/文件映射语义以及现有 bank 哈希。
 
 手动演奏自 `selected-gm-v3-range-file-map` 起携带独立目标：VR 使用实际触到的已启用键盘／琴条，PC 使用当前座位；两者不按 Program 0 回退。起音事件 kind 3～8 表示目标 0～5（旧 kind 9 不再可选），松键及控制器沿用原事件；稀疏快照以位 20～22 保存目标＋1（0 表示普通 MIDI 路由），位 8～19 为原音符身份，低字节仍为力度／延音标志。不同乐器的虚拟通道分开，晚加入恢复保留目标，禁用目标的手动音符丢弃而不改投其他乐器。规则哈希包含该语义；详细输入规则见 [控制与 UI](07-controls-and-ui.md)。
 
@@ -48,11 +48,24 @@ MidiEnsembleVoicePool 由现有 PianoVoicePool 转发入口驱动：钢琴/马�
 
 ## 播放器内音色映射
 
-当前播放区右上方的“音色映射”直接打开播放器弹层，不从设置或硬件 MIDI 页面进入。页面只列当前曲目实际出现过旋律 NoteOn 的原始 Program（界面编号 001～128，内部仍为 0～127），名称走中英日语言表；同曲的 Program Change 按原始事件顺序计入，鼓组不进入该表。每页16行，支持翻页、自动及全部恢复自动。
+当前播放区右上方的“乐器映射”直接打开播放器弹层，不从设置或硬件 MIDI 页面进入。“按原始音色”页签只列当前曲目实际出现过 NoteOn 的原始 Program（界面编号 001～128，内部仍为 0～127），名称走中英日语言表；同曲的 Program Change 按原始事件顺序计入，鼓通道也进入该表，以便手动覆盖。每页16行，支持翻页、自动及全部恢复自动。
 
 每个音色可选择钢琴、马林巴或四把提琴。选择尚未启用的目标时，同时打开该目标的公共勾选位和模型；保持已有启用集合，映射与集合一同提交。随后手动取消该目标时，该显式映射静音并标为未启用；重新选取可再次启用。更改映射保持歌曲时间与播放/暂停状态，重建当前位置的声音及对应弦光。映射按原始 Program 保存在本播放器的共享状态，切歌保留；不写入源 MIDI、曲库资产或个人 PlayerData，也不改变硬件 MIDI 的通道设置与实时音符。
 
 `fileProgramMap` 为空表示全自动，否则为128位数字字符串：0 自动，1～6 表示目标 ID＋1。完整 pending、confirmed、flight 快照分别保留不可变字符串；接收、回滚、晚加入及 Owner 交接同时恢复映射与集合。字符串长度、字符与已停用目标在应用前验证。选择/复位沿用公共播放权限，界面浏览不申请 ownership。
+
+## 播放器内音轨映射（2026-11-03）
+
+根据用户最新要求，文件通道映射已移除。播放区“乐器映射”仅提供“按原始音色 / 按原始音轨”两个页签。音轨页只列当前曲目包含 NoteOn 的来源音轨，按原始轨道索引排序，界面显示为 1 起始编号，有真实轨名时附上轨名；独立控制轨不列出，纯鼓组轨也可手动改派。每页 16 行，沿用翻页、权限、目标选择及单页签全部恢复自动。硬件 MIDI 的个人通道设置属于演奏输入，与文件路由独立。
+
+文件路由优先级为：显式音轨目标 → 显式 Program 目标 → 已开启的轨名适配 → GM 默认及提琴音域分配。音轨选择“跟随音色映射”后继续按该音符起音时的 Program 解析。同一个 MIDI 通道、同一 Program 的不同音轨也能分别指定乐器；同一轨使用多个通道时，这些旋律音符共用轨道目标。未被覆盖且没有已识别轨名的通道索引 9 保留 GM 鼓组默认值。显式目标未启用时静音，在映射页选择目标时自动启用；重置音轨映射保留 Program 映射及勾选集合，反之亦然。
+
+共享字段 `fileTrackMap` 为空表示全跟随音色，否则为按轨道索引严格升序的 6 字符记录：前 5 位十进制数字为原始轨道索引（0～65534），第 6 位为目标 ID＋1（1～6）。移除记录表示自动，不存 0 目标；拒绝重复、乱序、越界及非法字符。稀疏编码无需按最高轨号填充，运行选择变化时展开并二分查询。映射按原始轨号保存在该播放器共享状态，切歌保留，不写入 MIDI / 导入资产 / 压缩歌曲或个人 PlayerData。网络 pending、confirmed、flight、去重、回滚、晚加入和 Owner 交接全部携带不可变字符串，集合和两类映射一次应用；规则哈希为 `selected-gm-v6-file-track-map`，不混用旧版本。
+
+《拼凑的断音 / Patchwork Staccato》原文件为 SMF Type 1、两轨，分别有 1,730 / 1,117 个音符，均在通道 1，只有 Program 0。独立原始字节扫描、重新解析、已存导入资产、MPC1 解码及运行时分步解码逐音符核对一致：通道未丢失、轨道索引 0 / 1 也完整保留。报告为 `Logs/Patchwork-SourceMidiChannels.json` 与 `Logs/Patchwork-ChannelDecodeAudit.json`。这首歌需要按音轨分离，不能把轨道号伪装成 MIDI 通道。
+
+
+本次验证：独立扫描《拼凑的断音》的原始 MIDI 字节，并逐音符对照导入资产、已存 MPC1 与预算为 1 的运行时分步解码，通道与音轨均一致。Editor 路由检查覆盖实际 2,847 个音符及稀疏映射边界、删除、排序、非法状态、Program 回退、禁用静音和鼓组例外，共 20 项；完整快照及移除旧字段检查 8 项。主场景原生 Button → 实际 backing Udon 的 12 项检查包含两轨选择、自动启用、活动声音槽的来源轨道与目标、暂停保位及独立重置。合成 129 音轨列表的九页分页及上下界检查通过；中英日真实文字渲染和 18 项 GraphicRaycaster 检查通过。报告为 `Logs/FileTrackMapping-{Scene,Routing,Snapshots,NativeChecks,Voices,Pagination,UI}.json`，截图为 `Captures/FileTrackMapping/Patchwork-Tracks-{zh,en,ja}.png`。确认移除主场景 backing Udon 中旧文件通道映射与页签字段；原 MIDI、歌曲资产、压缩数据及其 meta 和两份分发 Prefab 的 SHA-256 均未改变。未进行真实 VRChat、远端晚加入或双客户端 Owner 交接验收。
 
 ## 全部 Program 的审阅展开
 
@@ -189,12 +202,88 @@ MidiEnsembleVoicePool 由现有 PianoVoicePool 转发入口驱动：钢琴/马�
 | 126 | 掌声 | 马 → 钢 → 低 → 大 → 中 → 小 |
 | 127 | 枪声 | 马 → 钢 → 低 → 大 → 中 → 小 |
 
+## 可选轨名自动适配（2026-11-04）
+
+“乐器映射 → 按原始音轨”提供“自动适配轨名”复选框，**默认关闭**。开启后按原始轨名缓存代表 Program，再使用当前已选乐器集合；不自动打开旋律乐器、不改写原始 `notePrograms`，不修改 MIDI、导入资产、MPC1 或 songId。手动音轨与 Program 映射均优先。未识别轨名沿用原 GM 规则。混合名称取最先出现且符合词边界的已知声部，大小写、编号和 `#2` 后缀不影响识别；并不声称能从 `Fx / Sample / Noise / Etc / MIDI Out` 等名称还原配器。
+
+完整扫描 `Assets/music/uaaaak`（包含 `_excluded`）的 **425 首** MIDI：全部成功解析，共 **5,492** 条有音符轨、**1,928,062** 个音符；所有音符起音时均为 Program 0，没有 Bank Select，也没有第 10 通道音符。常见精确轨名为 `Bass` 414 条、`Drum` 399 条、`Pad` 375 条、`Piano` 332 条、`Lead` 216 条；另有大量大小写、前后空格、`#2` 和混合声部变体。因此通道号或 Program 0 均不足以恢复这份曲库的分轨习惯。
+
+| 轨名声部（含常见变体） | 自动选择依据 |
+| --- | --- |
+| Piano / TruePianos / Close Grand / Harpci | 钢琴类 Program 0，沿用已选集合回退 |
+| Bass / Contrabass | Program 32 优先低音提琴；保持整轨低音身份，不按每音八度改投高音提琴；自动奏法拨弦 |
+| Violin / Viola / Cello | Program 40 / 41 / 42；对应目标可用时保持身份，否则沿用回退 |
+| String / Pad / Choir / Organ | Program 48，按当前提琴音域分配 |
+| Bell / Marimba / Arp / Pluck / Harp / Guitar | Program 12，优先马林巴；无马林巴时按既有集合回退 |
+| Music Box | Program 10；沿用当前规则中八音盒及其已选回退 |
+| Lead / Synth / Vocal / Miku / Brass / Flute 等 | Program 80，旋律声部按既有提琴音域分配 |
+| Drum / Kick / Snare / Clap / Hi-hat / Crash / Ride / Tom | 从任意文件通道送入现有鼓组，采用下面的近似规则 |
+
+用户明确选择“映射到鼓组，接受近似鼓点”。明确 Kick → 36，Snare / Clap → 38，Hi-hat → 42，Crash → 49，Ride → 51，Tom → 45；泛称 Drum 的原音高按 `<36 / <48 / <60 / <72 / <84 / 其余` 分别映射到 `36 / 38 / 45 / 47 / 42 / 49`。保留起音时间、音符身份和力度，鼓音尾部沿用采样；不猜测新节奏，不把原音高改写回曲目。这个寄存器近似不能还原原编曲的鼓件、反向音效或合成鼓设计。普通 GM 鼓且未命中轨名适配时保留原始鼓键。
+
+`IsFileDrum` 和 `FileDrumPitch` 共同驱动鼓音频、鼓道、鼓件动作与 Hi-hat 状态；旋律声音、琴键、瀑布和弦光共用 `TargetForNote`。文件第 10 通道不再独占鼓组：手动轨道 / Program 目标及开启后的明确旋律轨名可改派到旋律乐器；未覆盖时仍按 GM 默认。此修改针对文件播放，硬件 MIDI 个人通道规则与独立练习 / 分发 Prefab 的既有配置保持独立。
+
+`autoTrackRouting` 是完整共享状态，默认 false，随 pending / confirmed / flight、去重、回滚、晚加入与 Owner 交接保存。开关切歌保留；重置单页手动映射保留开关。改变路由后重建鼓音频及鼓道索引，复用现有逐帧时间预算，保持当前播放 / 暂停状态和时间锚点，不全曲重导入；Stopped 下保留实时旋律音符。规则、别名、优先级和鼓键近似计入 `rulesHash` / `catalogHash`。
+
+全曲库 Editor 检查已验证关闭时全部音符原路由不变、开启时每音符只分配一个目标、所有适配鼓点均有有效采样；识别 **4,420** 条声部轨，适配 **323,348** 个鼓点。原始汇总为 `Logs/UaakTrackAnalysis-20261104.json`，逐曲报告为 `Logs/AutoTrackRouting-Corpus.json`。实际 backing Udon / 原生 UI 共 43 项独立检查包含默认关闭、真实 UAAK 鼓轨、音频 / 鼓道身份一致、暂停保位、拒绝提交后的完整回滚、Stopped 下保留实时音符及加载期间的 NoteOff、第 10 通道实际钢琴采样与禁用静音、四份语言。最终 Editor 射线命中及空心 / 填充勾选框已单独检查，截图为 `Captures/AutoTrackRouting/`；汇总报告 `Logs/AutoTrackRouting-Verification.json`。当前 Unity / UdonSharp 无编译错误，Console 无 Error；未进行真实 VRChat、远端晚加入 / Owner 交接、硬件 MIDI、人工听音或玩家构建验收。
+
+## 手动文件鼓组目标（2026-11-04）
+
+规则 `selected-gm-v10-file-drums` 在文件映射中增加目标 8（鼓组），编码数字为 9。`fileProgramMap` 保持 128 字符，允许 0、1～6、8、9；`fileTrackMap` 保持每项 6 字符，末位允许 1～6、8、9。目标 6 / 数字 7 仍停用，旋律目标和 mask 不扩展，鼓组不占新的启用位。旧有效映射保持可读；新鼓组映射须使用新版客户端，规则与 catalog 哈希同次更新。
+
+手动轨道目标优先，其次手动 Program 目标；显式目标 8 从任意文件通道送入既有打击乐音频、鼓道和鼓件动作，旋律链不重复发声。显式旋律目标仍可覆盖默认第 10 通道或自动鼓组。手动鼓组使用原 MIDI 音高作为 GM 鼓键，不套用轨名自动近似；该近似仅在未手动映射且启用自动适配时使用。重置 / 恢复自动、暂停保位、重新绑定鼓索引及网络快照沿用既有流程；硬件 MIDI、旋律回退、资源预算与分发 Prefab 不因文件目标新增而改变。
+
+## 逐音轨开关（2026-11-04）
+
+当前规则升级为 `selected-gm-v11-track-switches`。`fileTrackMap` 保持排序的六字符记录及原始轨号：启用时沿用目标字符 `1～6 / 8 / 9`；关闭时用 `a～g / i / j` 保存同一目标，其中 `a` 表示关闭且跟随音色／自动路由。`b～g / i / j` 分别对应原字符 `1～6 / 8 / 9`；`7 / h` 继续拒绝，启用的自动记录仍省略。旧有效映射全部可读，新关闭状态要求新版规则／catalogHash，不能混用旧客户端。音色映射编码不变。
+
+Router 分别缓存开关和目标，关闭检查优先于手动映射、轨名适配、GM 鼓组默认与旋律回退。`TargetForNote` 返回无旋律目标，`IsFileDrum` 返回 false，声音、琴键、瀑布、鼓道和鼓件动作共用结果。目标编辑保留开关；开启保留目标；重置音轨页同时恢复全部开启。沿用 `RebindFileRouting` 的分帧鼓索引更新、预约取消和当前位置重建，保留 Playing／Paused 状态与时间锚点；不改实时输入。
+
+开关嵌在已有共享 `fileTrackMap`，因此 pending／flight／confirmed、验证、回滚、晚加入与 Owner 交接都沿用原完整快照，不增加额外网络字段。规则哈希显式包含编码与静音优先级，主场景增量更新；练习场景、分发 Prefab、源 MIDI 和 songId 不更新。
+
+验证入口 `Tools → Music MIDI Player → Validate Track Switches (Play Mode)` 显式启动有时限的 Editor／ClientSim 检查，自动退出并恢复 Edit Mode，不在导入或构建时运行。`Logs/TrackSwitches/verification.json` 的79项检查通过：真实多轨歌曲、全部有效目标编码往返、非法／停用编码拒绝、原生开关及目标选择、共享 pending／public／flight 快照、旋律隔离、鼓声音／鼓道索引、暂停保位、继续播放、权限、16处独立点击命中以及重置恢复。截图 `Captures/TrackSwitches/DisabledTracks.png`；四份语言 JSON 的同键与占位符已静态核对。未进行真实 VRChat、远端晚加入／Owner 交接、人工听音或构建验收。
+
+## 音轨八度与自动音域（2026-11-04）
+
+当前规则为 `selected-gm-v13-track-pitch`，保留并行 `v12-drum-selection` 的鼓组启用位与规则。文件按原始音轨设置八度 −10～+10（默认0），整页自动音域默认关闭。先以原始音高和元数据选目标，随后应用八度；自动音域开启时只对越界音作最少整八度折回，不重新选择目标、不改音级。关闭自动音域时仅在移调超出 MIDI 0～127 时以同样方式返回有效 MIDI 范围。鼓组音高、原始曲目数组和音符身份不变。
+
+原始范围由 `SelectedQ4/BANK-MAPPING.json` 的 piano／marimba、`Strings/BANK-MAPPING.json` 的对应 bank 与 `MusicBox/BANK-MAPPING.json` 的 sources 烘焙，排除 `derivedFrom`／派生音，不把扩展采样或模型覆盖范围当成实录。范围进入 rulesHash／catalogHash，Builder 和 Validator 一起检查：
+
+| 目标 | 原始实录根音范围（MIDI，C4=60） |
+| --- | --- |
+| 钢琴0 | 21～108 |
+| 马林巴1 | 36～96 |
+| 小提琴2 | 55～96 |
+| 中提琴3 | 48～86 |
+| 大提琴4 | 36～77 |
+| 低音提琴5 | 28～59 |
+| 八音盒7 | 74～103 |
+
+这不是每个音高／奏法都存在独立实录的承诺；区间内部继续使用原 bank 采样选择。停用目标6不启用。`PitchForNote` 供旋律声音、键盘计数／动作、瀑布位置／材质／特效与弦乐动作共用。重叠音保持原 noteId，折回到同一键也分别释放。
+
+`fileTrackMap` 继续读取空串和旧六字符记录。需要音高设置时采用 `P0 / P1` 头（自动音域关／开）和排序的七字符记录：五位原始轨号、原目标／开关字符、八度字符 `0123456789ABCDEFGHIJK`（索引减10，`A`=0）。扩展记录允许目标字符0表示跟随原规则，`7 / h` 继续拒绝。无自动音域且全部八度归零时压回旧格式，保留原目标与关闭标记；开启自动音域但无逐轨覆盖为 `P1`。旧客户端因规则哈希不同拒绝混用，不增加独立网络字段。
+
+完整字符串沿用 pending／flight／confirmed、接收、回滚与 Owner 交接。纯音高更改经 `RebuildFilePitch` 立即按当前时间重建；目标／开关／轨名规则变更仍走原分帧鼓索引重绑定。停止时仅改变文件设置，不重建实时音符。重置音轨页清除逐轨目标、开关及八度，保留自动音域和轨名适配；Program 页与个人输入设置不受影响。
+
+验证入口为 `Tools → Music MIDI Player → Validate Track Pitch (Play Mode)`，报告 `Logs/TrackPitch/verification.json`；只有显式调用才运行，检查完成自动退出 Play Mode。覆盖全部七个旋律目标的128音高及五档偏移、音级和实录边界、旧记录往返、原生加减／开关、停止／播放／暂停、实际声音池音高、琴键计数、瀑布落点、40轨分页、共享快照、鼓组保键、关闭轨预设、实时音符隔离、权限和重置。四份语言实际渲染保存在 `Captures/TrackPitch/`，另逐行检查字形可见，避免CJK文本被双行高度裁掉。仅为 Editor／ClientSim 验证，不代表真实 VRChat、远端晚加入／Owner 交接或人工听音验收。
+
+最终音高探针184项检查通过（包含4,864组原生Udon音高边界运算的归类检查），原逐轨开关79项回归也通过；Unity C#／UdonSharp 无编译错误。主场景增量接线，未删除原场景对象、未更新分发Prefab或练习场景，未构建或发布。
+
 ## 更新与验证入口
 
 - 菜单 Tools → Music MIDI Player → Update String Routing and Playback Mapping 原位更新当前主场景；保留曲库、资源身份和既有引用，不 Apply 分发 Prefab。修改规则后通过该入口重烘焙并更新 catalogHash。
+- 菜单 Tools → Music MIDI Player → Update Automatic Track Routing 增量更新主场景的轨名规则、可选复选框、鼓道引用与 catalogHash，保留开关值；新组件默认关闭，不同步曲库或 Apply 分发 Prefab。
 - MidiBuildValidator.ValidateRoot() 检查路由、复选框、哈希和表现引用；规则穷举 128×63 个非空选择组合。
 - MidiInstrumentRoutingValidation.Begin() 是显式触发的短时 Editor/ClientSim backing Udon 检查，结果写入 Logs/instrument-routing-playmode.json。检查范围和成功状态以报告为准，不能代替真实 VRChat 双客户端、硬件 MIDI 或人工听音。
 
 旧 selected-gm-v2 验证记录（不代表本次音域规则）：分组规则 16,256 个非空选择组合、Unity C# / UdonSharp 编译和主场景接线校验通过；实际 backing Udon 26 项检查通过（包括原生复选框、空集、并发、逐音 Program、分步解析、暂停/定位、外观切换和共享声源抢占）。界面截图为 Captures/Instrument-Checkboxes.png；具体边界见报告 scope。
 
 本次 `selected-gm-v3-range-file-map` 检查：Unity C# / UdonSharp 编译与主场景接线校验通过；六目标类别规则8,064个非空组合通过。`Logs/strings-range-file-mapping-playmode.json` 的68项实际 backing Udon 检查通过，包括六种提琴两两分界、四把组合、原 Program 保留、文件映射、自动启用、播放/暂停保留进度、回滚与四份语言。Orangestar《Alice in 冷凍庫》3618个实际音符分配为小提琴957、中提琴1272、大提琴399、低音提琴990。另检查128种音色的8页翻页及上下界，中英日实际 UI 渲染与15项 GraphicRaycaster 遮挡检查通过，截图在 `Captures/PlaybackMapping/`。这些是 Editor/ClientSim 检查，未做真实 VRChat、双客户端或人工听音验收；未构建、发布或 Apply 分发 Prefab。
+
+## 七活动目标：八音盒（2026-11-04）
+
+本段替代上文六目标表的当前边界；原表保留为历史。目标7为八音盒，6仍停用。规则 `selected-gm-v9-music-box`：每个原有排序都在马林巴1之后插入八音盒7，保持原有六目标相对次序；GM10新增专用排序 `7,1,0,2,3,4,5`。因此全部128个Program的候选都包含八音盒，仅启用八音盒也承接全部旋律。字符串音域分配仍仅限2～5，不能将目标7当作提琴。自动音轨关键字 `music box|musicbox|八音盒|オルゴール` 使用GM10，其余轨道角色规则保持。
+
+有效集合mask为0～191且bit6必须为0，共127个非空集合。`fileProgramMap`仍为128字符，允许0、1～6、8；稀疏`fileTrackMap`每项仍6字符，末位允许1～6、8。数字8代表目标7＋1；7拒绝。实时起音kind10代表八音盒，稀疏恢复目标＋1允许8（20～23位），原有身份位、鼓组默认行为、两类映射优先级和公共状态字段不改。规则／bank哈希进入catalogHash，旧客户端不可混用；旧有效映射和PlayerData可继续读，新增目标需要新版。
+
+同日并行补充：`selected-gm-v10-file-drums` 新增文件专用目标8（编码字符9）表示鼓组，沿用GM原始鼓音键。此目标不加入旋律优先级排序，八音盒仍是旋律目标7（字符8）。v11 增加逐轨开关，v12 增加鼓组独立启用位，v13 增加音轨八度／自动音域；当前以v13及对应哈希为准。

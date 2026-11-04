@@ -7,5 +7,5 @@
   "decodedFloat32EstimateBytes": 637250688.0,
   "observedEditorClipMemoryBytes": 319083864,
   "bankHash": "c63e562430c31daa14308ecb6f419f7b7a353e41366891cbacfd49d211fccf0f",
-  "note": "PCM / DecompressOnLoad; source Ogg q4 is not build/download size."
+  "note": "The memory observation was recorded with PCM. Current Standalone packing uses Vorbis quality 70; other targets default to PCM. Both use DecompressOnLoad. Source Ogg q4 is not build/download size."
 }

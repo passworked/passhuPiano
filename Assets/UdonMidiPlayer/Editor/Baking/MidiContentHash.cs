@@ -62,14 +62,16 @@ namespace MusicMidiPlayer.Editor.Baking
                     // Dependency hashes include platform-specific import artifacts. Hash the
                     // authored source/settings so switching PC/Android does not invalidate a bank.
                     writer.Write(SourceFileHash(path));
-                    string meta = File.ReadAllText(path + ".meta").Replace("\r\n", "\n").Replace('\r', '\n');
-                    // Retain every platform override; source/import-setting edits must still fail validation.
+                    string meta = Encoding.UTF8.GetString(MidiAudioPacking.ReadBankMetadata(path)).TrimStart('\uFEFF')
+                        .Replace("\r\n", "\n").Replace('\r', '\n');
                     writer.Write(Bytes(Encoding.UTF8.GetBytes(meta)));
                 }
                 Write(writer, bank.rootPitch); Write(writer, bank.lowPitch); Write(writer, bank.highPitch);
                 Write(writer, bank.sourceRate); Write(writer, bank.sourceChannels); Write(writer, bank.sourceFrameCount);
                 Write(writer, bank.sourcePeak); Write(writer, bank.regionGain); Write(writer, bank.tuningCents); Write(writer, bank.releaseDurationMs);
                 Write(writer, bank.pitchToRegion); writer.Write(bank.maxReleaseMs);
+                writer.Write(AudioEnergyBaker.Format);
+                Write(writer, bank.energyStarts); Write(writer, bank.energyCounts); Write(writer, bank.energyValues);
                 // Preserve existing single-layer piano identities.
                 if (bank.velocityLayerCount != 1) { writer.Write(bank.velocityLayerCount == 4 ? "velocity-layers-v2:44,69,100" : "velocity-layers-v1:42,84"); writer.Write(bank.velocityLayerCount); }
             });

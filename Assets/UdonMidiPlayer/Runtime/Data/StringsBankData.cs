@@ -8,6 +8,10 @@ namespace MusicMidiPlayer.Data
     {
         public string bankId;
         public string bankHash;
+        // Flat 20 ms mean-square envelopes; repeated clips share one range.
+        public int[] energyStarts = new int[0], energyCounts = new int[0];
+        public float[] energyValues = new float[0];
+
         public AudioClip[] attacks = new AudioClip[0];
         public AudioClip[] loops = new AudioClip[0];
         public int[] roots = new int[0];
@@ -22,6 +26,33 @@ namespace MusicMidiPlayer.Data
         {
             int index = Mathf.Clamp(articulation, 0, 2) * 128 + Mathf.Clamp(pitch, 0, 127);
             return pitchToRegion != null && index < pitchToRegion.Length ? pitchToRegion[index] : -1;
+        }
+
+        public float EnergyAt(int region, float sourceSeconds)
+        {
+            if (sourceSeconds < 0f) return 0f;
+            float fallback = peaks[region] * peaks[region];
+            float attackLength = attacks[region].length;
+            if (sourceSeconds < attackLength) return ReadEnergy(region * 2, sourceSeconds, fallback, 0f);
+            AudioClip loop = loops[region];
+            if (loop == null) return 0f;
+            return ReadEnergy(region * 2 + 1, (sourceSeconds - attackLength) % loop.length, fallback, loop.length);
+        }
+
+        private float ReadEnergy(int index, float seconds, float fallback, float loopLength)
+        {
+            if (energyStarts == null || energyCounts == null || index < 0 || index >= energyStarts.Length || index >= energyCounts.Length) return fallback;
+            int first = energyStarts[index], count = energyCounts[index];
+            if (count < 2 || energyValues == null || first < 0 || first > energyValues.Length - count) return fallback;
+            float position = Mathf.Max(0f, seconds) * 50f;
+            int point = Mathf.Min(count - 1, Mathf.FloorToInt(position));
+            if (point == count - 1) return 0f;
+            if (loopLength > 0f && point == count - 2)
+            {
+                float phase = (position - point) / Mathf.Max(0.0001f, loopLength * 50f - point);
+                return Mathf.Lerp(energyValues[first + point], energyValues[first], phase);
+            }
+            return Mathf.Lerp(energyValues[first + point], energyValues[first + point + 1], position - point);
         }
 
         public bool IsValid()

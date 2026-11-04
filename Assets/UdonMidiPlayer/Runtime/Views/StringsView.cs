@@ -21,6 +21,8 @@ namespace MusicMidiPlayer.Views
         [HideInInspector] public int activeStringCount, liveParticleCount, liveSymbolParticleCount;
         [HideInInspector] public Color[] songPalette;
         [HideInInspector] public string paletteSeedHash;
+        private Color[] _channelPalette = new Color[32];
+        private int[] _sparkChannel, _poseChannel;
         private Material[] _materials;
         private Material[] _contactMaterials;
         private Material _symbolMaterial;
@@ -32,6 +34,7 @@ namespace MusicMidiPlayer.Views
         private double[] _onset, _emittedOnset, _nextSpark, _poseAge;
         private bool _ready, _wasMusic;
         private MidiSongData _song;
+        private string _performancePlayerName = "";
         private double _lastTime = -1;
         private int _generation = -1;
 
@@ -43,6 +46,7 @@ namespace MusicMidiPlayer.Views
             songPalette = new Color[2]; _hitCount = new int[count];
             _contactMaterials = new Material[contacts.Length];
             _energy = new float[count]; _glow = new float[count]; _sparkPitch = new int[count];
+            _sparkChannel = new int[count]; _poseChannel = new int[bodies.Length];
             _onset = new double[count]; _emittedOnset = new double[count]; _nextSpark = new double[count];
             _posePitch = new int[bodies.Length]; _poseVelocity = new int[bodies.Length];
             _poseStyle = new int[bodies.Length]; _poseAge = new double[bodies.Length];
@@ -75,9 +79,30 @@ namespace MusicMidiPlayer.Views
         public void BindSong(MidiSongData song)
         {
             Initialize();
-            string text = song == null || string.IsNullOrEmpty(song.sourceHash) ? "MusicMidiPlayer" : song.sourceHash.ToLowerInvariant();
+            string text = PaletteSeed(song);
             if (_song == song && paletteSeedHash == text) return;
             Clear(); _song = song; paletteSeedHash = text;
+            ApplyPalette(text);
+        }
+
+        public void SetPerformancePalette(string displayName)
+        {
+            Initialize();
+            displayName = displayName ?? "";
+            if (_performancePlayerName == displayName) return;
+            _performancePlayerName = displayName;
+            paletteSeedHash = PaletteSeed(_song);
+            ApplyPalette(paletteSeedHash);
+        }
+
+        private string PaletteSeed(MidiSongData song)
+        {
+            if (!string.IsNullOrEmpty(_performancePlayerName)) return _performancePlayerName;
+            return song == null || string.IsNullOrEmpty(song.sourceHash) ? "MusicMidiPlayer" : song.sourceHash.ToLowerInvariant();
+        }
+
+        private void ApplyPalette(string text)
+        {
             uint seed = 2166136261u;
             for (int i = 0; i < text.Length; i++) seed = (seed ^ (uint)text[i]) * 16777619u;
             uint tone = seed * 1664525u + 1013904223u;
@@ -86,16 +111,26 @@ namespace MusicMidiPlayer.Views
             float saturation = .70f + .18f * ((tone & 65535u) / 65535f), value = .90f + .10f * ((tone >> 16) / 65535f);
             songPalette[0] = Color.HSVToRGB(hue, saturation * .82f, value);
             songPalette[1] = Color.HSVToRGB(hue, saturation, value * .55f);
+            for (int channel = 0; channel < 16; channel++)
+            {
+                float channelHue = Mathf.Repeat(hue + channel * .38196601125f, 1f);
+                _channelPalette[channel * 2] = Color.HSVToRGB(channelHue, saturation * .82f, value);
+                _channelPalette[channel * 2 + 1] = Color.HSVToRGB(channelHue, saturation, value * .55f);
+            }
             foreach (Material material in _materials) material.SetColor("_GlowColor", songPalette[0]);
             foreach (Material material in _contactMaterials) material.SetColor("_Color", songPalette[0]);
             // The shared symbol shader takes RGB from its private material, like the piano.
-            if (_symbolMaterial != null) _symbolMaterial.SetColor("_Color", songPalette[0]);
+            if (_symbolMaterial != null) _symbolMaterial.SetColor("_Color", Color.white);
         }
 
-        private Color PitchColor(int pitch)
+        public Color FileChannelColor(int pitch, int channel)
+        { Initialize(); return PitchColor(pitch, channel); }
+
+        private Color PitchColor(int pitch, int channel)
         {
             int key = pitch % 12;
-            return songPalette[key == 1 || key == 3 || key == 6 || key == 8 || key == 10 ? 1 : 0];
+            int shade = key == 1 || key == 3 || key == 6 || key == 8 || key == 10 ? 1 : 0;
+            return channel < 0 ? songPalette[shade] : _channelPalette[Mathf.Clamp(channel, 0, 15) * 2 + shade];
         }
 
         private int NoteSection(int channel, int track)
@@ -148,15 +183,15 @@ namespace MusicMidiPlayer.Views
             _lastTime = -1; _generation = -1; activeStringCount = 0; liveParticleCount = 0; liveSymbolParticleCount = 0;
         }
 
-        private void Gather(int section, int pitch, int velocity, double age, double onset, float level, int style)
+        private void Gather(int section, int pitch, int velocity, double age, double onset, float level, int style, int channel)
         {
             if (!HasPhysicalPitch(section, pitch) || level <= .001f) return;
             int index = section * 4 + PitchString(section, pitch);
             float energy = Mathf.Clamp01(level) * (style == 0 ? 1f : Mathf.Exp(-(float)age * 5f));
             _energy[index] = Mathf.Max(_energy[index], energy);
-            if (onset > _onset[index]) { _onset[index] = onset; _sparkPitch[index] = pitch; }
+            if (onset > _onset[index]) { _onset[index] = onset; _sparkPitch[index] = pitch; _sparkChannel[index] = channel; }
             if (_posePitch[section] < 0 || velocity >= _poseVelocity[section])
-            { _posePitch[section] = pitch; _poseVelocity[section] = velocity; _poseAge[section] = age; _poseStyle[section] = style; }
+            { _posePitch[section] = pitch; _poseVelocity[section] = velocity; _poseAge[section] = age; _poseStyle[section] = style; _poseChannel[section] = channel; }
         }
 
         public void Refresh(int ms)
@@ -172,10 +207,10 @@ namespace MusicMidiPlayer.Views
                 for (int i = 0; i < facade.sequencer.activeNoteCount; i++)
                 {
                     int n = facade.sequencer.activeNoteIds[i];
-                    if (_song.channel[n] == 9 || (facade.instrumentRouter != null && facade.instrumentRouter.TargetForNote(n) != routedTarget)) continue;
-                    int style = facade.instrumentRouter == null ? voices.articulation : facade.instrumentRouter.ArticulationForTarget(routedTarget, facade.instrumentRouter.notePrograms[n]);
-                    Gather(NoteSection(_song.channel[n], _song.trackIndex[n]), _song.pitch[n], _song.velocity[n], System.Math.Max(0, (ms - _song.startMs[n]) * .001),
-                        _song.startMs[n] * .001, _song.velocity[n] / 127f * _song.ExpressionAt(_song.channel[n], ms) / 127f, style);
+                    if (facade.instrumentRouter == null ? _song.channel[n] == 9 : facade.instrumentRouter.TargetForNote(n) != routedTarget) continue;
+                    int style = facade.instrumentRouter == null ? voices.articulation : facade.instrumentRouter.ArticulationForNote(routedTarget, n);
+                    Gather(NoteSection(_song.channel[n], _song.trackIndex[n]), facade.instrumentRouter == null ? _song.pitch[n] : facade.instrumentRouter.PitchForNote(n), _song.velocity[n], System.Math.Max(0, (ms - _song.startMs[n]) * .001),
+                        _song.startMs[n] * .001, _song.velocity[n] / 127f * _song.ExpressionAt(_song.channel[n], ms) / 127f, style, _song.channel[n]);
                 }
             else if (live)
             {
@@ -183,11 +218,11 @@ namespace MusicMidiPlayer.Views
                 if (facade.instrumentRouter != null && pool != null)
                 {
                     for (int i = 0; i < 64; i++) if (pool.active[i] && pool.live[i] && pool.targets[i] == routedTarget)
-                        Gather(NoteSection(pool.identities[i] / 128, -1), pool.pitches[i], pool.velocities[i], System.Math.Max(0, time - pool.starts[i]), pool.starts[i], pool.levels[i], pool.articulations[i]);
+                        Gather(NoteSection(pool.identities[i] / 128, -1), pool.pitches[i], pool.velocities[i], System.Math.Max(0, time - pool.starts[i]), pool.starts[i], pool.levels[i], pool.articulations[i], -1);
                 }
                 else
                     for (int i = 0; i < 32; i++) if (voices.sounding[i])
-                        Gather(voices.sections[i], voices.pitches[i], voices.velocities[i], System.Math.Max(0, time - voices.starts[i]), voices.starts[i], voices.levels[i], voices.articulation);
+                        Gather(voices.sections[i], voices.pitches[i], voices.velocities[i], System.Math.Max(0, time - voices.starts[i]), voices.starts[i], voices.levels[i], voices.articulation, -1);
             }
             for (int s = 0; s < bodies.Length; s++)
             {
@@ -196,7 +231,7 @@ namespace MusicMidiPlayer.Views
                 if (pitch >= 0)
                 {
                     contacts[s].localPosition = StringPoint(s, pitch);
-                    _contactMaterials[s].SetColor("_Color", PitchColor(pitch));
+                    _contactMaterials[s].SetColor("_Color", PitchColor(pitch, _poseChannel[s]));
                 }
                 int str = pitch < 0 ? 1 : PitchString(s, pitch);
                 float travel = style == 0 ? .10f * Mathf.Sin(phase * 3.4f) : .028f * Mathf.Sin(phase * 17f);
@@ -213,7 +248,7 @@ namespace MusicMidiPlayer.Views
                 _materials[i].SetFloat("_MusicTime", (float)time);
                 _materials[i].SetFloat("_Amount", .00065f * _glow[i]);
                 _materials[i].SetFloat("_GlowStrength", _glow[i]);
-                if (_energy[i] > .001f) _materials[i].SetColor("_GlowColor", PitchColor(_sparkPitch[i]));
+                if (_energy[i] > .001f) _materials[i].SetColor("_GlowColor", PitchColor(_sparkPitch[i], _sparkChannel[i]));
                 ParticleSystem symbols = i < symbolParticles.Length ? symbolParticles[i] : null;
                 if (symbols != null)
                 {
@@ -233,7 +268,7 @@ namespace MusicMidiPlayer.Views
                     bool attack = _onset[i] > _emittedOnset[i];
                     system.transform.localPosition = StringPoint(i / 4, _sparkPitch[i]);
                     var main = system.main;
-                    main.startColor = new ParticleSystem.MinMaxGradient(PitchColor(_sparkPitch[i]));
+                    main.startColor = new ParticleSystem.MinMaxGradient(PitchColor(_sparkPitch[i], _sparkChannel[i]));
                     system.Emit(attack ? Mathf.Clamp(Mathf.RoundToInt(2 + _energy[i] * 5), 1, 8) : 1);
                     // New attacks only: seeking/late joining never replays old symbol bursts.
                     if (attack && !rebuild)
@@ -241,6 +276,8 @@ namespace MusicMidiPlayer.Views
                         if (symbols != null && _hitCount[i] % 3 == 0)
                         {
                             symbols.transform.position = system.transform.position;
+                            var symbolMain = symbols.main;
+                            symbolMain.startColor = new ParticleSystem.MinMaxGradient(PitchColor(_sparkPitch[i], _sparkChannel[i]));
                             symbols.Emit(_energy[i] >= .85f && _hitCount[i] % 6 == 0 ? 2 : 1);
                         }
                         _hitCount[i]++;

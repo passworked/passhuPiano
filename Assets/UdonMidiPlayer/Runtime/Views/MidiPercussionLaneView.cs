@@ -8,6 +8,7 @@ namespace MusicMidiPlayer.Views
     public class MidiPercussionLaneView : UdonSharpBehaviour
     {
         public PercussionBankData bank;
+        public MusicMidiPlayer.Logic.MidiInstrumentRouter instrumentRouter;
         public Transform[] hitPoints=new Transform[0], bars=new Transform[0];
         public int windowMs=2400;
         public float height=1.85f;
@@ -16,6 +17,9 @@ namespace MusicMidiPlayer.Views
         [System.NonSerialized] public int[] noteIds=new int[0];
         private MaterialPropertyBlock _properties;
         private Material _noteMaterial;
+        private Color _liveColor = Color.white;
+        private Color[] _channelColors;
+        public void SetChannelPalette(Color[] colors) { _channelColors=colors; }
         private int[] _livePitch=new int[64];
         private float[] _liveStart=new float[64];
         private int _liveCursor;
@@ -36,7 +40,7 @@ namespace MusicMidiPlayer.Views
                 if(_song!=null && bank!=null && _bindCursor<_song.channel.Length)
                 {
                     int n=_bindCursor++;
-                    if(_song.channel[n]==9 && bank.Lane(_song.pitch[n])>=0)
+                    if((instrumentRouter == null ? _song.channel[n]==9 : instrumentRouter.IsFileDrum(n)) && bank.Lane(DrumPitch(n))>=0)
                     { if(_bindStage==0)_bindCount++; else noteIds[_bindWrite++]=n; }
                 }
                 else if(_bindStage==0)
@@ -47,6 +51,7 @@ namespace MusicMidiPlayer.Views
         }
         public void SetPalette(Color color)
         {
+            _liveColor=color;
             if(_properties==null)_properties=new MaterialPropertyBlock();
             if(_noteMaterial==null)
                 for(int i=0;i<bars.Length;i++)if(bars[i]!=null)
@@ -83,15 +88,24 @@ namespace MusicMidiPlayer.Views
             for(int i=first;i<last && visibleCount<bars.Length;i++)
             {
                 int n=noteIds[i];
-                int lane=bank.Lane(_song.pitch[n]);if(lane<0)continue;
-                Show(visibleCount++,lane,Mathf.Max(0,(_song.startMs[n]-ms)/(float)windowMs)*height,_song.pitch[n],n);
+                int pitch=DrumPitch(n), lane=bank.Lane(pitch);if(lane<0)continue;
+                Show(visibleCount++,lane,Mathf.Max(0,(_song.startMs[n]-ms)/(float)windowMs)*height,pitch,n,_channelColors==null? _liveColor : _channelColors[Mathf.Clamp(_song.channel[n],0,15)]);
             }
             for(int i=visibleCount;i<bars.Length;i++)if(bars[i]!=null)bars[i].gameObject.SetActive(false);
         }
-        private void Show(int slot,int lane,float offset,int pitch,int identity)
+        public int DrumPitch(int note)
+        { return instrumentRouter == null ? _song.pitch[note] : instrumentRouter.FileDrumPitch(note); }
+        private void Show(int slot,int lane,float offset,int pitch,int identity,Color color)
         {
             if(lane>=hitPoints.Length || hitPoints[lane]==null || bars[slot]==null)return;
             var bar=bars[slot];bar.gameObject.SetActive(true);
+            var renderer=bar.GetComponent<Renderer>();
+            if(renderer!=null && _properties!=null)
+            {
+                _properties.Clear();_properties.SetFloat("_NoteOrder",(slot+1f)/Mathf.Max(1,bars.Length));
+                _properties.SetColor("_Color",color);_properties.SetColor("_BaseColor",color);
+                _properties.SetColor("_EmissionColor",color*3f);renderer.SetPropertyBlock(_properties);
+            }
             bar.position=hitPoints[lane].position+Vector3.up*(offset+.04f)+transform.right*((identity%3-1)*.018f);
             // Open hi-hat uses a thin plate; closed/pedal uses a short diamond-like block.
             bar.localScale=new Vector3(pitch==46?.13f:.09f,.065f,pitch==46?.025f:.065f);
@@ -108,7 +122,7 @@ namespace MusicMidiPlayer.Views
             {
                 float age=Time.realtimeSinceStartup-_liveStart[i];
                 int lane=bank.Lane(_livePitch[i]);
-                if(age>=0 && age<.5f && lane>=0){Show(i,lane,age*.85f,_livePitch[i],i);visibleCount++;}
+                if(age>=0 && age<.5f && lane>=0){Show(i,lane,age*.85f,_livePitch[i],i,_liveColor);visibleCount++;}
                 else if(bars[i]!=null)bars[i].gameObject.SetActive(false);
             }
         }

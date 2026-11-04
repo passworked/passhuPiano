@@ -43,7 +43,7 @@ namespace MusicMidiPlayer.Logic
             (int)HumanBodyBones.RightRingIntermediate, (int)HumanBodyBones.RightLittleIntermediate };
         private int[] _desktopNotes = new int[18]; // note + 1, zero means released
         private int[] _fingerNotes = new int[10];
-        private int[] _noteUsers = new int[1024]; // view * 128 + pitch
+        private int[] _noteUsers = new int[1152]; // nine stable model slots * 128 + pitch
         private Vector3[] _previous = new Vector3[10];
         private bool[] _hasPrevious = new bool[10];
         private bool _sustain;

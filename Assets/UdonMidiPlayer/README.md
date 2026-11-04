@@ -1,5 +1,9 @@
 # Udon MIDI Player
 
+## 2026-11-04 · rc.3 黄金角通道与曲库编辑器
+
+当前候选 `1.0.0-rc.3`。文件播放通道按黄金角旋转配色；Import MIDI / Edit Library 改为分类与曲目双栏草稿编辑，支持外部 MIDI / 文件夹 / ZIP / 下载直链、署名、排序、去重、源文件维护与保存应用。见包内 [Unity MIDI 导入教程](Documentation/MidiImport.md)。主场景的多乐器、音轨路由与扩展在完整源码中交付；两份独立钢琴 Prefab 继续使用自己的合规曲库。真实 VRChat 与干净接收工程仍待验收。
+
 ## 2026-11-02 源码候选更新
 
 当前源码版本 `1.0.0-rc.2`，目标私仓为 [passworked/passhuPiano](https://github.com/passworked/passhuPiano)。跟进 Windows 性能路径更新：UI 按状态刷新、合奏音频批量结算、瀑布 Shader 动画和加载收尾分帧；主场景保留独立提琴奏法入口和目录分类更新。源码及对应编译程序一起更新，不将场景曲库同步到两份分发 Prefab，不覆盖 rc.1 已封存产物。优化的实测收益与真实客户端行为仍待验收；本轮不运行 Play Mode、Profiler、测试套件或世界构建。
@@ -34,7 +38,7 @@ VRChat / UdonSharp 的 MIDI 钢琴播放器 MVP。已实现批量导入、复音
 
 正常接入世界时，将 `Prefabs/UdonMidiPlayer.prefab` 拖入场景。需要更换曲库或音源时，打开 `Tools/Music MIDI Player/Configure Player`，选择播放器根对象及源曲库/音源后应用配置；工具负责数据烘焙和引用接线。
 
-编辑器窗口与世界面板仅提供 English、中文、日本語三个语言入口，初次使用自动检测语言并以英文兜底。中文共用一个入口：世界内按 VRChat 客户端语言显示简体或繁体，编辑器按编辑器／系统语言判断；其他语言环境点中文默认简体。两处均通过“文/A”图标打开单排三个国旗按钮，界面不提供自动语言选项。编辑器顶部的选择保存在本机；世界面板右上角的选择仅影响当前玩家、当前播放器，本次会话内生效。曲名、曲库名和自定义目录名保留原文。语言表与维护方式见 [国际化说明](Localization/README.md)。
+编辑器窗口与世界面板仅提供 English、中文、日本語三个语言入口，初次使用自动检测语言并以英文兜底。中文共用一个入口：世界内按 VRChat 客户端语言显示简体或繁体，编辑器按编辑器／系统语言判断；其他语言环境点中文默认简体。两处均通过“文/A”图标打开单排三个国旗按钮，界面不提供自动语言选项。编辑器顶部的选择保存在本机；世界面板右上角的选择仅影响当前玩家、当前播放器，本次会话内生效。曲名、曲库名和自定义目录名保留原文；标准曲库分类在文件夹按钮与顶部目录路径中显示当前语言译名。语言表与维护方式见 [国际化说明](Localization/README.md)。
 
 现提供两套可直接拖入场景的独立播放器预制体：
 
@@ -143,3 +147,7 @@ Salamander 原作者为 Alexander Holm，FreePats SF2 版由 FreePats 项目整�
 ### 按设备显示输入设置（2026-10-27）
 
 VR 输入区使用左右手示意图，十个手指开关分别位于对应指尖；“一键全选”和“全部取消”同时更新全部手指。取消已按下的手指会沿现有音符引用计数释放输入。PC 仅显示键盘布局、坐下演奏说明与快捷键；VR 仅显示手指设置及摇杆灵敏度。依据本地玩家 `IsUserInVR()` 选择界面，与 MIDI 设备连接状态无关，也不改变其他玩家的设置。
+
+## Authoring main scene: music box
+
+The main scene includes an 88-tine music box (A0–C8), with a rotating pinned cylinder, damped tine vibration, and the existing marimba-style palette/waterfall/effects. Audio preserves MIDI0–127; its low register is pitch-derived from CC0 rbnuser recordings. This addition is maintained separately from the piano distribution prefabs and practice scene. Source and validation details: `Docs/UdonMidiPlayer/24-music-box.md`.

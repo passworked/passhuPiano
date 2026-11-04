@@ -22,6 +22,8 @@ namespace MusicMidiPlayer.Data
         public int noteCount;
         public int packedDataBytes;
         [NonSerialized] public bool isDecoded;
+        // Optional MPC1 tag 6 v1: four original note IDs per byte, 0 legacy, 1 sustain, 2 spiccato, 3 pizzicato.
+        [NonSerialized] public byte[] violinArticulations = new byte[0];
         [NonSerialized] public string decodeError = "";
         // Playback arrays belong only to the currently loaded song; no expanded arrays are baked.
         [NonSerialized] public int[] startMs = new int[0];
@@ -346,6 +348,13 @@ namespace MusicMidiPlayer.Data
                         timbreDataVersion = 1; _timbreEnd = _packedCursor + length;
                         NextDecodeStage(17);
                     }
+                    else if (tag == 6)
+                    {
+                        if (violinArticulations.Length != 0 || length != (noteCount + 3) / 4 + 1 || ReadPackedByte() != 1)
+                        { FailDecode("Invalid or duplicate violin articulation extension"); return false; }
+                        violinArticulations = new byte[length - 1];
+                        NextDecodeStage(19);
+                    }
                     else NextDecodeStage(length == 0 ? (_extensionCount == 0 ? 13 : 11) : 12);
                 }
                 else if (_decodeStage == 12)
@@ -417,6 +426,13 @@ namespace MusicMidiPlayer.Data
                     timbreKind[_decodeIndex] = descriptor & 3; timbreValue[_decodeIndex] = value;
                     timbreTrackIndex[_decodeIndex] = track; timbreEventIndex[_decodeIndex++] = _timbrePreviousEvent;
                 }
+                else if (_decodeStage == 19)
+                {
+                    int value = ReadPackedByte();
+                    if (_decodeStage < 0) return false;
+                    violinArticulations[_decodeIndex] = (byte)value;
+                    if (++_decodeIndex == violinArticulations.Length) NextDecodeStage(_extensionCount == 0 ? 13 : 11);
+                }
                 else if (_decodeStage == 13)
                 {
                     if (_packedCursor != _packedEnd)
@@ -449,6 +465,7 @@ namespace MusicMidiPlayer.Data
             _previousTime = 0; _previousToken = 0; _checkpointCount = 0; _pedalSegment = 0;
             _extensionCount = 0; _extensionBytes = 0;
             timbreDataVersion = 0; _timbreEnd = 0; _timbrePreviousEvent = 0;
+            violinArticulations = new byte[0];
             timbreMs = new int[0]; timbreChannel = new int[0]; timbreKind = new int[0];
             timbreValue = new int[0]; timbreTrackIndex = new int[0]; timbreEventIndex = new int[0];
             _hasExpressionExtension=false; _expressionEnd=0; _expressionChannel=0; _expressionWrite=0; _expressionRemaining=0;

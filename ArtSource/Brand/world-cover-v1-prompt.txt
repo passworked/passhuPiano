@@ -1,0 +1,19 @@
+Tool: built-in image_gen.imagegen
+Date: 2026-11-03
+Output: passhu-piano-world-cover-v1.png
+Title: パッシュのピアノ
+Subtitle: PASSHU'S PIANO
+Reference: user-attached blue/cyan piano-P logo
+
+Use case: ads-marketing / logo-brand.
+Create a polished final VRChat world cover image, landscape canvas EXACT 4:3 aspect ratio, ideally 1536 x 1152.
+Input image 1 is a reference logo, not the target composition: faithfully retain its distinctive single P-shaped grand-piano outline, two rounded piano-key cutouts below, and three ascending rounded horizontal MIDI bars above, with the upper right bar cyan. Reproduce the recognizable logo cleanly with smooth edges; remove reference edge noise. Do not put the square reference itself on the cover.
+Primary request: minimalist Japanese piano world cover with an understated technical music-software aesthetic.
+Background: nearly black deep navy, largely flat, with an extremely subtle sparse blueprint grid and a few elegant fine cyan-blue timing lines, spacious and calm. No scenery, no room, no photographic piano, no people.
+Composition: full canvas 4:3. The centered inscribed 16:9 crop-safe region spans the full width and the middle 75 percent of canvas height (y=12.5% to 87.5%). ALL logo, title, subtitle and meaningful visual elements must fit comfortably inside this region, with additional generous margins. Upper and lower outer strips are background only. Do not draw crop guides or aspect-ratio labels.
+Create a strong centered horizontal lockup: a medium-large reference-derived blue/cyan piano-P emblem on the left and typography on its right. The lockup itself occupies approximately x=15% to 85%, y=34% to 65%. The logo is about 28% of image height. Main Japanese title should be large, clearly readable at thumbnail size, very clean modern Japanese sans serif, off-white, medium-bold, on ONE line. Under it a smaller widely tracked uppercase English subtitle, subdued cyan-gray. Under the lockup, one very restrained fine rule and three small ascending MIDI note capsules can subtly echo the logo. Align everything precisely. Balanced negative space, simple refined visual identity, finished editorial typography, no busy HUD graphics.
+Text (verbatim, only these TWO lines):
+"パッシュのピアノ"
+"PASSHU'S PIANO"
+Japanese exact characters: パ ッ シ ュ の ピ ア ノ. Ensure small ッ and small ュ are correct. No Chinese title, no other captions, no invented small writing, no version numbers, no watermarks.
+Palette: deep navy #070E19, rich blue #0874BE, bright cyan #00DBE7, ivory white #F0F6FA. Restrained glow only immediately around emblem if needed, crisp flat vector-like forms rather than 3D bevels. The brand logo and title are the visual focus. Minimal, technical, elegant, recognizably music-oriented.

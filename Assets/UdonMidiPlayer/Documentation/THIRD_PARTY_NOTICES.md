@@ -16,6 +16,8 @@ This release excludes BY-SA, NC, ND and unknown-permission scores and sound samp
 
 - **Versilian Studios LLC; Karoryfer Samples; Austin McMahon** — CC0-1.0. [Source](https://github.com/sfzinstruments/virtuosity_drums/tree/9f04cf9a734527edfbb0a4eee1f674e45bbf71bc). Notices: `Assets/UdonMidiPlayer/Audio/VirtuosityDrums/LICENSE.txt`, `Assets/UdonMidiPlayer/Audio/VirtuosityDrums/ATTRIBUTION.txt`.
 
+- **rbnuser** — CC0-1.0. [Source](https://freesound.org/people/rbnuser/packs/19724/). Notices: `Assets/UdonMidiPlayer/Audio/MusicBox/LICENSE.txt`, `Assets/UdonMidiPlayer/Audio/MusicBox/ATTRIBUTION.txt`.
+
 Sample conversions, velocity/root selection, tuning, loop processing and aliases are described in the original bank mappings and local ATTRIBUTION files. Salamander remains CC BY 3.0. Iowa permission remains its original unrestricted permission, not CC0 or a project-owned CC license.
 
 ## Fonts

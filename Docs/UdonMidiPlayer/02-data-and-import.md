@@ -1,5 +1,11 @@
 # 02 · 曲目数据与批量导入方案
 
+## 2026-11-04：rc.3 曲库编辑器
+
+当前操作教程见 [Unity MIDI 导入](../MIDI_IMPORT.md)，开发边界见 [编辑器操作契约](../Developer/MIDI_LIBRARY_EDITOR.md)。原 Import MIDI 入口保留，新增 Edit Library 同窗口入口；采用分类 / 曲目双栏草稿、拖动排序、行内曲名作者、外部 MIDI / ZIP / 文件夹 / 直链输入、哈希复用、明确启用的同名版本择优、选轨、保留身份的重导入 / 源文件替换 / 改名及 JSON 引用歌单。新增默认保留通道10与全部音高；既有歌曲的导入设置保持不变。
+
+源事件计数只供 Editor 同版本选择，不新增运行数据或改变既有 MPC1 编码。保存只重解析需要更新的曲目，并通过现有同步链更新已加载普通场景；导入失败和场景应用失败分别报告。显示曲名更新内容哈希但不重新解析源。分发 Prefab、未打开场景与练习系统不自动迁移。
+
 下文保留 v0.1 设计基线；当前已有 Editor 导入器与 MPC1 压缩数据实现，现行增量约定以本节及代码为准。字段、单位与状态以[统一约定](CONTRACTS.md)为准；运行消费方式见[时钟与音序器](03-transport-and-sequencer.md)。
 
 ## 2026-10-31：保留原 MIDI 音色元数据
@@ -15,6 +21,8 @@ MPC1 可选 TLV tag 4 保存该信息：事件数，然后逐项写入时间差�
 本次已补全 560 份歌曲资产（含并行加入的 GM Drum Study），保存 30,614 条 Program Change，未发现 Bank Select；音色扩展合计增加 156,576 字节（约 153 KiB）。逐首核对既有播放数组、songId、源资产及已有压缩资源 GUID；主场景、两份分发 Prefab、示例与练习场景的对象 ID 和逐对象非空引用保持一致。Unity C# / UdonSharp 编译、Editor 压缩往返、分步解码边界与真实曲目、旧格式兼容检查通过；未据此声称完成真实 VRChat 或听音验收。备份位于 `RecoveryBackups/TimbreMetadata-20261031/`，文件与引用核对记录位于 `Logs/MidiTimbreMetadata-*-check.json`。
 
 ## 一、导入链路与资产边界
+
+2026-11-04 新增 MPC1 可选 tag 6 / v1：Editor `ViolinArticulationBaker` 按原 noteId 烘焙小提琴自动奏法，每音符 2 bit，四个 noteId 共一个 byte。编码值 0=沿用旧规则、1=长弓、2=跳弓、3=拨弦；payload 为版本 byte 1 加 `ceil(noteCount/4)` 个 byte。新版运行解码器按既有加载预算读取到当前曲目的 `violinArticulations`，卸载清空；缺少扩展时自动退回原 GM 策略，重复、错误长度或不支持的版本被拒绝。源 MIDI、源曲目 contentHash / songId 及既有音符 / 事件数组不改，算法身份进入路由指纹及 catalogHash；发声 / 定位 / 运弓只查表。具体阈值与范围见[弦乐组接入准备](14-strings-preparation.md)。
 
 计划使用纯 Editor C# 完成 `SMF 字节读取 → 源事件合并 → 时间换算 → 音符配对 → 踏板展开 → 规范化资产 → Udon 数据烘焙`。SDK 已注册 `.mid` 资产处理，因此使用显式 `MidiImportWindow`，通过 `File.ReadAllBytes` 或 Editor 专用解析库读取源文件，不另注册争夺 `.mid` 扩展名的 ScriptedImporter。MVP 通过窗口按钮重导入；后续若增加 AssetPostprocessor，只标脏，不默认自动重烘焙全曲库。`.mid` 解析、排序和诊断不进入 Udon 每帧逻辑，也不依赖在世界内读取本地文件、加载 MIDI 插件或访问普通 ScriptableObject 的自定义字段。
 

@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "policy_id": "passhupiano-instrument-contributions-v1",
+  "name": "Music box / 八音盒 / オルゴール",
+  "contributor": "Local authoring: passhu; AI-assisted implementation",
+  "base_commit": null,
+  "submission_commit": null,
+  "stage": "complete_implementation_pending_client_acceptance",
+  "provided": [
+    "model",
+    "sound_source",
+    "integration",
+    "documentation"
+  ],
+  "remaining_work": [
+    "PC VRChat single-client evidence",
+    "maintainer quality and acceptance review"
+  ],
+  "target_assets": [
+    "Assets/Scenes/VRCDefaultWorldScene.unity"
+  ],
+  "platforms": {
+    "PC": "Unity_Editor_ClientSim_passed_VRChat_client_not_verified",
+    "mobile": "not_verified"
+  },
+  "inputs": {
+    "midi_file_playback": "backing_Udon_verified_real_VRChat_not_verified",
+    "hardware_midi": "implemented_not_device_verified",
+    "pc_keyboard": "implemented_not_client_verified",
+    "vr_performance": "implemented_not_device_verified"
+  },
+  "sound_semantics": {
+    "range": "MIDI0-127 audio and rolling markers; physical comb 21-108; recorded74-103 sparse; low and edge roots derived",
+    "velocity": "one layer; velocity^1.6; uniform bank gain0.7",
+    "release_and_pedals": "existing sample-bank NoteOff/CC64; 1800ms release cap",
+    "loops_and_articulations": "no loop; single articulation",
+    "physical_sources_per_note": 1
+  },
+  "resources": [
+    {
+      "path": "Assets/UdonMidiPlayer/Audio/MusicBox/BANK-MAPPING.json",
+      "kind": "samples_and_provenance",
+      "creator": "rbnuser",
+      "source_url": "https://freesound.org/people/rbnuser/packs/19724/",
+      "license": "CC0-1.0",
+      "license_file": "Assets/UdonMidiPlayer/Audio/MusicBox/LICENSE.txt",
+      "sha256": "2d341a0ecb657ad987ad7af2fc6cd43dda8e503eee260eb45e3d0a88502ff3b0",
+      "modifications": "HQ MP3 preview acquisition; tuning correction, mono48k Vorbisq5, fades,6 pitch-derived roots",
+      "derived_from": [
+        "12 source IDs and hashes listed in BANK-MAPPING.json"
+      ]
+    },
+    {
+      "path": "ArtSource/MusicBox/README.md",
+      "kind": "procedural_model",
+      "creator": "Project author, AI-assisted",
+      "license": "CC-BY-4.0",
+      "source_url": null,
+      "modifications": null
+    }
+  ],
+  "audio_format_proposal": "48kHz mono Vorbisq5 source; PCM/DecompressOnLoad; 1 velocity layer",
+  "resource_measurements": {
+    "model_triangles": 12266,
+    "static_mesh_triangles": 11946,
+    "particle_triangles_max": 320,
+    "distinct_concurrent_materials": 8,
+    "renderers": 128,
+    "texture_width_max": 1024,
+    "texture_height_max": 512,
+    "texture_rgba32_full_mip_estimate_bytes": 3320484,
+    "source_audio_bytes": 397868,
+    "audio_float32_pcm_estimate_bytes": 14195800,
+    "scope_and_method": "Complete main-scene MusicBox view including clear cover, round table, stool, waterfall slots, particle maximums and shared effects textures/cubemap; host UI/fonts excluded. Static reflection/mesh counts plus actual initialized backing-Udon material check. 2026-11-04. No Git commits exist in this checkout.",
+    "evidence": [
+      "Logs/MusicBox-Budget.json",
+      "Logs/MusicBox-Validation.json"
+    ]
+  },
+  "integration_changes": [
+    "target7/model8; preserve retired6/7",
+    "shared64-source pool; bank energy/hash",
+    "Transparent tabletop box, smooth rotating cylinder with rolling crystal notes, and vibrating comb",
+    "selectors, file and hardware routing, PC and VR input bounds",
+    "four-language labels and attribution catalog"
+  ],
+  "synchronization_changes": [
+    "mask191 skips bit6",
+    "file map8=target7+1",
+    "live eventkind10",
+    "snapshot target+1 extends through bit23",
+    "catalog hash selected-gm-v10-file-drums after concurrent file-only drum extension; music-box encoding unchanged"
+  ],
+  "ai_assistance": {
+    "used": true,
+    "scope": [
+      "code",
+      "procedural_model",
+      "audio_processing_script",
+      "documentation"
+    ],
+    "inputs_and_rights": "Existing project marimba presentation and CC0 rbnuser recordings; no generated audio",
+    "human_review": "pending"
+  },
+  "verification": {
+    "editor_compile": "passed_Unity_CSharp_and_UdonSharp",
+    "PC_VRChat_single_client": "not_run",
+    "other_declared_inputs": "164 Editor/ClientSim backing-Udon checks passed; no real devices",
+    "multi_client": "not_run",
+    "environment": "Unity2022.3.22f1 authoring main scene, local checkout has no commits",
+    "evidence": [
+      "Logs/MusicBox-Budget.json",
+      "Logs/MusicBox-Validation.json",
+      "Logs/MusicBox-SceneValidation.txt",
+      "Captures/MusicBox/Contact-FX.gif"
+    ]
+  },
+  "known_limitations": [
+    "HQ MP3 sources are lossy",
+    "Low register is derived, not recorded",
+    "28 waterfall slots; excess candidates may be visually dropped without dropping audio",
+    "No client or multi-client acceptance"
+  ],
+  "maintainer_decision": "pending",
+  "maintainer_confirmation_url": null
+}

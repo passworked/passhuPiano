@@ -42,6 +42,8 @@ namespace MusicMidiPlayer.Networking
         [UdonSynced] public int pianoAppearance = 1;
         [UdonSynced] public int stringsArticulation;
         [UdonSynced] public string fileProgramMap = "";
+        [UdonSynced] public string fileTrackMap = "";
+        [UdonSynced] public bool autoTrackRouting;
         [UdonSynced] public int stringArticulationOverrides;
 
         [UdonSynced] public bool liveMidiActive;
@@ -108,6 +110,8 @@ namespace MusicMidiPlayer.Networking
         private int _pendingMask = 1, _pendingPianoAppearance = 1;
         private int _pendingArticulation;
         private string _pendingFileProgramMap = "";
+        private string _pendingFileTrackMap = "";
+        private bool _pendingAutoTrackRouting;
         private int _pendingStringArticulations;
         private int _pendingState;
         private double _pendingPosition;
@@ -121,6 +125,8 @@ namespace MusicMidiPlayer.Networking
         private int _confirmedMask = 1, _confirmedPianoAppearance = 1;
         private int _confirmedArticulation;
         private string _confirmedFileProgramMap = "";
+        private string _confirmedFileTrackMap = "";
+        private bool _confirmedAutoTrackRouting;
         private int _confirmedStringArticulations;
         private int _confirmedState;
         private double _confirmedPosition;
@@ -136,6 +142,8 @@ namespace MusicMidiPlayer.Networking
         private int _flightMask = 1, _flightPianoAppearance = 1;
         private int _flightArticulation;
         private string _flightFileProgramMap = "";
+        private string _flightFileTrackMap = "";
+        private bool _flightAutoTrackRouting;
         private int _flightStringArticulations;
         private int _flightState;
         private double _flightPosition;
@@ -158,7 +166,7 @@ namespace MusicMidiPlayer.Networking
             {
                 networkReady = true;
                 _SaveConfirmed(library.catalogHash, facade.selectedSongId, clock.GetState(),
-                    clock.GetPositionSeconds(), clock.GetServerSeconds(), 0, 0, facade.selectedInstrument, facade.voicePool.strings == null ? 0 : facade.voicePool.strings.articulation, facade.InstrumentMask(), facade.instrumentRouter == null ? 1 : facade.instrumentRouter.pianoAppearance, facade.FileProgramMap(), facade.StringArticulationOverrides());
+                    clock.GetPositionSeconds(), clock.GetServerSeconds(), 0, 0, facade.selectedInstrument, facade.voicePool.strings == null ? 0 : facade.voicePool.strings.articulation, facade.InstrumentMask(), facade.instrumentRouter == null ? 1 : facade.instrumentRouter.pianoAppearance, facade.FileProgramMap(), facade.FileTrackMap(), facade.AutoTrackRouting(), facade.StringArticulationOverrides());
                 return;
             }
             _TryBootstrap();
@@ -207,7 +215,7 @@ namespace MusicMidiPlayer.Networking
             string nextSong = facade.selectedSongId;
             int nextState = clock.GetState();
             double nextPosition = nextState == Stopped ? 0 : clock.GetPositionAtServerTime(nowServer);
-            if (!_ValidateSnapshot(library.catalogHash, nextSong, nextState, nextPosition, nowServer, facade.selectedInstrument, facade.InstrumentMask(), facade.instrumentRouter == null ? 1 : facade.instrumentRouter.pianoAppearance, facade.FileProgramMap(), facade.StringArticulationOverrides()))
+            if (!_ValidateSnapshot(library.catalogHash, nextSong, nextState, nextPosition, nowServer, facade.selectedInstrument, facade.InstrumentMask(), facade.instrumentRouter == null ? 1 : facade.instrumentRouter.pianoAppearance, facade.FileProgramMap(), facade.FileTrackMap(), facade.AutoTrackRouting(), facade.StringArticulationOverrides()))
             {
                 if (hasPendingIntent) _CancelPending();
                 else _Rollback();
@@ -219,7 +227,7 @@ namespace MusicMidiPlayer.Networking
 
             if (_localFallback)
             {
-                _SaveConfirmed(library.catalogHash, nextSong, nextState, nextPosition, nowServer, 0, 0, facade.selectedInstrument, facade.voicePool.strings == null ? 0 : facade.voicePool.strings.articulation, facade.InstrumentMask(), facade.instrumentRouter == null ? 1 : facade.instrumentRouter.pianoAppearance, facade.FileProgramMap(), facade.StringArticulationOverrides());
+                _SaveConfirmed(library.catalogHash, nextSong, nextState, nextPosition, nowServer, 0, 0, facade.selectedInstrument, facade.voicePool.strings == null ? 0 : facade.voicePool.strings.articulation, facade.InstrumentMask(), facade.instrumentRouter == null ? 1 : facade.instrumentRouter.pianoAppearance, facade.FileProgramMap(), facade.FileTrackMap(), facade.AutoTrackRouting(), facade.StringArticulationOverrides());
                 return;
             }
 
@@ -245,7 +253,7 @@ namespace MusicMidiPlayer.Networking
             _applyingSnapshot = false;
             if (_localFallback)
             {
-                _SaveConfirmed(library.catalogHash, endedSong, Stopped, 0, nowServer, 0, 0, facade.selectedInstrument, facade.voicePool.strings == null ? 0 : facade.voicePool.strings.articulation, facade.InstrumentMask(), facade.instrumentRouter == null ? 1 : facade.instrumentRouter.pianoAppearance, facade.FileProgramMap(), facade.StringArticulationOverrides());
+                _SaveConfirmed(library.catalogHash, endedSong, Stopped, 0, nowServer, 0, 0, facade.selectedInstrument, facade.voicePool.strings == null ? 0 : facade.voicePool.strings.articulation, facade.InstrumentMask(), facade.instrumentRouter == null ? 1 : facade.instrumentRouter.pianoAppearance, facade.FileProgramMap(), facade.FileTrackMap(), facade.AutoTrackRouting(), facade.StringArticulationOverrides());
                 return;
             }
             // A public maintenance transition does not require the local user's operation gate.
@@ -292,7 +300,7 @@ namespace MusicMidiPlayer.Networking
                     if (!_pendingApplied)
                     {
                         _applyingSnapshot = true;
-                        if (facade.instrumentRouter != null) facade._ApplyRoutingState(_pendingMask, _pendingPianoAppearance, _pendingFileProgramMap);
+                        if (facade.instrumentRouter != null) facade._ApplyRoutingState(_pendingMask, _pendingPianoAppearance, _pendingFileProgramMap, _pendingFileTrackMap, _pendingAutoTrackRouting);
                         else facade._ApplyInstrument(_pendingInstrument);
                         facade._ApplyStringsArticulation(_pendingArticulation);
                         facade._ApplyStringArticulationOverrides(_pendingStringArticulations);
@@ -352,7 +360,7 @@ namespace MusicMidiPlayer.Networking
             double nowServer = clock.GetServerSeconds();
             int currentState = clock.GetState();
             double position = currentState == Stopped ? 0 : clock.GetPositionAtServerTime(nowServer);
-            if (!_ValidateSnapshot(library.catalogHash, facade.selectedSongId, currentState, position, nowServer, facade.selectedInstrument, facade.InstrumentMask(), facade.instrumentRouter == null ? 1 : facade.instrumentRouter.pianoAppearance, facade.FileProgramMap(), facade.StringArticulationOverrides())) return;
+            if (!_ValidateSnapshot(library.catalogHash, facade.selectedSongId, currentState, position, nowServer, facade.selectedInstrument, facade.InstrumentMask(), facade.instrumentRouter == null ? 1 : facade.instrumentRouter.pianoAppearance, facade.FileProgramMap(), facade.FileTrackMap(), facade.AutoTrackRouting(), facade.StringArticulationOverrides())) return;
 
             liveMidiActive = _liveActive && clock.GetState() == Stopped;
             liveMidiEpoch = _liveEpoch;
@@ -372,6 +380,8 @@ namespace MusicMidiPlayer.Networking
             pianoAppearance = facade.instrumentRouter == null ? 1 : facade.instrumentRouter.pianoAppearance;
             stringsArticulation = facade.voicePool.strings == null ? 0 : facade.voicePool.strings.articulation;
             fileProgramMap = facade.FileProgramMap();
+            fileTrackMap = facade.FileTrackMap();
+            autoTrackRouting = facade.AutoTrackRouting();
             stringArticulationOverrides = facade.StringArticulationOverrides();
 
             _flightHash = catalogHash;
@@ -380,6 +390,8 @@ namespace MusicMidiPlayer.Networking
             _flightMask = enabledInstrumentMask; _flightPianoAppearance = pianoAppearance;
             _flightArticulation = stringsArticulation;
             _flightFileProgramMap = fileProgramMap;
+            _flightFileTrackMap = fileTrackMap;
+            _flightAutoTrackRouting = autoTrackRouting;
             _flightStringArticulations = stringArticulationOverrides;
             _flightState = state;
             _flightPosition = anchorPositionSeconds;
@@ -409,7 +421,7 @@ namespace MusicMidiPlayer.Networking
             _lastSentAt = Time.realtimeSinceStartup;
             _confirmedSeekToken = _flightSeekToken;
             _SaveConfirmed(_flightHash, _flightSongId, _flightState, _flightPosition,
-                _flightServer, _flightWriter, _flightSequence, _flightInstrument, _flightArticulation, _flightMask, _flightPianoAppearance, _flightFileProgramMap, _flightStringArticulations);
+                _flightServer, _flightWriter, _flightSequence, _flightInstrument, _flightArticulation, _flightMask, _flightPianoAppearance, _flightFileProgramMap, _flightFileTrackMap, _flightAutoTrackRouting, _flightStringArticulations);
             _MarkActivity();
             if (hasPendingIntent && _flightIntentGeneration == _intentGeneration)
             {
@@ -467,7 +479,7 @@ namespace MusicMidiPlayer.Networking
         {
             if (NetworkCalling.InNetworkCall || !CanAcceptCommands() || hasPendingIntent ||
                 !facade.CanReceiveLiveMidi() || gate == null || !gate.CanControl()) return;
-            if (kind < 0 || kind > 9 || channel < 0 || channel > 15 || number < 0 || number > 127 || value < 0 || value > 127) return;
+            if (kind < 0 || kind > 10 || channel < 0 || channel > 15 || number < 0 || number > 127 || value < 0 || value > 127) return;
             if (kind >= 3 && (channel == 9 || value == 0 || facade.instrumentRouter == null || !facade.instrumentRouter.IsEnabled(kind - 3))) return;
             if (kind == 2 && number != 11 && number != 64 && number != 120 && number != 121 && number != 123) return;
             if (kind == 0 && value == 0) kind = 1;
@@ -688,6 +700,8 @@ namespace MusicMidiPlayer.Networking
             _pendingMask = facade.InstrumentMask(); _pendingPianoAppearance = facade.instrumentRouter == null ? 1 : facade.instrumentRouter.pianoAppearance;
             _pendingArticulation = facade.voicePool.strings == null ? 0 : facade.voicePool.strings.articulation;
             _pendingFileProgramMap = facade.FileProgramMap();
+            _pendingFileTrackMap = facade.FileTrackMap();
+            _pendingAutoTrackRouting = facade.AutoTrackRouting();
             _pendingStringArticulations = facade.StringArticulationOverrides();
             _pendingState = desiredState;
             _pendingPosition = position;
@@ -773,7 +787,7 @@ namespace MusicMidiPlayer.Networking
         {
             if (!_hasConfirmed || !_DependenciesReady()) return;
             _applyingSnapshot = true;
-            if (facade.instrumentRouter != null) facade._ApplyRoutingState(_confirmedMask, _confirmedPianoAppearance, _confirmedFileProgramMap);
+            if (facade.instrumentRouter != null) facade._ApplyRoutingState(_confirmedMask, _confirmedPianoAppearance, _confirmedFileProgramMap, _confirmedFileTrackMap, _confirmedAutoTrackRouting);
             else facade._ApplyInstrument(_confirmedInstrument);
             facade._ApplyStringsArticulation(_confirmedArticulation);
             facade._ApplyStringArticulationOverrides(_confirmedStringArticulations);
@@ -784,7 +798,7 @@ namespace MusicMidiPlayer.Networking
 
         private void _ProcessReceivedSnapshot()
         {
-            if (!_ValidateSnapshot(catalogHash, songId, state, anchorPositionSeconds, anchorServerSeconds, instrumentIndex, enabledInstrumentMask, pianoAppearance, fileProgramMap, stringArticulationOverrides))
+            if (!_ValidateSnapshot(catalogHash, songId, state, anchorPositionSeconds, anchorServerSeconds, instrumentIndex, enabledInstrumentMask, pianoAppearance, fileProgramMap, fileTrackMap, autoTrackRouting, stringArticulationOverrides))
             {
                 _deferredReceive = false;
                 if (hasPendingIntent) _CancelPending();
@@ -804,12 +818,12 @@ namespace MusicMidiPlayer.Networking
             bool duplicate = _hasConfirmed && catalogHash == _confirmedHash && songId == _confirmedSongId &&
                 state == _confirmedState && anchorPositionSeconds == _confirmedPosition &&
                 anchorServerSeconds == _confirmedServer && writerPlayerId == _confirmedWriter &&
-                snapshotSequence == _confirmedSequence && seekToken == _confirmedSeekToken && instrumentIndex == _confirmedInstrument && stringsArticulation == _confirmedArticulation && enabledInstrumentMask == _confirmedMask && pianoAppearance == _confirmedPianoAppearance && fileProgramMap == _confirmedFileProgramMap && stringArticulationOverrides == _confirmedStringArticulations;
+                snapshotSequence == _confirmedSequence && seekToken == _confirmedSeekToken && instrumentIndex == _confirmedInstrument && stringsArticulation == _confirmedArticulation && enabledInstrumentMask == _confirmedMask && pianoAppearance == _confirmedPianoAppearance && fileProgramMap == _confirmedFileProgramMap && fileTrackMap == _confirmedFileTrackMap && autoTrackRouting == _confirmedAutoTrackRouting && stringArticulationOverrides == _confirmedStringArticulations;
             bool recoveringFromError = lastError != "";
             bool explicitSeek = _hasConfirmed && seekToken != _confirmedSeekToken;
             _confirmedSeekToken = seekToken;
             _SaveConfirmed(catalogHash, songId, state, anchorPositionSeconds,
-                anchorServerSeconds, writerPlayerId, snapshotSequence, instrumentIndex, stringsArticulation, enabledInstrumentMask, pianoAppearance, fileProgramMap, stringArticulationOverrides);
+                anchorServerSeconds, writerPlayerId, snapshotSequence, instrumentIndex, stringsArticulation, enabledInstrumentMask, pianoAppearance, fileProgramMap, fileTrackMap, autoTrackRouting, stringArticulationOverrides);
             _deferredReceive = false;
             _requestSnapshot = false;
             _MarkActivity();
@@ -823,7 +837,7 @@ namespace MusicMidiPlayer.Networking
         }
 
         private void _SaveConfirmed(string hash, string selected, int currentState, double position,
-            double server, int writer, int sequence, int selectedInstrument, int articulation, int mask, int appearance, string fileMap, int choices)
+            double server, int writer, int sequence, int selectedInstrument, int articulation, int mask, int appearance, string fileMap, string trackMap, bool automatic, int choices)
         {
             _confirmedHash = hash;
             _confirmedSongId = selected;
@@ -831,6 +845,8 @@ namespace MusicMidiPlayer.Networking
             _confirmedMask = mask; _confirmedPianoAppearance = appearance;
             _confirmedArticulation = articulation;
             _confirmedFileProgramMap = fileMap;
+            _confirmedFileTrackMap = trackMap;
+            _confirmedAutoTrackRouting = automatic;
             _confirmedStringArticulations = choices;
             _confirmedState = currentState;
             _confirmedPosition = position;
@@ -845,7 +861,7 @@ namespace MusicMidiPlayer.Networking
             if (_hasConfirmed || _localFallback || !VRC.SDKBase.Networking.IsNetworkSettled) return;
             if (writerPlayerId > 0)
             {
-                if (!_ValidateSnapshot(catalogHash, songId, state, anchorPositionSeconds, anchorServerSeconds, instrumentIndex, enabledInstrumentMask, pianoAppearance, fileProgramMap, stringArticulationOverrides))
+                if (!_ValidateSnapshot(catalogHash, songId, state, anchorPositionSeconds, anchorServerSeconds, instrumentIndex, enabledInstrumentMask, pianoAppearance, fileProgramMap, fileTrackMap, autoTrackRouting, stringArticulationOverrides))
                 {
                     _SetError(_validationError);
                     _requestSnapshot = true;
@@ -858,7 +874,7 @@ namespace MusicMidiPlayer.Networking
                     // before this client was ready. Do not reset a populated instance to defaults.
                     _confirmedSeekToken = seekToken;
                     _SaveConfirmed(catalogHash, songId, state, anchorPositionSeconds,
-                        anchorServerSeconds, writerPlayerId, snapshotSequence, instrumentIndex, stringsArticulation, enabledInstrumentMask, pianoAppearance, fileProgramMap, stringArticulationOverrides);
+                        anchorServerSeconds, writerPlayerId, snapshotSequence, instrumentIndex, stringsArticulation, enabledInstrumentMask, pianoAppearance, fileProgramMap, fileTrackMap, autoTrackRouting, stringArticulationOverrides);
                     _ClearError();
                     _ApplyConfirmed(true);
                     _snapshotDirty = true;
@@ -879,7 +895,7 @@ namespace MusicMidiPlayer.Networking
                 initialSong = library.songs != null && library.songs.Length > 0 && Utilities.IsValid(library.songs[0])
                     ? library.songs[0].songId : "";
             double nowServer = clock.GetServerSeconds();
-            _SaveConfirmed(library.catalogHash, initialSong, Stopped, 0, nowServer, _LocalPlayerId(), 0, facade.selectedInstrument, facade.voicePool.strings == null ? 0 : facade.voicePool.strings.articulation, facade.InstrumentMask(), facade.instrumentRouter == null ? 1 : facade.instrumentRouter.pianoAppearance, facade.FileProgramMap(), facade.StringArticulationOverrides());
+            _SaveConfirmed(library.catalogHash, initialSong, Stopped, 0, nowServer, _LocalPlayerId(), 0, facade.selectedInstrument, facade.voicePool.strings == null ? 0 : facade.voicePool.strings.articulation, facade.InstrumentMask(), facade.instrumentRouter == null ? 1 : facade.instrumentRouter.pianoAppearance, facade.FileProgramMap(), facade.FileTrackMap(), facade.AutoTrackRouting(), facade.StringArticulationOverrides());
             _ClearError();
             _ApplyConfirmed(true);
             networkReady = true;
@@ -911,6 +927,8 @@ namespace MusicMidiPlayer.Networking
             _pendingMask = _confirmedMask; _pendingPianoAppearance = _confirmedPianoAppearance;
             _pendingArticulation = _confirmedArticulation;
             _pendingFileProgramMap = _confirmedFileProgramMap;
+            _pendingFileTrackMap = _confirmedFileTrackMap;
+            _pendingAutoTrackRouting = _confirmedAutoTrackRouting;
             _pendingStringArticulations = _confirmedStringArticulations;
             _BeginOwnershipRequest();
         }
@@ -924,13 +942,13 @@ namespace MusicMidiPlayer.Networking
             _takeoverAt = _lastActivityAt + Random.Range(minimum, maximum);
         }
 
-        private bool _ValidateSnapshot(string hash, string selected, int currentState, double position, double server, int selectedInstrument, int mask, int appearance, string fileMap, int choices)
+        private bool _ValidateSnapshot(string hash, string selected, int currentState, double position, double server, int selectedInstrument, int mask, int appearance, string fileMap, string trackMap, bool automatic, int choices)
         {
             _validationError = "";
             if (!Utilities.IsValid(library) || hash != library.catalogHash)
                 _validationError = "播放器配置不一致，请联系世界作者";
-            else if (facade.instrumentRouter != null && (mask < 0 || mask > 63 || appearance < 0 || appearance > 1
-                || !facade.instrumentRouter.IsValidFileProgramMap(fileMap) || choices < 0 || choices > 255))
+            else if (facade.instrumentRouter != null && (mask < 0 || (mask & ~447) != 0 || appearance < 0 || appearance > 1
+                || !facade.instrumentRouter.IsValidFileProgramMap(fileMap) || !facade.instrumentRouter.IsValidFileTrackMap(trackMap) || choices < 0 || choices > 255))
                 _validationError = "播放器状态数据无效";
             else if (!facade.HasInstrument(selectedInstrument) || stringsArticulation < 0 || stringsArticulation > 2)
                 _validationError = "播放器状态数据无效";

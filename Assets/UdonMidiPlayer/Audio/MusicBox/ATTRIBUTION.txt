@@ -1,0 +1,5 @@
+MusicalBoxSingleNotes by rbnuser, CC0 1.0. https://freesound.org/people/rbnuser/packs/19724/
+Source: Freesound HQ MP3 previews (lossy), not lossless originals. Original individual pages and hashes retained in BANK-MAPPING.json and Downloads/MusicBox.
+Adaptations: measured pitch correction, mono downmix, 48 kHz Vorbis q5, short edge fades, octave-derived auxiliary roots A0/A1/A2/A3/A4/C8. No per-note normalization. Derived low notes are an extended sound design range, not real low-register recordings.
+
+2026-11-04 loudness calibration (instrument-loudness-v1): requested +15 dB fixed linear gain, capped per clip at -1.5 dBFS decoded 4x peak. Original velocity response, pitch and decay retained; no waveform limiting. Per-file applied gain and original hashes: BANK-MAPPING.json.

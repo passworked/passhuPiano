@@ -114,6 +114,7 @@ namespace MusicMidiPlayer.Editor.Prefab
         {
             if (string.IsNullOrEmpty(path)) return false;
             path = path.Replace('\\', '/');
+            if (MidiReleasePolicy.ExcludedFromCandidate(path)) return false;
             if (!path.StartsWith("Assets/", StringComparison.Ordinal) || AssetDatabase.IsValidFolder(path)) return false;
             if (!File.Exists(path)) throw new FileNotFoundException("Missing release dependency", path);
             return paths.Add(path);

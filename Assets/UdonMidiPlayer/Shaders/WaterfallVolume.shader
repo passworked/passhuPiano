@@ -15,6 +15,11 @@ Shader "MusicMidiPlayer/WaterfallVolume"
         _BreathAmount ("Hit Breathing", Range(0,1)) = 0
         [HideInInspector] _NoteOrder ("Stable Note Order", Float) = 0
         [HideInInspector] _GpuAnimation ("Time Driven Notes", Float) = 0
+        [HideInInspector] _PianoImpact ("Velocity and Landing Radiance", Float) = 0
+        [HideInInspector] _RollOverDrum ("Notes follow a drum arc", Float) = 0
+        [HideInInspector] _DrumContactAngle ("Comb contact angle", Float) = -1.02
+        [HideInInspector] _DrumArcSweep ("Cylinder arc sweep", Float) = 2.04
+        [HideInInspector] _DrumNoteThicknessRatio ("Note thickness / cylinder radius", Float) = 0.0465
         [HideInInspector] _VisualTime ("Local Music Seconds", Float) = 0
         [HideInInspector] _WindowSeconds ("Visible Seconds", Float) = 3
         [HideInInspector] _MinimumFraction ("Minimum Visible Length", Float) = 0.005
@@ -47,7 +52,9 @@ Shader "MusicMidiPlayer/WaterfallVolume"
         half _Metallic, _Smoothness, _EdgeStrength, _Saturation, _BodyGlow, _FacetStrength;
         float _EndBevelRatio;
         half _BreathAmount;
-        float _GpuAnimation, _VisualTime, _WindowSeconds, _MinimumFraction, _NoteEmission;
+        float _GpuAnimation, _RollOverDrum, _DrumContactAngle, _DrumArcSweep, _VisualTime, _WindowSeconds, _MinimumFraction, _NoteEmission;
+        float _DrumNoteThicknessRatio;
+        float _PianoImpact;
         struct v2f
         {
             float4 noteLocal : TEXCOORD0;  // xyz: deformed local position, w: normalized cap depth
@@ -88,6 +95,13 @@ Shader "MusicMidiPlayer/WaterfallVolume"
                     lengthFraction = min(1.0, max(_MinimumFraction, high - low));
                     centerFraction = clamp((low + high) * 0.5, lengthFraction * 0.5, 1.0 - lengthFraction * 0.5);
                 }
+                if (_RollOverDrum > 0.5)
+                {
+                    // Short crystal markers stay above the pins even on long sustained notes.
+                    lengthFraction = min(lengthFraction, 0.08);
+                    centerFraction = clamp(low + lengthFraction * 0.5, lengthFraction * 0.5, 1.0 - lengthFraction * 0.5);
+                    height *= _DrumArcSweep;
+                }
                 height *= max(lengthFraction, 0.000001);
             }
             // Local, bounded sizing: no CPU overlap search or per-vertex note list.
@@ -104,6 +118,9 @@ Shader "MusicMidiPlayer/WaterfallVolume"
             float bodyScale = seam / 0.465;
             float capScale = cap / 0.035;
             float y = abs(v.vertex.y);
+            // The inner profile follows the cylinder even at the cut ends. Its solid
+            // depth grows outwards from the metal, independently of note length.
+            float drumDepth = max(0.0, 0.5 - 0.12 * saturate((y - 0.465) / 0.035) - v.vertex.z);
             v.vertex.y = sign(v.vertex.y) * (y <= 0.465
                 ? y * bodyScale : seam + (y - 0.465) * capScale);
             // Duplicated flat-face vertices let the two affine regions use their exact
@@ -120,12 +137,23 @@ Shader "MusicMidiPlayer/WaterfallVolume"
             v.vertex.y = v.vertex.y * lengthFraction + centerFraction - 0.5;
             v.vertex.x *= widen;
             v.vertex.z *= deepen;
+            float2 rollBasis = float2(0,1);
+            if (_RollOverDrum > 0.5)
+            {
+                float angle = _DrumContactAngle + (v.vertex.y + 0.5) * _DrumArcSweep;
+                sincos(angle, rollBasis.x, rollBasis.y);
+                float radius = 1.0 + drumDepth * _DrumNoteThicknessRatio;
+                v.vertex.yz = rollBasis.yx * radius;
+            }
             o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
             float3 view = UnityWorldSpaceViewDir(o.worldPos);
             // Remove note stretch from the viewing basis, preserving glints on long notes.
             o.viewDir = float3(dot(view, normalize(unity_ObjectToWorld._m00_m10_m20)),
                 dot(view, normalize(unity_ObjectToWorld._m01_m11_m21)),
                 dot(view, normalize(unity_ObjectToWorld._m02_m12_m22)));
+            if (_RollOverDrum > 0.5)
+                o.viewDir.yz = float2(dot(o.viewDir.yz, float2(-rollBasis.x, rollBasis.y)),
+                    -dot(o.viewDir.yz, rollBasis.yx));
             o.pos = UnityObjectToClipPos(v.vertex);
             UNITY_TRANSFER_FOG(o, o.pos);
             return o;
@@ -170,12 +198,29 @@ Shader "MusicMidiPlayer/WaterfallVolume"
             half3 noteColor = UNITY_ACCESS_INSTANCED_PROP(NoteData, _Color).rgb;
             half hit = _BreathAmount;
             half3 emissionColor = _EmissionColor.rgb;
+            half landingPulse = 0.0h;
             if (_GpuAnimation > 0.5)
             {
                 float4 timing = UNITY_ACCESS_INSTANCED_PROP(NoteData, _NoteTiming);
                 hit = timing.z < 0.5 ? step(timing.x, _VisualTime) : 0.0;
+                if (_RollOverDrum > 0.5)
+                    hit = step(timing.x, _VisualTime) * saturate(1.0 - (_VisualTime - timing.x) / 0.12);
                 noteColor = lerp(noteColor, lerp(noteColor, half3(1,1,1), 0.25h), hit);
                 emissionColor = noteColor * lerp(max(0.0, _NoteEmission), max(1.0, _NoteEmission * 2.5), hit);
+                if (_PianoImpact > 0.5)
+                {
+                    half strength = pow(saturate(timing.w), 1.35h);
+                    float age = max(0.0, _VisualTime - timing.x);
+                    half attack = smoothstep(0.0, 0.025, age) * exp2(-max(0.0, age - 0.025) * 17.0);
+                    // Measure from the actual landing plane, in note-width units. Long
+                    // notes retain their crystal body instead of turning into white lamps.
+                    float fromLanding = max(0.0, i.noteLocal.y + 0.5) * i.noteNormal.w;
+                    half nearLanding = exp2(-fromLanding * 1.8);
+                    half touching = timing.z < 0.5 ? step(timing.x, _VisualTime) : (timing.y < 0.0 ? 1.0h : 0.0h);
+                    landingPulse = nearLanding * touching * (0.12h + attack * (0.35h + strength * 0.75h));
+                    noteColor = UNITY_ACCESS_INSTANCED_PROP(NoteData, _Color).rgb;
+                    emissionColor = noteColor * max(0.0, _NoteEmission) * lerp(0.80h, 1.12h, strength);
+                }
             }
             half3 hue = SaturatePreservingHueValue(noteColor);
             half3 emissionHue = SaturatePreservingHueValue(emissionColor);
@@ -194,8 +239,9 @@ Shader "MusicMidiPlayer/WaterfallVolume"
                 + front * _FacetStrength * (0.16h * reflectionBand + 0.26h * innerGlint)
                 + _EdgeStrength * (0.40h * bevel + 0.45h * fresnel));
             half4 color = half4(body + glow + reflected * lerp(0.035h, 0.18h, _Metallic) * (0.35h + fresnel) * lerp(half3(1,1,1), hue, _Metallic), 1);
+            color.rgb += lerp(hue, half3(1,1,1), 0.20h) * landingPulse;
             half breath = 0.825h + 0.175h * cos(_Time.y * 5.235987756);
-            color.rgb *= lerp(1.0h, breath, hit);
+            color.rgb *= lerp(1.0h, breath, _RollOverDrum > 0.5 || _PianoImpact > 0.5 ? 0.0h : hit);
             UNITY_APPLY_FOG(i.fogCoord, color);
             return color;
         }
@@ -204,3 +250,4 @@ Shader "MusicMidiPlayer/WaterfallVolume"
     }
     FallBack Off
 }
+

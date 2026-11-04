@@ -23,6 +23,23 @@ namespace MusicMidiPlayer.Editor.Prefab
         public Song[] songs;
         public AudioGroup[] audioGroups;
 
+        [Serializable] private sealed class CandidateScope
+        {
+            public string version;
+            public string[] excludedPaths, excludedPrefixes;
+        }
+
+        public static bool ExcludedFromCandidate(string path)
+        {
+            string scopePath = "Tools/Release/candidates/" + Version + ".json";
+            if (!File.Exists(scopePath)) return false;
+            var scope = JsonUtility.FromJson<CandidateScope>(File.ReadAllText(scopePath));
+            if (scope == null || scope.version != Version) throw new InvalidOperationException("Invalid candidate scope");
+            string value = path.EndsWith(".meta", StringComparison.Ordinal) ? path.Substring(0, path.Length - 5) : path;
+            return (scope.excludedPaths ?? new string[0]).Contains(value)
+                || (scope.excludedPrefixes ?? new string[0]).Any(prefix => value.StartsWith(prefix, StringComparison.Ordinal) || value == prefix.TrimEnd('/'));
+        }
+
         [Serializable]
         public class Resource { public string path, guid, sha256, license; }
 

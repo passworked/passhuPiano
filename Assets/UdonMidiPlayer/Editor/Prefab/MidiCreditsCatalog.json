@@ -1,0 +1,130 @@
+{
+  "entries": [
+    {
+      "category": 1,
+      "name": "MusicalBoxSingleNotes — Music box",
+      "author": "rbnuser",
+      "license": "CC0 1.0",
+      "detailKey": "",
+      "source": "https://freesound.org/people/rbnuser/packs/19724/",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "category": 0,
+      "name": "credits.code_name",
+      "author": "passhu — passhuPiano / musicMidiPlayer",
+      "license": "MIT",
+      "detailKey": "",
+      "source": "https://github.com/passworked/passhuPiano",
+      "licenseUrl": "https://github.com/passworked/passhuPiano/blob/main/Licenses/MIT.txt"
+    },
+    {
+      "category": 0,
+      "name": "credits.art_name",
+      "author": "passhu — passhuPiano / musicMidiPlayer",
+      "license": "CC BY 4.0",
+      "detailKey": "",
+      "source": "https://github.com/passworked/passhuPiano",
+      "licenseUrl": "https://github.com/passworked/passhuPiano/blob/main/Licenses/CC-BY-4.0.txt"
+    },
+    {
+      "category": 0,
+      "name": "VizVid / JLChnToZ",
+      "author": "JLChnToZ",
+      "license": "credits.reference_only",
+      "detailKey": "",
+      "source": "https://github.com/JLChnToZ/VVMW",
+      "licenseUrl": ""
+    },
+    {
+      "category": 0,
+      "name": "Unity · VRChat SDK · UdonSharp · TextMesh Pro",
+      "author": "Unity Technologies · VRChat · Merlin / UdonSharp contributors",
+      "license": "credits.upstream_terms",
+      "detailKey": "",
+      "source": "https://github.com/vrchat-community/UdonSharp",
+      "licenseUrl": ""
+    },
+    {
+      "category": 1,
+      "name": "Salamander Grand Piano",
+      "author": "Alexander Holm; FreePats / Roberto",
+      "license": "CC BY 3.0",
+      "detailKey": "credits.piano_detail",
+      "source": "https://freepats.zenvoid.org/Piano/acoustic-grand-piano.html",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/"
+    },
+    {
+      "category": 1,
+      "name": "University of Iowa — Marimba",
+      "author": "Lawrence Fritts; Andrew Thierauf; University of Iowa",
+      "license": "credits.iowa_license",
+      "detailKey": "",
+      "source": "https://theremin.music.uiowa.edu/MIS-Pitches-2012/MISMarimba2012.html",
+      "licenseUrl": "https://theremin.music.uiowa.edu/MIS.html"
+    },
+    {
+      "category": 1,
+      "name": "VSCO 2 Community Edition — Strings",
+      "author": "Versilian Studios / Sam Gossner; Ivy Audio / Simon Dalzell",
+      "license": "CC0 1.0",
+      "detailKey": "",
+      "source": "https://versilian-studios.com/vsco-community/",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "category": 1,
+      "name": "Virtuosity Drums",
+      "author": "Versilian Studios LLC; Karoryfer Samples; Austin McMahon",
+      "license": "CC0 1.0",
+      "detailKey": "",
+      "source": "https://github.com/sfzinstruments/virtuosity_drums/tree/9f04cf9a734527edfbb0a4eee1f674e45bbf71bc",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "category": 2,
+      "name": "Noto Sans CJK SC",
+      "author": "Adobe — Noto CJK contributors",
+      "license": "SIL OFL 1.1",
+      "detailKey": "",
+      "source": "https://github.com/notofonts/noto-cjk",
+      "licenseUrl": "https://github.com/passworked/passhuPiano/blob/main/Assets/UdonMidiPlayer/Fonts/NotoSansCJK-OFL.txt"
+    },
+    {
+      "category": 2,
+      "name": "Comfortaa",
+      "author": "The Comfortaa Project Authors — Johan Aakerlund",
+      "license": "SIL OFL 1.1",
+      "detailKey": "",
+      "source": "https://github.com/JLChnToZ/VVMW/tree/1b0606d873b95a724da2d12b3ac0e156824fc5ed/Packages/idv.jlchntoz.vvmw/Fonts",
+      "licenseUrl": "https://github.com/passworked/passhuPiano/blob/main/Assets/UdonMidiPlayer/Fonts/Comfortaa-OFL.txt"
+    },
+    {
+      "category": 2,
+      "name": "Noto Sans Hebrew · Noto Sans Thai",
+      "author": "Google Inc. — Noto contributors",
+      "license": "SIL OFL 1.1",
+      "detailKey": "",
+      "source": "https://github.com/notofonts/noto-fonts",
+      "licenseUrl": "https://github.com/passworked/passhuPiano/blob/main/Assets/UdonMidiPlayer/Fonts/LICENSE_OFL.txt"
+    },
+    {
+      "category": 2,
+      "name": "Bravura",
+      "author": "Steinberg Media Technologies GmbH",
+      "license": "SIL OFL 1.1",
+      "detailKey": "",
+      "source": "https://github.com/steinbergmedia/bravura",
+      "licenseUrl": "https://github.com/passworked/passhuPiano/blob/main/ArtSource/DemoMusicClassroom/Fonts/Bravura-LICENSE.txt"
+    },
+    {
+      "category": 2,
+      "name": "Liberation Sans",
+      "author": "Google Corporation; Red Hat, Inc.",
+      "license": "SIL OFL 1.1",
+      "detailKey": "",
+      "source": "https://github.com/liberationfonts/liberation-fonts",
+      "licenseUrl": "https://github.com/passworked/passhuPiano/blob/main/Assets/TextMesh%20Pro/Fonts/LiberationSans%20-%20OFL.txt"
+    }
+  ]
+}

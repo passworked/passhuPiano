@@ -1,0 +1,65 @@
+// Execute through Unity MCP execute_code, outside Play mode. Creates no project assets.
+var checks = new System.Collections.Generic.List<string>();
+void Need(bool ok, string label) { if (!ok) throw new System.Exception(label); checks.Add(label); }
+MusicMidiPlayer.Editor.Assets.MidiSongAsset Fixture(int[] held, int interval, int velocity)
+{
+    var s = UnityEngine.ScriptableObject.CreateInstance<MusicMidiPlayer.Editor.Assets.MidiSongAsset>();
+    int n = held.Length;
+    s.sourceHash = new string('0', 64); s.songId = new string('1',32);
+    s.startMs = Enumerable.Range(0,n).Select(i=>i*interval).ToArray();
+    s.keyUpMs = Enumerable.Range(0,n).Select(i=>s.startMs[i]+held[i]).ToArray();
+    s.releaseMs = (int[])s.keyUpMs.Clone(); s.durationMs = s.releaseMs.Max();
+    s.pitch=Enumerable.Repeat(69,n).ToArray(); s.velocity=Enumerable.Repeat(velocity,n).ToArray();
+    s.channel=new int[n]; s.trackIndex=new int[n];
+    var events=Enumerable.Range(0,n).SelectMany(i=>Enumerable.Range(0,3).Select(k=>new {id=i,kind=k,time=k==0?s.startMs[i]:s.keyUpMs[i]})).OrderBy(e=>e.time).ThenBy(e=>e.id).ThenBy(e=>e.kind).ToArray();
+    s.eventMs=events.Select(e=>e.time).ToArray();s.eventKind=events.Select(e=>e.kind).ToArray();s.eventNoteId=events.Select(e=>e.id).ToArray();
+    int cp=s.durationMs/1000+1;s.checkpointEventIndex=new int[cp];s.checkpointActiveOffsets=new int[cp+1];
+    var ids=new System.Collections.Generic.List<int>();
+    for(int c=0;c<cp;c++) { s.checkpointEventIndex[c]=events.Count(e=>e.time<c*1000);ids.AddRange(Enumerable.Range(0,n).Where(i=>s.startMs[i]<c*1000 && s.releaseMs[i]>=c*1000));s.checkpointActiveOffsets[c+1]=ids.Count; }
+    s.checkpointActiveNoteIds=ids.ToArray();s.pedalOffsets=new int[4];return s;
+}
+int[] Styles(MusicMidiPlayer.Editor.Assets.MidiSongAsset s)
+{
+    byte[] p=MusicMidiPlayer.Editor.Baking.ViolinArticulationBaker.Bake(s);
+    return Enumerable.Range(0,s.startMs.Length).Select(n=>((p[n>>2]>>((n&3)*2))&3)-1).ToArray();
+}
+void Phrase(int count,int held,int interval,int velocity,int expected,string label)
+{
+    var s=Fixture(Enumerable.Repeat(held,count).ToArray(),interval,velocity);
+    try { Need(Styles(s).All(x=>x==expected),label);MusicMidiPlayer.Editor.Baking.MidiSongCodec.ValidateRoundTrip(s); }
+    finally { UnityEngine.Object.DestroyImmediate(s); }
+}
+Phrase(4,450,500,100,0,"Long notes sustain");
+Phrase(4,260,250,100,0,"Overlapping notes sustain");
+Phrase(4,245,250,100,0,"Connected short melody sustains");
+Phrase(4,100,250,100,1,"Detached rhythmic notes spiccato");
+Phrase(4,80,400,64,2,"Repeated soft sparse short notes pizzicato");
+Phrase(1,80,400,64,0,"Isolated short note stays conservative");
+Phrase(2,80,400,64,1,"Two weak pizzicato candidates fall back to spiccato");
+Phrase(4,60,60,100,0,"Fast connected melody sustains");
+Phrase(4,30,80,100,1,"Fast detached melody spiccato");
+Phrase(4,80,1400,64,0,"Long rests reset phrase evidence");
+var mixed=Fixture(new[]{100,100,100,100,450,450,450,450,80,80,80,80},500,64);
+try
+{
+    Need(Styles(mixed).SequenceEqual(new[]{2,2,2,2,0,0,0,0,2,2,2,2}),"One stream changes style at phrase boundaries");
+    mixed.velocity=Enumerable.Repeat(100,12).ToArray();
+    Need(Styles(mixed).SequenceEqual(new[]{1,1,1,1,0,0,0,0,1,1,1,1}),"Loud detached notes do not become pizzicato");
+    for(int i=0;i<12;i++) mixed.channel[i]=9;
+    Need(Styles(mixed).All(x=>x==-1),"Drum channel has no violin hints");
+}
+finally { UnityEngine.Object.DestroyImmediate(mixed); }
+var isolated=Fixture(Enumerable.Repeat(80,4).ToArray(),400,64);
+try
+{
+    isolated.trackIndex=new[]{0,1,2,3};Need(Styles(isolated).All(x=>x==0),"Tracks do not borrow phrase evidence");
+    isolated.trackIndex=new int[4];isolated.channel=new[]{0,1,2,3};Need(Styles(isolated).All(x=>x==0),"Channels do not borrow phrase evidence");
+    isolated.channel=new int[4];isolated.timbreEventIndex=new[]{3,6,9};isolated.timbreKind=new int[3];isolated.timbreChannel=new int[3];isolated.timbreValue=new[]{40,40,40};
+    Need(Styles(isolated).All(x=>x==0),"Program boundaries reset phrase evidence");
+    isolated.timbreChannel=new[]{1,1,1};Need(Styles(isolated).All(x=>x==2),"Other channel Program Changes do not split this phrase");
+}
+finally { UnityEngine.Object.DestroyImmediate(isolated); }
+MusicMidiPlayer.Editor.Baking.MidiSongCodec.ValidateBoundaryCases();checks.Add("Codec boundary, corruption, unknown optional, required and duplicate extension checks");
+System.IO.Directory.CreateDirectory("Logs");
+System.IO.File.WriteAllText("Logs/violin-auto-editor.json",Newtonsoft.Json.JsonConvert.SerializeObject(new {checks=checks.Count,passed=checks},Newtonsoft.Json.Formatting.Indented));
+return new {count=checks.Count,passed=checks};

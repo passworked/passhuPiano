@@ -8,6 +8,10 @@ namespace MusicMidiPlayer.Data
     public class PianoBankData : UdonSharpBehaviour
     {
         public string bankHash;
+        // Flat 20 ms mean-square envelopes; repeated clips share one range.
+        public int[] energyStarts = new int[0], energyCounts = new int[0];
+        public float[] energyValues = new float[0];
+
         // Regions are contiguous per recorded velocity layer.
         public int velocityLayerCount = 1;
         public AudioClip[] clips = new AudioClip[0];
@@ -26,6 +30,23 @@ namespace MusicMidiPlayer.Data
         // an instance public-variable override. Keep this empty; the Editor bakes all 88 entries.
         public int[] pitchToRegion = new int[0];
         public int maxReleaseMs = 180;
+
+        public float EnergyAt(int region, float sourceSeconds)
+        {
+            if (sourceSeconds < 0f || sourceSeconds >= clips[region].length) return 0f;
+            return ReadEnergy(region, sourceSeconds, sourcePeak[region] * sourcePeak[region]);
+        }
+
+        private float ReadEnergy(int index, float seconds, float fallback)
+        {
+            if (energyStarts == null || energyCounts == null || index < 0 || index >= energyStarts.Length || index >= energyCounts.Length) return fallback;
+            int first = energyStarts[index], count = energyCounts[index];
+            if (count < 2 || energyValues == null || first < 0 || first > energyValues.Length - count) return fallback;
+            float position = Mathf.Max(0f, seconds) * 50f;
+            int point = Mathf.Min(count - 1, Mathf.FloorToInt(position));
+            if (point == count - 1) return 0f;
+            return Mathf.Lerp(energyValues[first + point], energyValues[first + point + 1], position - point);
+        }
 
         public bool IsValid()
         {

@@ -20,9 +20,6 @@ namespace MusicMidiPlayer.Editor.Prefab
             TMP_Text labelStyle = general.Find("CurrentLanding/Label").GetComponent<TMP_Text>();
             Image markStyle = ui.currentLandingSelectionMark.GetComponent<Image>();
             RectTransform title = (RectTransform)general.Find("Title"); title.sizeDelta = new Vector2(200, title.sizeDelta.y);
-            ui.fileMappingEntry = MakeButton(ui.transform,"FileMappingEntry",new Vector2(-20,137),new Vector2(140,32),ui,"_OpenFileMapping",rowStyle,buttonStyle);
-            ui.fileMappingEntryLabel=Text(ui.fileMappingEntry.transform,"Label","Timbre mapping",Vector2.zero,new Vector2(128,28),labelStyle,17);
-            ((RectTransform)ui.transform.Find("NowPlayingCaption")).sizeDelta=new Vector2(340,24);
             ui.midiMappingEntry = MakeButton(general, "MidiMappingEntry", new Vector2(100,214), new Vector2(112,32), ui, "_OpenMidiMapping", rowStyle, buttonStyle);
             ui.midiPerformanceEntryLabel=Text(ui.midiMappingEntry.transform,"Label","MIDI PLAY",Vector2.zero,new Vector2(100,28),labelStyle,18);
             var page = Rect(settings,"MidiMapping",Vector2.zero,new Vector2(980,480));
@@ -47,8 +44,8 @@ namespace MusicMidiPlayer.Editor.Prefab
             ui.midiChoicePanel=overlay.gameObject;ui.midiChoiceContent=content;
             ui.midiChoiceTitle=Text(content,"Title","",new Vector2(0,170),new Vector2(416,30),labelStyle,22);
             ui.midiChoiceTitleRect=(RectTransform)ui.midiChoiceTitle.transform;
-            ui.midiTargetButtons=new Button[8];ui.midiTargetLabels=new TMP_Text[8];ui.midiTargetMarks=new GameObject[8];
-            for(int i=0;i<8;i++)
+            ui.midiTargetButtons=new Button[9];ui.midiTargetLabels=new TMP_Text[9];ui.midiTargetMarks=new GameObject[9];
+            for(int i=0;i<9;i++)
             {
                 var option=MakeButton(content,"Target"+i,new Vector2(0,124-i*40),new Vector2(424,36),ui,"_MidiTarget"+i,rowStyle,buttonStyle);
                 ui.midiTargetButtons[i]=option;
@@ -66,8 +63,8 @@ namespace MusicMidiPlayer.Editor.Prefab
             ui.midiPerformancePrompt.enableWordWrapping=true;
             ui.midiPerformanceHint=Text(performance,"Hint","",new Vector2(0,77),new Vector2(880,32),labelStyle,18);
             ui.midiPerformanceHint.alignment=TextAlignmentOptions.Center;
-            ui.midiPerformanceTargets=new Button[7];ui.midiPerformanceTargetLabels=new TMP_Text[7];ui.midiPerformanceTargetMarks=new GameObject[7];
-            for(int i=0;i<7;i++)
+            ui.midiPerformanceTargets=new Button[8];ui.midiPerformanceTargetLabels=new TMP_Text[8];ui.midiPerformanceTargetMarks=new GameObject[8];
+            for(int i=0;i<8;i++)
             {
                 var option=MakeButton(performance,"Instrument"+i,new Vector2(i%2==0?-225:225,25-i/2*55),new Vector2(424,42),ui,"_MidiTarget"+(i+1),rowStyle,buttonStyle);
                 ui.midiPerformanceTargets[i]=option;
@@ -80,25 +77,121 @@ namespace MusicMidiPlayer.Editor.Prefab
             var advanced=MakeButton(performance,"Advanced",new Vector2(225,-205),new Vector2(424,36),ui,"_OpenMidiAdvanced",rowStyle,buttonStyle);
             ui.midiPerformanceAdvanced=Text(advanced.transform,"Label","",Vector2.zero,new Vector2(400,30),labelStyle,18);
             overlay.gameObject.SetActive(false);page.gameObject.SetActive(false);performance.gameObject.SetActive(false);
-            ConfigureFileMapping(ui,ui.transform,panelStyle,rowStyle,buttonStyle,labelStyle,markStyle);
+            ConfigurePlaybackMapping(ui);
             MidiPlayerUIBuilder.ConfigureHierarchy((RectTransform)ui.transform);
             UdonSharpEditorUtility.CopyProxyToUdon(ui,ProxySerializationPolicy.All);EditorUtility.SetDirty(ui);
+        }
+        public static void ConfigurePlaybackMapping(MidiPlayerUI ui)
+        {
+            if (ui.settingsPanel == null || ui.facade == null || ui.facade.instrumentRouter == null) return;
+            var general = ui.settingsPanel.transform.Find("Content");
+            var panelStyle = general.GetComponent<Image>();
+            var rowStyle = general.Find("CurrentLanding").GetComponent<Image>();
+            var buttonStyle = general.Find("CurrentLanding").GetComponent<Button>();
+            var labelStyle = general.Find("CurrentLanding/Label").GetComponent<TMP_Text>();
+            var markStyle = ui.currentLandingSelectionMark.GetComponent<Image>();
+            ui.fileMappingEntry = MakeButton(ui.transform,"FileMappingEntry",new Vector2(-20,137),new Vector2(140,32),ui,"_OpenFileMapping",rowStyle,buttonStyle);
+            ui.fileMappingEntryLabel=Text(ui.fileMappingEntry.transform,"Label","Instrument mapping",Vector2.zero,new Vector2(128,28),labelStyle,17);
+            ((RectTransform)ui.transform.Find("NowPlayingCaption")).sizeDelta=new Vector2(340,24);
+            ConfigureFileMapping(ui,ui.transform,panelStyle,rowStyle,buttonStyle,labelStyle,markStyle);
+            MidiPlayerUIBuilder.ConfigureHierarchy((RectTransform)ui.transform);
+            UdonSharpEditorUtility.CopyProxyToUdon(ui,ProxySerializationPolicy.All); EditorUtility.SetDirty(ui);
+            // CopyProxyToUdon preserves unknown variables, so remove only the retired file-channel fields.
+            foreach (var proxy in new UdonSharp.UdonSharpBehaviour[] { ui, ui.facade.instrumentRouter, ui.facade.network })
+            {
+                if (proxy == null) continue;
+                var backing = UdonSharpEditorUtility.GetBackingUdonBehaviour(proxy);
+                foreach (string symbol in new[] { "fileChannelMap", "usedFileChannels", "fileChannelTab", "fileChannelTabLabel", "fileChannelTabMark" })
+                    backing.publicVariables.RemoveVariable(symbol);
+                EditorUtility.SetDirty(backing);
+            }
         }
         private static void ConfigureFileMapping(MidiPlayerUI ui,Transform settings,Image panelStyle,Image rowStyle,Button buttonStyle,TMP_Text labelStyle,Image markStyle)
         {
             var page=Rect(settings,"FileMappingPanel",Vector2.zero,new Vector2(980,480));Paint(page,panelStyle);Block(page);
             ui.fileMappingPanel=page.gameObject;
-            ui.fileMappingTitle=Text(page,"Title","MIDI FILE TIMBRES",new Vector2(-80,210),new Vector2(720,32),labelStyle,22);
+            ui.fileMappingTitle=Text(page,"Title","INSTRUMENT MAPPING",new Vector2(-290,210),new Vector2(350,32),labelStyle,22);
+            ui.fileProgramTab = MakeButton(page,"ByProgram",new Vector2(-10,210),new Vector2(150,34),ui,"_FileByProgram",rowStyle,buttonStyle);
+            ui.fileProgramTabLabel=Text(ui.fileProgramTab.transform,"Label","By timbre",Vector2.zero,new Vector2(138,30),labelStyle,18);
+            var fileProgramTabMark=Rect(ui.fileProgramTab.transform,"Selected",new Vector2(0,-15),new Vector2(130,3));
+            Paint(fileProgramTabMark,markStyle).raycastTarget=false; ui.fileProgramTabMark=fileProgramTabMark.gameObject;
+            // Reuse the former file-channel tab; hardware MIDI settings are independent.
+            var previousTab = page.Find("ByChannel");
+            if (previousTab != null && page.Find("ByTrack") == null) previousTab.name = "ByTrack";
+            ui.fileTrackTab = MakeButton(page,"ByTrack",new Vector2(155,210),new Vector2(150,34),ui,"_FileByTrack",rowStyle,buttonStyle);
+            ui.fileTrackTabLabel=Text(ui.fileTrackTab.transform,"Label","By track",Vector2.zero,new Vector2(138,30),labelStyle,18);
+            var fileTrackTabMark=Rect(ui.fileTrackTab.transform,"Selected",new Vector2(0,-15),new Vector2(130,3));
+            Paint(fileTrackTabMark,markStyle).raycastTarget=false; ui.fileTrackTabMark=fileTrackTabMark.gameObject;
             var back=MakeButton(page,"Back",new Vector2(400,210),new Vector2(120,34),ui,"_CloseFileMapping",rowStyle,buttonStyle);
             ui.fileMappingBack=Text(back.transform,"Label","Back",Vector2.zero,new Vector2(104,30),labelStyle,18);
             ui.fileMappingHint=Text(page,"Hint","",new Vector2(0,174),new Vector2(920,30),labelStyle,16);
+            ui.fileMappingHintRect=(RectTransform)ui.fileMappingHint.transform;
+            var automatic=Rect(page,"AutoTrackRouting",new Vector2(-242,178),new Vector2(456,28));
+            var automaticBackground=Paint(automatic,rowStyle);
+            var automaticToggle=Get<Toggle>(automatic);automaticToggle.targetGraphic=automaticBackground;
+            automaticToggle.colors=buttonStyle.colors;automaticToggle.group=null;automaticToggle.toggleTransition=Toggle.ToggleTransition.None;
+            var box=Rect(automatic,"Checkbox",new Vector2(-210,0),new Vector2(18,18));
+            var frame=Paint(box,rowStyle);frame.sprite=null;frame.color=labelStyle.color;frame.raycastTarget=false;
+            var inset=Rect(box,"Inset",Vector2.zero,new Vector2(14,14));
+            var insetImage=Paint(inset,rowStyle);insetImage.sprite=null;insetImage.raycastTarget=false;
+            var automaticMark=Rect(box,"Selected",Vector2.zero,new Vector2(12,12));
+            var checkedImage=Paint(automaticMark,markStyle);checkedImage.sprite=null;checkedImage.raycastTarget=false;
+            automaticMark.SetAsLastSibling();
+            automaticToggle.graphic=checkedImage;automaticToggle.SetIsOnWithoutNotify(ui.facade.AutoTrackRouting());
+            automaticToggle.onValueChanged=new Toggle.ToggleEvent();
+            UnityEventTools.AddStringPersistentListener(automaticToggle.onValueChanged,UdonSharpEditorUtility.GetBackingUdonBehaviour(ui).SendCustomEvent,"_OnAutoTrackRoutingChanged");
+            ui.fileAutoTrackToggle=automaticToggle;
+            ui.fileAutoTrackLabel=Text(automatic,"Label","Auto-adapt tracks",new Vector2(12,0),new Vector2(410,26),labelStyle,16);
+            var range=Rect(page,"AutoRange",new Vector2(242,178),new Vector2(456,28));
+            var rangeBackground=Paint(range,rowStyle);var rangeToggle=Get<Toggle>(range);rangeToggle.targetGraphic=rangeBackground;
+            rangeToggle.colors=buttonStyle.colors;rangeToggle.group=null;rangeToggle.toggleTransition=Toggle.ToggleTransition.None;
+            var rangeBox=Rect(range,"Checkbox",new Vector2(-210,0),new Vector2(18,18));
+            var rangeFrame=Paint(rangeBox,rowStyle);rangeFrame.sprite=null;rangeFrame.color=labelStyle.color;rangeFrame.raycastTarget=false;
+            var rangeInset=Rect(rangeBox,"Inset",Vector2.zero,new Vector2(14,14));
+            var rangeInsetImage=Paint(rangeInset,rowStyle);rangeInsetImage.sprite=null;rangeInsetImage.raycastTarget=false;
+            var rangeMark=Rect(rangeBox,"Selected",Vector2.zero,new Vector2(12,12));
+            var rangeImage=Paint(rangeMark,markStyle);rangeImage.sprite=null;rangeImage.raycastTarget=false;
+            rangeToggle.graphic=rangeImage;rangeToggle.SetIsOnWithoutNotify(ui.facade.instrumentRouter.FileAutoRange());
+            rangeToggle.onValueChanged=new Toggle.ToggleEvent();
+            UnityEventTools.AddStringPersistentListener(rangeToggle.onValueChanged,UdonSharpEditorUtility.GetBackingUdonBehaviour(ui).SendCustomEvent,"_OnFileAutoRangeChanged");
+            ui.fileAutoRangeToggle=rangeToggle;
+            ui.fileAutoRangeLabel=Text(range,"Label","Auto-fit instrument range",new Vector2(12,0),new Vector2(410,26),labelStyle,16);
+            ui.fileOctaveHeadings=new TMP_Text[2];
+            for(int i=0;i<2;i++)
+            { ui.fileOctaveHeadings[i]=Text(page,"OctaveHeading"+i,"Octave",new Vector2((i==0?-242:242)+158,151),new Vector2(132,18),labelStyle,13);ui.fileOctaveHeadings[i].alignment=TextAlignmentOptions.Center; }
             ui.fileProgramButtons=new Button[16];ui.fileProgramLabels=new TMP_Text[16];ui.fileProgramValues=new TMP_Text[16];
+            ui.fileTrackEnabledToggles=new Toggle[16];
+            ui.fileOctaveDownButtons=new Button[16];ui.fileOctaveUpButtons=new Button[16];ui.fileOctaveValues=new TMP_Text[16];
             for(int i=0;i<16;i++)
             {
                 var row=MakeButton(page,"Program"+i,new Vector2(i<8?-242:242,132-i%8*40),new Vector2(456,36),ui,"_FileProgram"+i,rowStyle,buttonStyle);
                 ui.fileProgramButtons[i]=row;
                 ui.fileProgramLabels[i]=Text(row.transform,"Source","",new Vector2(-93,0),new Vector2(250,30),labelStyle,17);
                 ui.fileProgramValues[i]=Text(row.transform,"Value","",new Vector2(130,0),new Vector2(178,30),labelStyle,17);
+                int column=i<8?-242:242;float y=124-i%8*38;
+                var enabledRect=Rect(page,"TrackEnabled"+i,new Vector2(column-210,y),new Vector2(32,36));
+                var enabledBackground=Paint(enabledRect,rowStyle);
+                var enabledToggle=Get<Toggle>(enabledRect);enabledToggle.targetGraphic=enabledBackground;
+                enabledToggle.colors=buttonStyle.colors;enabledToggle.group=null;enabledToggle.toggleTransition=Toggle.ToggleTransition.None;
+                var enabledBox=Rect(enabledRect,"Checkbox",Vector2.zero,new Vector2(18,18));
+                var enabledFrame=Paint(enabledBox,rowStyle);enabledFrame.sprite=null;enabledFrame.color=labelStyle.color;enabledFrame.raycastTarget=false;
+                var enabledInset=Rect(enabledBox,"Inset",Vector2.zero,new Vector2(14,14));
+                var enabledInsetImage=Paint(enabledInset,rowStyle);enabledInsetImage.sprite=null;enabledInsetImage.raycastTarget=false;
+                var enabledMark=Rect(enabledBox,"Selected",Vector2.zero,new Vector2(12,12));
+                var enabledImage=Paint(enabledMark,markStyle);enabledImage.sprite=null;enabledImage.raycastTarget=false;
+                enabledToggle.graphic=enabledImage;enabledToggle.SetIsOnWithoutNotify(true);
+                enabledToggle.onValueChanged=new Toggle.ToggleEvent();
+                UnityEventTools.AddStringPersistentListener(enabledToggle.onValueChanged,UdonSharpEditorUtility.GetBackingUdonBehaviour(ui).SendCustomEvent,"_FileTrackEnabled"+i);
+                var enabledNavigation=enabledToggle.navigation;enabledNavigation.mode=Navigation.Mode.None;enabledToggle.navigation=enabledNavigation;
+                ui.fileTrackEnabledToggles[i]=enabledToggle;enabledRect.gameObject.SetActive(false);
+                var down=MakeButton(page,"TrackOctaveDown"+i,new Vector2(column+108,y),new Vector2(32,36),ui,"_FileOctaveDown"+i,rowStyle,buttonStyle);
+                Text(down.transform,"Label","−",Vector2.zero,new Vector2(30,30),labelStyle,22).alignment=TextAlignmentOptions.Center;
+                var up=MakeButton(page,"TrackOctaveUp"+i,new Vector2(column+208,y),new Vector2(32,36),ui,"_FileOctaveUp"+i,rowStyle,buttonStyle);
+                Text(up.transform,"Label","+",Vector2.zero,new Vector2(30,30),labelStyle,22).alignment=TextAlignmentOptions.Center;
+                ui.fileOctaveDownButtons[i]=down;ui.fileOctaveUpButtons[i]=up;
+                ui.fileOctaveValues[i]=Text(page,"TrackOctaveValue"+i,"0",new Vector2(column+158,y),new Vector2(56,30),labelStyle,17);
+                ui.fileOctaveValues[i].alignment=TextAlignmentOptions.Center;
+                down.gameObject.SetActive(false);up.gameObject.SetActive(false);ui.fileOctaveValues[i].gameObject.SetActive(false);
             }
             var reset=MakeButton(page,"Reset",new Vector2(-290,-205),new Vector2(350,34),ui,"_ResetFileMapping",rowStyle,buttonStyle);
             ui.fileResetButton=reset;ui.fileMappingReset=Text(reset.transform,"Label","",Vector2.zero,new Vector2(330,30),labelStyle,18);
@@ -115,14 +208,40 @@ namespace MusicMidiPlayer.Editor.Prefab
             ui.fileChoicePanel=overlay.gameObject;ui.fileChoiceContent=content;
             ui.fileChoiceTitle=Text(content,"Title","",new Vector2(0,150),new Vector2(416,30),labelStyle,20);
             ui.fileChoiceTitleRect=(RectTransform)ui.fileChoiceTitle.transform;
-            ui.fileTargetButtons=new Button[7];ui.fileTargetLabels=new TMP_Text[7];ui.fileTargetMarks=new GameObject[7];
-            for(int i=0;i<7;i++)
+            var scrollRoot=Rect(content,"TargetScroll",new Vector2(0,-24),new Vector2(424,280));
+            var viewport=Rect(scrollRoot,"Viewport",new Vector2(-8,0),new Vector2(408,280));
+            var viewportImage=Paint(viewport,panelStyle);viewportImage.sprite=null;viewportImage.color=Color.clear;
+            Get<RectMask2D>(viewport);
+            var options=Rect(viewport,"Options",Vector2.zero,new Vector2(408,360));
+            options.anchorMin=options.anchorMax=options.pivot=new Vector2(.5f,1);options.anchoredPosition=Vector2.zero;
+            var scroll=Get<ScrollRect>(scrollRoot);scroll.viewport=viewport;scroll.content=options;
+            scroll.horizontal=false;scroll.vertical=true;scroll.movementType=ScrollRect.MovementType.Clamped;
+            scroll.inertia=false;scroll.scrollSensitivity=34;
+            var barRect=Rect(scrollRoot,"Scrollbar",new Vector2(206,0),new Vector2(12,280));
+            Paint(barRect,rowStyle);
+            var sliding=Rect(barRect,"SlidingArea",Vector2.zero,Vector2.zero);
+            sliding.anchorMin=Vector2.zero;sliding.anchorMax=Vector2.one;sliding.offsetMin=sliding.offsetMax=Vector2.zero;
+            var thumb=Rect(sliding,"Handle",Vector2.zero,Vector2.zero);var thumbImage=Paint(thumb,markStyle);
+            var bar=Get<Scrollbar>(barRect);bar.handleRect=null;bar.handleRect=thumb;bar.targetGraphic=thumbImage;
+            bar.direction=Scrollbar.Direction.BottomToTop;bar.colors=buttonStyle.colors;
+            var navigation=bar.navigation;navigation.mode=Navigation.Mode.None;bar.navigation=navigation;
+            scroll.verticalScrollbar=bar;scroll.verticalScrollbarVisibility=ScrollRect.ScrollbarVisibility.AutoHide;
+            ui.fileTargetScroll=scroll;
+            ui.fileTargetButtons=new Button[10];ui.fileTargetLabels=new TMP_Text[10];ui.fileTargetMarks=new GameObject[10];
+            for(int i=0;i<10;i++)
             {
-                var option=MakeButton(content,"Target"+i,new Vector2(0,104-i*40),new Vector2(424,36),ui,"_MidiTarget"+i,rowStyle,buttonStyle);
-                ui.fileTargetButtons[i]=option;ui.fileTargetLabels[i]=Text(option.transform,"Label","",Vector2.zero,new Vector2(400,30),labelStyle,18);
-                var selected=Rect(option.transform,"Selected",new Vector2(0,-15),new Vector2(400,3));
+                // Move the existing targets into the viewport, preserving objects and references.
+                var previous=content.Find("Target"+i);if(previous!=null)previous.SetParent(options,false);
+                int row=i>7?i-1:i;
+                var option=MakeButton(options,"Target"+i,new Vector2(0,-20-row*40),new Vector2(408,36),ui,i==9?"_FileDrums":"_MidiTarget"+i,rowStyle,buttonStyle);
+                var optionRect=(RectTransform)option.transform;optionRect.anchorMin=optionRect.anchorMax=new Vector2(.5f,1);
+                option.gameObject.SetActive(i!=7);
+                ui.fileTargetButtons[i]=option;ui.fileTargetLabels[i]=Text(option.transform,"Label","",Vector2.zero,new Vector2(384,30),labelStyle,18);
+                var selected=Rect(option.transform,"Selected",new Vector2(0,-15),new Vector2(384,3));
                 Paint(selected,markStyle).raycastTarget=false;ui.fileTargetMarks[i]=selected.gameObject;
             }
+            scroll.verticalNormalizedPosition=1;
+            overlay.SetAsLastSibling();
             overlay.gameObject.SetActive(false);page.gameObject.SetActive(false);
         }
         private static T Get<T>(Component c) where T:Component {var v=c.GetComponent<T>();return v!=null?v:c.gameObject.AddComponent<T>();}

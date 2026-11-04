@@ -23,6 +23,8 @@ namespace MusicMidiPlayer.Editor
 
         static MidiEditorI18n()
         {
+            foreach (string[] entry in MidiLibraryTranslations.Entries)
+                Translations[entry[0]] = new[] { entry[1], entry[2], entry[3] };
             string normalizedLanguage = NormalizeSelection(language);
             if (language != normalizedLanguage)
             {

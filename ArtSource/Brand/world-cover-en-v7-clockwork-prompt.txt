@@ -1,0 +1,13 @@
+Tool: built-in image_gen.imagegen
+Date: 2026-11-04
+Output: passhu-piano-world-cover-en-v7-clockwork.png
+Edit target: passhu-piano-world-cover-en-v6-handprint.png
+Color reference: Captures/ClockworkCelestial/02-day.png
+
+Use case: precise-object-edit, color palette change only.
+Asset type: Passhu's Piano VRChat world cover.
+Input image 1 is the EDIT TARGET, the existing 4:3 landscape cover. Input image 2 is ONLY a color reference showing the current clocktower music hall: aged brass gears, warm timber, cream stone and deep patinated green structural metal. Do not insert anything from image 2.
+Edit image 1 by changing ONLY its colors to harmonize with the clocktower scene. Keep every shape, position, scale, edge, texture and layout as close to the source as possible. The existing piano/P emblem must retain exactly the same silhouette, holes, keys and three floating rounded note capsules. Keep the exact existing unconnected hand-printed lettering "Passhu's Piano", the same font, apostrophe, spacing, size, baseline and placement. Keep every peripheral musical staff, clef and note exactly where it is, with the same low opacity and line weight. Preserve the soft mottled gradient background texture and relative luminance structure, exact 4:3 canvas and 16:9 central crop-safe branding.
+Color-only mapping: transform the blue gradient background into a refined desaturated deep patinated forest/teal green gradient, approximately dark #203D38 at the outer areas and muted #355B4E toward the softly brighter center, echoing the clocktower green ironwork. Transform the icy cyan piano/P emblem and two lower capsules into soft luminous champagne/aged brass gold with restrained shading, around #D9BB7B highlights and #BA955D shaded areas; keep them as the same smooth graphic, not physically textured metal. Transform the top bright turquoise capsule into a lighter warm antique gold #E4C989 accent, distinguishable but harmonious. Recolor the off-white title to warm ivory #F4EBD7. Recolor the faint blue peripheral sheet music into muted warm pale brass/ivory, preserving exactly the same subtle opacity. The visual mood is warm, calm and elegant like the scene's brass gears and wood, with clearly readable title and logo at thumbnail size.
+Strict constraints: This is only recoloring the existing image. No new objects, gears, clocks, scenery, borders, extra text, ornaments, icon modifications or typography redesign. Do not move or redraw design elements. Output one opaque finished 4:3 cover.
+

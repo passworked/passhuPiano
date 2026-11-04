@@ -64,6 +64,8 @@ def main():
     report=dict(quality=4,piano=piano,marimba=marimba,pianoLayers=[3,7,11,15],velocityUpperBounds=[44,69,100,127],marimbaRecordedCount=60,
                 bytes={k:sum(r['bytes'] for r in rows) for k,rows in [('piano',piano),('marimba',marimba)]})
     (OUT/'BANK-MAPPING.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+    subprocess.run(['node', str(ROOT/'Tools/calibrate_instrument_loudness.cjs'), '--bank', 'marimba'], check=True)
+    report = json.loads((OUT/'BANK-MAPPING.json').read_text(encoding='utf-8'))
     print(json.dumps({'clips':{'piano':len(piano),'marimba':len(marimba)},'bytes':report['bytes']}))
 
 if __name__=='__main__':main()

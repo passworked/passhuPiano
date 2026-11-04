@@ -18,6 +18,7 @@ namespace MusicMidiPlayer.Editor.Baking
 
         public sealed class DecodedSong
         {
+            public byte[] violinArticulations = Array.Empty<byte>();
             public int noteCount, durationMs;
             public int[] startMs, keyUpMs, releaseMs, pitch, velocity, channel, trackIndex;
             public int[] eventMs, eventKind, eventNoteId;
@@ -73,7 +74,7 @@ namespace MusicMidiPlayer.Editor.Baking
                 }
             }
             bool expression=source.expressionMs!=null && source.expressionMs.Length>0;
-            WriteInt(bytes, (expression ? 1 : 0) + (source.timbreDataVersion == 1 ? 1 : 0));
+            WriteInt(bytes, 1 + (expression ? 1 : 0) + (source.timbreDataVersion == 1 ? 1 : 0));
             if(expression)
             {
                 var payload=new List<byte>(); WriteInt(payload,source.expressionMs.Length);
@@ -99,6 +100,9 @@ namespace MusicMidiPlayer.Editor.Baking
                 }
                 WriteUInt(bytes, 4); WriteInt(bytes, payload.Count); bytes.AddRange(payload);
             }
+            byte[] violinStyles = ViolinArticulationBaker.Bake(source);
+            WriteUInt(bytes, 6); WriteInt(bytes, violinStyles.Length + 1);
+            bytes.Add(1); bytes.AddRange(violinStyles);
             uint hash = Hash(bytes, bytes.Count);
             for (int i = 0; i < 4; i++) bytes.Add((byte)(hash >> (8 * i)));
             return bytes.ToArray();
@@ -212,6 +216,13 @@ namespace MusicMidiPlayer.Editor.Baking
                     }
                     if (remaining - reader.Remaining != length) throw new InvalidDataException("MPC1 音色段长度无效");
                 }
+                else if (tag == 6)
+                {
+                    if (result.violinArticulations.Length != 0 || length != (n + 3) / 4 + 1 || length > reader.Remaining || reader.Byte() != 1)
+                        throw new InvalidDataException("MPC1 violin articulation extension is invalid or duplicated");
+                    result.violinArticulations = new byte[length - 1];
+                    for (int j = 0; j < length - 1; j++) result.violinArticulations[j] = (byte)reader.Byte();
+                }
                 else reader.Skip(length);
             }
             if (reader.Remaining != 0) throw new InvalidDataException("MPC1 存在未声明的尾部数据");
@@ -222,6 +233,10 @@ namespace MusicMidiPlayer.Editor.Baking
         public static void ValidateRoundTrip(MidiSongAsset source, byte[] packed = null)
         {
             DecodedSong decoded = Decode(packed ?? Encode(source));
+            byte[] styles = ViolinArticulationBaker.Bake(source);
+            if (styles.Length != decoded.violinArticulations.Length) throw new InvalidDataException("MPC1 violin articulation length mismatch");
+            for (int i = 0; i < styles.Length; i++)
+                if (styles[i] != decoded.violinArticulations[i]) throw new InvalidDataException("MPC1 violin articulation round-trip mismatch");
             if (source.durationMs != decoded.durationMs || source.startMs.Length != decoded.noteCount)
                 throw new InvalidDataException("MPC1 曲目元数据往返不一致");
             if (source.timbreDataVersion != decoded.timbreDataVersion) throw new InvalidDataException("MPC1 音色版本往返不一致");
@@ -260,8 +275,9 @@ namespace MusicMidiPlayer.Editor.Baking
                 byte[] unsupported = (byte[])packed.Clone(); unsupported[3] = 50; ReplaceChecksum(unsupported); RequireReject(unsupported);
                 byte[] flags = (byte[])packed.Clone(); flags[4] = 3; ReplaceChecksum(flags); RequireReject(flags);
                 // Unknown optional extension is skippable; unknown required extension must fail.
-                byte[] optional = AddTestExtension(packed, 6); ValidateRoundTrip(source, optional);
-                RequireReject(AddTestExtension(packed, 3));
+                byte[] optional = AddTestExtension(packed, 8, (n + 3) / 4 + 1); ValidateRoundTrip(source, optional);
+                RequireReject(AddTestExtension(packed, 3, (n + 3) / 4 + 1));
+                RequireReject(AddTestExtension(packed, 6, (n + 3) / 4 + 1));
             }
             finally { UnityEngine.Object.DestroyImmediate(source); }
         }
@@ -329,11 +345,14 @@ namespace MusicMidiPlayer.Editor.Baking
             uint hash = Hash(bytes, bytes.Length - 4);
             for (int i = 0; i < 4; i++) bytes[bytes.Length - 4 + i] = (byte)(hash >> (8 * i));
         }
-        private static byte[] AddTestExtension(byte[] original, byte tag)
+        private static byte[] AddTestExtension(byte[] original, byte tag, int payloadLength)
         {
             var bytes = new List<byte>(original);
-            bytes.RemoveRange(bytes.Count - 5, 5); // Existing zero extension count and checksum.
-            bytes.AddRange(new byte[] { 1, tag, 1, 42, 0, 0, 0, 0 });
+            // This boundary fixture has exactly one extension: tag 6, one version byte, packed styles.
+            int countOffset = bytes.Count - 4 - payloadLength - 3 - 1;
+            bytes[countOffset]++;
+            bytes.RemoveRange(bytes.Count - 4, 4);
+            bytes.AddRange(new byte[] { tag, 1, 42, 0, 0, 0, 0 });
             byte[] result = bytes.ToArray(); ReplaceChecksum(result); return result;
         }
         private static void RequireReject(byte[] bytes)

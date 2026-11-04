@@ -172,12 +172,12 @@ namespace MusicMidiPlayer.Editor.Prefab
             return ambiguous ? null : onlyLibrary;
         }
 
-        public static int SynchronizeLibraryPlayers(MidiLibraryAsset library, Action<string> report)
+        public static int SynchronizeLibraryPlayers(MidiLibraryAsset library, Action<string> report, bool failOnError = false, bool useLibraryDefault = false)
         {
             if (library == null) return 0;
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 throw new InvalidOperationException("请退出播放模式后同步曲库");
-            int updated = 0, matched = 0;
+            int updated = 0, matched = 0, failed = 0;
             foreach (MidiPlayerFacade facade in UnityEngine.Resources.FindObjectsOfTypeAll<MidiPlayerFacade>())
             {
                 if (!IsScenePlayer(facade)) continue;
@@ -189,13 +189,21 @@ namespace MusicMidiPlayer.Editor.Prefab
                 Undo.SetCurrentGroupName("Synchronize MIDI Library");
                 try
                 {
-                    SynchronizeLibrary(facade, configuration);
+                    SynchronizeLibrary(facade, configuration, useLibraryDefault ? library.defaultSongId : null);
+                    if (useLibraryDefault && !string.IsNullOrEmpty(configuration.defaultSongId))
+                    {
+                        Undo.RecordObject(configuration, "Use MIDI library default");
+                        configuration.defaultSongId = "";
+                        EditorUtility.SetDirty(configuration);
+                        AssetDatabase.SaveAssetIfDirty(configuration);
+                    }
                     Undo.CollapseUndoOperations(undoGroup);
                     updated++;
                     report?.Invoke(facade.gameObject.scene.name + "：已自动配置 " + library.songs.Length + " 首曲目，请保存场景。");
                 }
                 catch (Exception exception)
                 {
+                    failed++;
                     Undo.RevertAllDownToGroup(undoGroup);
                     report?.Invoke(facade.gameObject.scene.name + "：曲库已保存，自动配置失败：" + exception.Message);
                     Debug.LogException(exception);
@@ -203,6 +211,7 @@ namespace MusicMidiPlayer.Editor.Prefab
                 finally { Undo.IncrementCurrentGroup(); }
             }
             if (matched == 0) report?.Invoke("曲库已保存；当前打开的场景中没有使用此曲库的播放器。");
+            if (failOnError && failed > 0) throw new InvalidOperationException("Scene application failed: " + failed + "; applied: " + updated);
             return updated;
         }
 
@@ -250,7 +259,7 @@ namespace MusicMidiPlayer.Editor.Prefab
         }
 
         // Updating songs must not rebuild the piano, effects, audio pool or custom UI styling.
-        private static void SynchronizeLibrary(MidiPlayerFacade facade, MidiPlayerConfigurationAsset configuration)
+        private static void SynchronizeLibrary(MidiPlayerFacade facade, MidiPlayerConfigurationAsset configuration, string libraryDefaultOverride = null)
         {
             MidiDataBaker.ValidateLibrary(configuration.library);
             MidiDataBaker.ValidateBank(configuration.bank);
@@ -258,8 +267,8 @@ namespace MusicMidiPlayer.Editor.Prefab
                 throw new InvalidOperationException("音源配置已变化，请先在 Configure Player 应用配置");
             if (facade.playerUI == null || facade.network == null)
                 throw new InvalidOperationException("播放器接线不完整，请先在 Configure Player 应用配置");
-            string defaultId = string.IsNullOrEmpty(configuration.defaultSongId)
-                ? configuration.library.defaultSongId : configuration.defaultSongId;
+            string defaultId = libraryDefaultOverride ?? (string.IsNullOrEmpty(configuration.defaultSongId)
+                ? configuration.library.defaultSongId : configuration.defaultSongId);
             if (string.IsNullOrEmpty(defaultId)) defaultId = configuration.library.songs[0].songId;
             bool foundDefault = false;
             foreach (MidiSongAsset song in configuration.library.songs)
@@ -812,7 +821,7 @@ namespace MusicMidiPlayer.Editor.Prefab
         private static void EnsureBankPrepared(PianoBankAsset bank)
         {
             if (bank == null) throw new InvalidOperationException("请选择有效钢琴音源");
-            if (string.IsNullOrEmpty(bank.bankHash)) MidiDataBaker.PrepareBank(bank);
+            if (string.IsNullOrEmpty(bank.bankHash) || bank.energyStarts == null || bank.energyStarts.Length != bank.clips.Length) MidiDataBaker.PrepareBank(bank);
             else MidiDataBaker.ValidateBank(bank);
         }
 

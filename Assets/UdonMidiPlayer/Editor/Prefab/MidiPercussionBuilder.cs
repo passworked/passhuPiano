@@ -49,7 +49,7 @@ namespace MusicMidiPlayer.Editor.Prefab
             MidiPlayerBuilder.EnsurePrograms();
             Transform root=player.transform.root;
             var bank=Component<PercussionBankData>(Child(root.Find("Data"),"PercussionBank"));
-            BakeBank(bank,map);
+            MidiAudioPacking.BakeWithSourcePcm(map.rows.Select(row => row.file), () => BakeBank(bank,map));
             Transform presentation=Child(root.Find("Presentation"),"DrumKit");
             bool fresh=presentation.GetComponent<MidiDrumKitView>()==null;
             if(fresh)presentation.localPosition=new Vector3(3.15f,0,1.45f);
@@ -125,12 +125,13 @@ namespace MusicMidiPlayer.Editor.Prefab
                 var settings=importer.defaultSampleSettings;
                 bool changed=settings.compressionFormat!=AudioCompressionFormat.PCM || settings.loadType!=AudioClipLoadType.DecompressOnLoad
                     || settings.sampleRateSetting!=AudioSampleRateSetting.PreserveSampleRate || !settings.preloadAudioData || importer.loadInBackground || importer.forceToMono;
-                if(!changed)continue;
-                settings.compressionFormat=AudioCompressionFormat.PCM;settings.loadType=AudioClipLoadType.DecompressOnLoad;
-                settings.sampleRateSetting=AudioSampleRateSetting.PreserveSampleRate;settings.preloadAudioData=true;importer.defaultSampleSettings=settings;
-                importer.loadInBackground=false;importer.forceToMono=false;
-                foreach(string platform in new[]{"Standalone","Android","iOS"})if(importer.ContainsSampleSettingsOverride(platform))importer.ClearSampleSettingOverride(platform);
-                importer.SaveAndReimport();
+                if(changed)
+                {
+                    settings.compressionFormat=AudioCompressionFormat.PCM;settings.loadType=AudioClipLoadType.DecompressOnLoad;
+                    settings.sampleRateSetting=AudioSampleRateSetting.PreserveSampleRate;settings.preloadAudioData=true;importer.defaultSampleSettings=settings;
+                    importer.loadInBackground=false;importer.forceToMono=false;
+                }
+                if(MidiAudioPacking.Configure(importer) || changed)importer.SaveAndReimport();
             }
         }
         private static void BakeBank(PercussionBankData bank,Mapping map)
@@ -153,17 +154,20 @@ namespace MusicMidiPlayer.Editor.Prefab
                 float peak=0;foreach(float sample in samples)peak=Mathf.Max(peak,Mathf.Abs(sample));bank.peaks[i]=peak;
                 bank.maxTailMs=Mathf.Max(bank.maxTailMs,Mathf.CeilToInt(clip.length*1000));
             }
-            bank.bankHash=ComputeBankHash();
+            AudioEnergyBaker.Bake(bank);
+            bank.bankHash=ComputeBankHash(bank);
             if(!bank.IsValid())throw new InvalidOperationException("Invalid GM drum bank.");
             for(int p=35;p<=81;p++)for(int v=1;v<=127;v++)for(int rr=0;rr<2;rr++)
                 if(bank.SelectRegion(p,v,rr)<0)throw new InvalidOperationException("Unmapped GM note/velocity: "+p+"/"+v);
         }
-        public static string ComputeBankHash()
+        public static string ComputeBankHash(PercussionBankData bank)
         {
             var text=new System.Text.StringBuilder("gm-drums-v2:oneshot:hat-choke25:shared64-reserve16:off-note-ignored:stable-event-hash:");
+            AudioEnergyBaker.Validate(bank.clips, bank.energyStarts, bank.energyCounts, bank.energyValues);
+            text.Append(AudioEnergyBaker.Fingerprint(bank.energyStarts, bank.energyCounts, bank.energyValues));
             text.Append(File.ReadAllText(AudioFolder+"/BANK-MAPPING.json"));
             foreach(string path in Directory.GetFiles(AudioFolder,"*.ogg").OrderBy(p=>p,StringComparer.Ordinal))
-                text.Append(MidiContentHash.Bytes(File.ReadAllBytes(path))).Append(MidiContentHash.Bytes(File.ReadAllBytes(path+".meta")));
+                text.Append(MidiContentHash.Bytes(File.ReadAllBytes(path))).Append(MidiContentHash.Bytes(MidiAudioPacking.ReadBankMetadata(path.Replace('\\', '/'))));
             return MidiContentHash.Bytes(System.Text.Encoding.UTF8.GetBytes(text.ToString()));
         }
         private static MidiPlayerConfigurationAsset Configuration(MidiPlayerFacade player)

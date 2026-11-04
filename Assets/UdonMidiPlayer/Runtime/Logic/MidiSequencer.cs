@@ -10,6 +10,7 @@ namespace MusicMidiPlayer.Logic
     public class MidiSequencer : UdonSharpBehaviour
     {
         public PianoVoicePool voicePool;
+        public MusicMidiPlayer.Views.ClockworkMusicLink clockworkMusicLink;
         [HideInInspector] public MidiSongData song;
         [HideInInspector] public int[] keyDownCount = new int[88];
         [HideInInspector] public int[] activeNoteIds = new int[0];
@@ -93,7 +94,7 @@ namespace MusicMidiPlayer.Logic
             if (song.keyUpMs[id] > ms)
             {
                 _held[id] = true;
-                int key = song.channel[id] == 9 ? -1 : song.pitch[id] - 21;
+                int key = IsDrum(id) ? -1 : song.pitch[id] - 21;
                 if (key >= 0 && key < 88) keyDownCount[key]++;
             }
         }
@@ -116,11 +117,14 @@ namespace MusicMidiPlayer.Logic
             _lastPosition = positionMs;
         }
 
+        private bool IsDrum(int note)
+        { return voicePool != null && voicePool.ensemble != null ? voicePool.ensemble.router.IsFileDrum(note) : song.channel[note] == 9; }
+
         private void ApplyEvent(int index, int positionMs, bool output)
         {
             int id = song.eventNoteId[index];
             int kind = song.eventKind[index];
-            int key = song.channel[id] == 9 ? -1 : song.pitch[id] - 21;
+            int key = IsDrum(id) ? -1 : song.pitch[id] - 21;
             if (kind == 0)
             {
                 AddActive(id);
@@ -130,6 +134,7 @@ namespace MusicMidiPlayer.Logic
                     if (key >= 0 && key < 88) keyDownCount[key]++;
                 }
                 if (output && voicePool != null) voicePool.NoteDown(id, positionMs, generation);
+                if (output && clockworkMusicLink != null) clockworkMusicLink.FileNote(id, positionMs);
             }
             else if (kind == 1)
             {

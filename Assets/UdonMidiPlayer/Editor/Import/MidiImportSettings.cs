@@ -20,6 +20,8 @@ namespace MusicMidiPlayer.Editor.Import
 
     public sealed class MidiImportResult
     {
+        // All source events, including metadata and unsupported controls; Editor version selection only.
+        public int sourceEventCount;
         public int timbreDataVersion = 1;
         public int[] timbreMs = Array.Empty<int>(), timbreChannel = Array.Empty<int>(), timbreKind = Array.Empty<int>();
         public int[] timbreValue = Array.Empty<int>(), timbreTrackIndex = Array.Empty<int>(), timbreEventIndex = Array.Empty<int>();

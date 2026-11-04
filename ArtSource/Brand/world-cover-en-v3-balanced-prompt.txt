@@ -1,0 +1,15 @@
+Tool: built-in image_gen.imagegen
+Date: 2026-11-03
+Output: passhu-piano-world-cover-en-v3-balanced.png
+References: passhu-piano-world-cover-en-v2-bright.png; passhu-piano-world-cover-en-v1.png
+
+Create a balanced revision of this English piano-world cover, precisely midway in mood between the two attached references.
+Image 1 is the too-bright, overly saturated version: use only as a reminder of bolder scale. Its rainbow palette, big waves, pink accents and heavy title are too much.
+Image 2 is the too-dark, too-tiny version: use its EXACT original piano-P logo geometry and clean modern typography as the identity reference, but make the overall composition appreciably larger and the background brighter.
+Desired result: moderately lively, welcoming, polished music-tech identity. Calm blue with a little cyan sparkle. Neither austere luxury nor neon party.
+Canvas EXACT 4:3 landscape. ALL essential logo and text comfortably inside the central inscribed 16:9 area (middle 75% of height). Decorative background bleeds fully.
+BACKGROUND: medium muted denim/slate blue, a smooth very subtle tonal gradient from #263D59 at top left to #557C99 near the lower right, moderate luminance. This is a visibly blue background, lighter than dark navy but nowhere near bright candy pastels. One broad softly diffused cool-blue ambient field behind the emblem adds gentle life. NO distinct waves, NO blobs, NO pink, coral, magenta, rainbow, grid, lines or loose floating capsules. Color stays within blue and cyan.
+LOGO: horizontally centered, from approximately y=24% to y=60%, height about 36% of canvas, preserving the original P-shaped grand piano outline with the two lower rounded piano-key negative cutouts and THREE ascending MIDI capsules. Copy the silhouette from image 2, including its open negative space, do not add a filled purple bowl. Main shape a clean light cerulean-blue #8ECBF1, with a very subtle blue tonal gradient. The highest MIDI capsule is a cheerful clean turquoise #43E6DA, the other two remain light blue. Smooth crisp geometry, flat graphic with a touch of luminous polish, not shiny 3D.
+TITLE: centered single line beneath the emblem around y=70%, exact text "PASSHU'S PIANO". Clean modern geometric sans serif, REGULAR to MEDIUM weight (NOT bold), off-white #EFF5FA, compact tasteful kerning. Total title width about 58% of canvas width, comfortably readable and clearly larger than image 2, less oversized and less heavy than image 1. Generous but intentional gap from logo. No second line.
+Mood target: an inviting creative piano space with a technical visual identity. Restrained liveliness through the medium-blue light, clear cyan accent and confident scale. Keep clean negative space while allowing the lockup to occupy more of the safe area than the original dark design.
+No other text, Chinese, Japanese, border, watermark, crop guides, physical piano or photographic objects. Deliver one finished opaque cover image.

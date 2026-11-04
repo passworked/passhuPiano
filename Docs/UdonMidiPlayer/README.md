@@ -5,9 +5,13 @@
 | 读者 / 任务 | 先读 | 状态 |
 | --- | --- | --- |
 | 安装与使用 | [快速开始](../GETTING_STARTED.md) | 当前入口，不表示验收通过 |
+| Unity MIDI 导入与曲库管理 | [用户教程](../MIDI_IMPORT.md)、[原子操作契约](../Developer/MIDI_LIBRARY_EDITOR.md) | rc.3 双栏草稿编辑器；保存并应用 |
 | AI / 程序修改 | [AI 工作指南](../Developer/AI_GUIDE.md)、[当前实现](../Developer/CURRENT_STATE.md) | 明确源码基线与证据边界 |
 | 提交乐器 | [贡献政策](../Contributing/README.md)、[预算](../Contributing/BUDGETS.md)、[模板](../Contributing/INSTRUMENT_SUBMISSION_TEMPLATE.md) | 2026-11-02 维护者已确认 |
 | 工具检索 | [文档地图](../doc-map.json)、[政策 JSON](../Contributing/instrument-policy.json) | 机器可读；未测值用 null |
+| 移动端规划 | [移动端适配调研报告](23-mobile-adaptation-report.md) | 2026-11-04 静态调研与官方依据；尚未实施或实机验收 |
+| 钟楼第二场景 | [独立第二场景与单点光源](25-clockwork-second-scene.md) | 独立美术 / 播放器接入，仅一个实时点光源；客户端未验收 |
+| 作者、赞助与社群板 | [独立组合预制体](26-community-boards.md) | 从 PullTabIdle 提取，内部依赖已接线并放入钟楼入口信息墙；客户端未验收 |
 
 下面技术分册包含当前规则、分日期更新及历史设计。旧段落中的“当前”仅指其记录日期；v0.1 的初始范围、单层音源或“尚未实现”不能覆盖新入口、维护者确认政策和实际源码。细粒度修改时再按任务读取相应分册。
 
@@ -59,6 +63,7 @@
 | [20 DEMO 日系音乐教室](20-demo-music-classroom.md) | Blender 源模型、主场景接入、美术碰撞与播放器保护边界 | 美术、世界作者与维护者 |
 | [21 v1.0 发布与开源规划](21-v1-release-and-open-source.md) | 两份钢琴 Prefab、完整项目 monorepo、MIT / CC BY 范围、第三方许可、RC 与发布维护 | 项目负责人、分发与开源维护者 |
 | [22 发布实施记录](22-release-implementation.md) | passhu 署名、曲谱 / 音源白名单、独立曲库筛选、包与源码工具、候选证据和剩余验收 | 分发与开源维护者 |
+| [23 移动端适配调研](23-mobile-adaptation-report.md) | Android / Quest / iOS 官方实现、输入与音频缺口、静态资源盘点、分阶段计划与验证边界 | 程序、UI、音频与维护者 |
 
 ## 2. 历史设计：v0.1 首版范围
 
@@ -113,3 +118,5 @@ flowchart TD
 开发期间已执行 29 项 Parser 边界检查、Unity C#/UdonSharp 编译，以及默认场景原实例的 Editor 原生 Button.onClick → backing Udon 检查。最新[Play Mode 报告](../../Logs/MusicMidiPlayer-playmode-report.json)覆盖播放、暂停、切歌、停止、实际声部 clip/pitch/generation 映射、琴键中间动画帧与恢复、瀑布同色和三踏板按下/平滑释放/复位；三踏板完整覆盖采用运行时临时控制数据，未改动源 MIDI。Prefab 的网络 Manual、本地 None 序列化设置也通过校验。该报告是开发工程记录，不随资源包分发。
 
 这些检查不包含鼠标/VR 射线点按、捕获音频或听感验收。真实 VRChat 双客户端、晚加入、所有权竞争、失活接管和长时间偏差尚需按[性能与验收](09-performance-and-validation.md)执行。各分册性能数字继续按初始目标处理，不标成已经达到的指标。
+
+2026-11-04 八音盒：主场景追加88梳齿、旋转针带和拨片振动，声音保留MIDI0～127。CC0实录、派生低区、预算与验证边界见[第24册](24-music-box.md)。

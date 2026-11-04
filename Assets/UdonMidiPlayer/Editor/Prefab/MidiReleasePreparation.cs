@@ -138,6 +138,7 @@ namespace MusicMidiPlayer.Editor.Prefab
                 foreach (string guid in AssetDatabase.FindAssets("t:Scene", new[] { "Assets/Scenes", "Assets/UdonMidiPlayer/Samples" }))
                 {
                     string scenePath = AssetDatabase.GUIDToAssetPath(guid);
+                    if (MidiReleasePolicy.ExcludedFromCandidate(scenePath)) continue;
                     string tempPath = temp + "/" + Guid.NewGuid().ToString("N") + ".unity";
                     File.Copy(scenePath, tempPath);
                     AssetDatabase.ImportAsset(tempPath, ImportAssetOptions.ForceSynchronousImport);

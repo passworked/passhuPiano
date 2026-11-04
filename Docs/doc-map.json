@@ -1,44 +1,169 @@
 {
   "schema_version": 1,
-  "updated_on": "2026-11-03",
+  "updated_on": "2026-11-04",
   "readme_localization": {
     "default_language": "en",
     "canonical": "README.md",
-    "translations": { "zh-CN": "README.zh-CN.md", "ja": "README.ja.md" },
+    "translations": {
+      "zh-CN": "README.zh-CN.md",
+      "ja": "README.ja.md"
+    },
     "scope": "repository_readmes_only",
     "detailed_guides_language": "zh-CN_unless_noted",
-    "synchronize": ["features", "version", "validation_status", "Unity_SDK_baseline", "commands", "links", "licenses", "contribution_requirements"]
+    "synchronize": [
+      "features",
+      "version",
+      "validation_status",
+      "Unity_SDK_baseline",
+      "commands",
+      "links",
+      "licenses",
+      "contribution_requirements"
+    ]
   },
-  "implementation_baseline": { "commit": "21c05930f4562aac1fbb1f8df62d2bf45fc06524", "source_version": "1.0.0-rc.2", "evidence": "static_source_inspection_not_runtime_acceptance" },
+  "implementation_baseline": {
+    "commit": "21c05930f4562aac1fbb1f8df62d2bf45fc06524",
+    "source_version": "1.0.0-rc.2",
+    "evidence": "static_source_inspection_not_runtime_acceptance"
+  },
   "entrypoints": {
     "users": "Docs/GETTING_STARTED.md",
     "agents": "Docs/Developer/AI_GUIDE.md",
     "current_implementation": "Docs/Developer/CURRENT_STATE.md",
     "instrument_contributors": "Docs/Contributing/README.md",
-    "instrument_policy": "Docs/Contributing/instrument-policy.json"
+    "instrument_policy": "Docs/Contributing/instrument-policy.json",
+    "midi_import": "Docs/MIDI_IMPORT.md"
   },
   "documents": [
-    { "path": "AGENTS.md", "status": "current_operational_constraints", "purpose": "Core constraints and navigation" },
-    { "path": "CONTRIBUTING.md", "status": "current", "purpose": "Contribution entry and approval scope" },
-    { "path": "Docs/GETTING_STARTED.md", "status": "current", "purpose": "Setup and usage without implied acceptance" },
-    { "path": "Docs/Developer/AI_GUIDE.md", "status": "current", "purpose": "Agent workflow, evidence and task routing" },
-    { "path": "Docs/Developer/CURRENT_STATE.md", "status": "current_baseline_facts", "purpose": "Source map and explicit unpublished differences" },
-    { "path": "Docs/Contributing/instrument-policy.json", "status": "maintainer_confirmed_policy", "purpose": "Machine-readable instrument requirements and resource limits" },
-    { "path": "Docs/Contributing/README.md", "status": "maintainer_confirmed_policy", "purpose": "Human-readable contribution policy" },
-    { "path": "Docs/Contributing/BUDGETS.md", "status": "maintainer_confirmed_policy", "purpose": "Measurement scope, units and formulas" },
-    { "path": "Docs/Contributing/INSTRUMENT_SUBMISSION_TEMPLATE.md", "status": "template_not_acceptance", "purpose": "Submission and evidence record" },
-    { "path": "Docs/Contributing/instrument-submission.template.json", "status": "template_not_acceptance", "purpose": "Nullable machine-readable contribution record" },
-    { "path": "Docs/UdonMidiPlayer/CONTRACTS.md", "status": "mixed_historical_and_dated_updates", "purpose": "Read current code before reusing old interfaces and budgets" },
-    { "path": "Docs/UdonMidiPlayer/18-adding-instruments.md", "status": "historical_technical_matrix_with_current_entry", "purpose": "Integration change locations; old review questions are not new policy" },
-    { "path": "Docs/UdonMidiPlayer/19-gm-program-fallback.md", "status": "current_rules_with_historical_context", "purpose": "Six active targets, GM routing and preserved retired identity" },
-    { "path": "Docs/UdonMidiPlayer/17-maintenance-conventions.md", "status": "current_maintenance_rules", "purpose": "Scope, preservation and verification boundaries" },
-    { "path": "Docs/UdonMidiPlayer/22-release-implementation.md", "status": "dated_release_evidence", "purpose": "Release/source operations, not global runtime sign-off" }
+    {
+      "path": "Docs/UdonMidiPlayer/06-waterfall-and-keyboard.md",
+      "status": "editor_proxy_render_and_udon_vm_verified_pending_client_acceptance",
+      "purpose": "Crystal waterfall, velocity-sensitive independent piano impacts, merged collision-free particles, musical-time lifecycle and scene-only migration boundaries"
+    },
+    {
+      "path": "Docs/UdonMidiPlayer/26-community-boards.md",
+      "status": "imported_and_clockwork_scene_placed_editor_verified_pending_client_acceptance",
+      "purpose": "Standalone author, sponsor and community boards extracted from connected PullTabIdle scene, preserved asset identities and internal references, placed in clockwork entrance information area"
+    },
+    {
+      "path": "Docs/UdonMidiPlayer/25-clockwork-second-scene.md",
+      "status": "editor_udon_vm_verified_pending_client_acceptance",
+      "purpose": "Independent enclosed clockwork scene, coupled mechanics and local clock, one celestial Point Light, translucent dial, floral sky, fixed fan layouts, heritage art refinement and original workshop props, 10 MB resource accounting with download increment unmeasured, validation and maintenance boundaries"
+    },
+    {
+      "path": "Docs/UdonMidiPlayer/24-music-box.md",
+      "status": "authoring_implementation_pending_client_acceptance",
+      "purpose": "Music box source, range, mechanics, target migration and validation limits"
+    },
+    {
+      "path": "AGENTS.md",
+      "status": "current_operational_constraints",
+      "purpose": "Core constraints and navigation"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "status": "current",
+      "purpose": "Contribution entry and approval scope"
+    },
+    {
+      "path": "Docs/GETTING_STARTED.md",
+      "status": "current",
+      "purpose": "Setup and usage without implied acceptance"
+    },
+    {
+      "path": "Docs/Developer/AI_GUIDE.md",
+      "status": "current",
+      "purpose": "Agent workflow, evidence and task routing"
+    },
+    {
+      "path": "Docs/Developer/CURRENT_STATE.md",
+      "status": "current_baseline_facts",
+      "purpose": "Source map and explicit unpublished differences"
+    },
+    {
+      "path": "Docs/Contributing/instrument-policy.json",
+      "status": "maintainer_confirmed_policy",
+      "purpose": "Machine-readable instrument requirements and resource limits"
+    },
+    {
+      "path": "Docs/Contributing/README.md",
+      "status": "maintainer_confirmed_policy",
+      "purpose": "Human-readable contribution policy"
+    },
+    {
+      "path": "Docs/Contributing/BUDGETS.md",
+      "status": "maintainer_confirmed_policy",
+      "purpose": "Measurement scope, units and formulas"
+    },
+    {
+      "path": "Docs/Contributing/INSTRUMENT_SUBMISSION_TEMPLATE.md",
+      "status": "template_not_acceptance",
+      "purpose": "Submission and evidence record"
+    },
+    {
+      "path": "Docs/Contributing/instrument-submission.template.json",
+      "status": "template_not_acceptance",
+      "purpose": "Nullable machine-readable contribution record"
+    },
+    {
+      "path": "Docs/UdonMidiPlayer/CONTRACTS.md",
+      "status": "mixed_historical_and_dated_updates",
+      "purpose": "Read current code before reusing old interfaces and budgets"
+    },
+    {
+      "path": "Docs/UdonMidiPlayer/18-adding-instruments.md",
+      "status": "historical_technical_matrix_with_current_entry",
+      "purpose": "Integration change locations; old review questions are not new policy"
+    },
+    {
+      "path": "Docs/UdonMidiPlayer/19-gm-program-fallback.md",
+      "status": "current_rules_with_historical_context",
+      "purpose": "Seven active targets, shared per-track switches/octaves and original recorded-range folding, optional track adaptation and preserved retired identity"
+    },
+    {
+      "path": "Docs/UdonMidiPlayer/17-maintenance-conventions.md",
+      "status": "current_maintenance_rules",
+      "purpose": "Scope, preservation and verification boundaries"
+    },
+    {
+      "path": "Docs/UdonMidiPlayer/22-release-implementation.md",
+      "status": "dated_release_evidence",
+      "purpose": "Release/source operations, not global runtime sign-off"
+    },
+    {
+      "path": "Docs/UdonMidiPlayer/23-mobile-adaptation-report.md",
+      "status": "research_and_proposal_not_implemented",
+      "purpose": "Official mobile references, static project audit, Android/Quest/iOS adaptation plan and unverified acceptance criteria"
+    }
   ],
   "authoring_only_changes": [
-    { "path": "Assets/UdonMidiPlayer/Editor/Baking/AudioEnergyBaker.cs", "exists_in_implementation_baseline": false, "status": "not_shipped_by_this_documentation_change" },
-    { "path": "Assets/UdonMidiPlayer/Editor/Prefab/MidiBuildValidator.cs", "exists_in_implementation_baseline": true, "change_in_implementation_baseline": false, "status": "non_blocking_world_build_callback_is_authoring_only" },
-    { "path": "Assets/UdonMidiPlayer/Runtime/Audio/PianoVoicePool.cs", "exists_in_implementation_baseline": true, "change_in_implementation_baseline": false, "status": "energy_compression_and_default_balance_are_authoring_only" }
+    {
+      "path": "Assets/UdonMidiPlayer/Editor/Baking/AudioEnergyBaker.cs",
+      "exists_in_implementation_baseline": false,
+      "status": "not_shipped_by_this_documentation_change"
+    },
+    {
+      "path": "Assets/UdonMidiPlayer/Editor/Prefab/MidiBuildValidator.cs",
+      "exists_in_implementation_baseline": true,
+      "change_in_implementation_baseline": false,
+      "status": "non_blocking_world_build_callback_is_authoring_only"
+    },
+    {
+      "path": "Assets/UdonMidiPlayer/Runtime/Audio/PianoVoicePool.cs",
+      "exists_in_implementation_baseline": true,
+      "change_in_implementation_baseline": false,
+      "status": "energy_compression_and_default_balance_are_authoring_only"
+    }
   ],
   "unmeasured_values": "Use null / not_run / not_verified; never infer passed or zero.",
-  "automation": { "resource_budget_enforcement_implemented": false, "required_review_configuration_changed_by_this_work": false }
+  "automation": {
+    "resource_budget_enforcement_implemented": false,
+    "required_review_configuration_changed_by_this_work": false
+  },
+  "release_candidate": {
+    "version": "1.0.0-rc.3",
+    "operation_contract": "Docs/Developer/MIDI_LIBRARY_EDITOR.md",
+    "user_guide": "Docs/MIDI_IMPORT.md",
+    "runtime_acceptance": "not_verified"
+  }
 }

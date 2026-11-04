@@ -27,7 +27,8 @@ namespace MusicMidiPlayer.Audio
         private bool _initialized;
 
         private int Limit() { return Mathf.Min(Capacity,Mathf.Max(1,output.voiceLimit/4)); }
-        public int ReservedCount() { return hasSongDrums || activeVoiceCount>0 ? Limit() : 0; }
+        private bool IsEnabled() { return output.ensemble == null || output.ensemble.router.IsDrumsEnabled(); }
+        public int ReservedCount() { return IsEnabled() && (hasSongDrums || activeVoiceCount>0) ? Limit() : 0; }
         private int Offset() { return output.voiceSources.Length-Capacity; }
         private AudioSource Source(int slot) { return output.voiceSources[Offset()+slot]; }
         private void Initialize()
@@ -44,7 +45,7 @@ namespace MusicMidiPlayer.Audio
         }
         public void BeginBindSong(MidiSongData song)
         {
-            Initialize(); StopAll(); _song=song; _generation=-1; playbackEndMs=0; unmappedNoteCount=0;
+            Initialize(); CancelSong(); _song=song; _generation=-1; playbackEndMs=0; unmappedNoteCount=0;
             hasSongDrums=false;
             _bindStage=0; _bindCursor=0; _bindCount=0; _bindWrite=0; _bindNextClose=int.MaxValue;
         }
@@ -55,7 +56,7 @@ namespace MusicMidiPlayer.Audio
                 if(_bindStage==0)
                 {
                     if(_song!=null && bank!=null && _bindCursor<_song.channel.Length)
-                    { if(_song.channel[_bindCursor++]==9)_bindCount++; continue; }
+                    { if(IsDrum(_bindCursor++))_bindCount++; continue; }
                     int count=_bindCount;
                     _ids=new int[count]; _regions=new int[count]; _ends=new int[count]; _chokes=new int[count]; _seen=new int[count];
                     hasSongDrums=count>0; _bindCursor=0; _bindStage=1;
@@ -65,8 +66,8 @@ namespace MusicMidiPlayer.Audio
                     if(_song!=null && bank!=null && _bindCursor<_song.channel.Length)
                     {
                         int n=_bindCursor++;
-                        if(_song.channel[n]!=9)continue;
-                        int r=bank.SelectRegion(_song.pitch[n],_song.velocity[n],n), cursor=_bindWrite++;
+                        if(!IsDrum(n))continue;
+                        int r=bank.SelectRegion(DrumPitch(n),_song.velocity[n],n), cursor=_bindWrite++;
                         _ids[cursor]=n; _regions[cursor]=r; _seen[cursor]=-1; _chokes[cursor]=int.MaxValue;
                         _ends[cursor]=r<0?_song.startMs[n]:_song.startMs[n]+Mathf.CeilToInt(bank.clips[r].length*1000f);
                         if(r<0)unmappedNoteCount++;
@@ -76,7 +77,7 @@ namespace MusicMidiPlayer.Audio
                 }
                 else if(_bindCursor>=0)
                 {
-                    int i=_bindCursor--, pitch=_song.pitch[_ids[i]];
+                    int i=_bindCursor--, pitch=DrumPitch(_ids[i]);
                     if(pitch==46 && _bindNextClose<int.MaxValue)
                     { _chokes[i]=_bindNextClose; _ends[i]=Mathf.Min(_ends[i],_bindNextClose+25); }
                     if(pitch==42 || pitch==44)_bindNextClose=_song.startMs[_ids[i]];
@@ -85,11 +86,15 @@ namespace MusicMidiPlayer.Audio
                 else
                 {
                     _bindStage=-1;
-                    if(hasSongDrums)output.ClaimPercussionSources();
+                    if(hasSongDrums && IsEnabled())output.ClaimPercussionSources();
                 }
             }
             return _bindStage<0;
         }
+        private bool IsDrum(int note)
+        { return output.ensemble == null ? _song.channel[note] == 9 : output.ensemble.router.IsFileDrum(note); }
+        private int DrumPitch(int note)
+        { return output.ensemble == null ? _song.pitch[note] : output.ensemble.router.FileDrumPitch(note); }
         private int Upper(int ms)
         {
             int lo=0,hi=_ids.Length;
@@ -145,7 +150,7 @@ namespace MusicMidiPlayer.Audio
         }
         private void Request(int index,int ms,bool attack)
         {
-            if(_seen[index]==_generation || _regions[index]<0 || (!attack && _ends[index]<=ms)) return;
+            if(!IsEnabled() || _seen[index]==_generation || _regions[index]<0 || (!attack && _ends[index]<=ms)) return;
             int note=_ids[index];
             int slot=Allocate(_song.startMs[note]>ms); if(slot<0) return;
             int r=_regions[index];
@@ -156,12 +161,12 @@ namespace MusicMidiPlayer.Audio
             double start=dsp+System.Math.Max(0,(_song.startMs[note]-ms)*.001);
             _live[slot]=false;_slotIndex[slot]=index;_slotGeneration[slot]=_generation;
             _seen[index]=_generation;
-            StartSlot(slot,r,_song.pitch[note],_song.velocity[note],start,age,
+            StartSlot(slot,r,DrumPitch(note),_song.velocity[note],start,age,
                 dsp+(_ends[index]-ms)*.001+delay,_chokes[index]==int.MaxValue?double.MaxValue:dsp+(_chokes[index]-ms)*.001+delay);
         }
         public void LiveNoteDown(int pitch,int velocity,int eventId)
         {
-            if(bank==null) return;
+            if(bank==null || !IsEnabled()) return;
             int r=bank.SelectRegion(pitch,velocity,eventId);if(r<0) {unmappedNoteCount++;return;}
             Initialize();output.ClaimPercussionSources();
             double dsp=AudioSettings.dspTime;
@@ -184,8 +189,19 @@ namespace MusicMidiPlayer.Audio
             _start[slot]=start-age;_end[slot]=end;_choke[slot]=choke;
             if(!_active[slot]) activeVoiceCount++;
             _active[slot]=true;source.priority=40;
-            source.volume=output.muted?0:Mathf.Clamp01(output.localVolume*_level[slot]);
+            source.volume=0; // Refresh the common headroom bound before this attack can be heard.
             source.PlayScheduled(start);source.SetScheduledEndTime(end);
+            output.RefreshOutput();
+        }
+        public void RelocateSources()
+        {
+            if (!_initialized || bank == null) return;
+            for (int i = 0; i < Capacity; i++) if (_active[i])
+            {
+                int lane = bank.lanes[_slotRegion[i]];
+                if (lane >= 0 && lane < hitPoints.Length && hitPoints[lane] != null)
+                    Source(i).transform.position = hitPoints[lane].position;
+            }
         }
         public void ReclaimEndedVoices()
         {
@@ -208,11 +224,22 @@ namespace MusicMidiPlayer.Audio
                 _level[i]=_baseGain[i]*fade;
                 Source(i).priority=dsp-_start[i]<.12?40:160+Mathf.Clamp((int)((dsp-_start[i])*8),0,60);
             }
-            ApplyOutputGains(1);
+            ApplyOutputGains(output.compressionGain);
+        }
+        public float EnergySum(double dsp)
+        {
+            float sum = 0f;
+            for (int i = 0; i < Capacity; i++) if (_active[i] && dsp >= _start[i])
+                sum += _level[i] * _level[i] * bank.EnergyAt(_slotRegion[i], (float)(dsp - _start[i]));
+            return sum;
         }
         public float PeakSum()
         {
             float sum=0;for(int i=0;i<Capacity;i++) if(_active[i])sum+=_level[i]*bank.peaks[_slotRegion[i]];return sum;
+        }
+        public float MaxLevel()
+        {
+            float level=0;for(int i=0;i<Capacity;i++)if(_active[i])level=Mathf.Max(level,_level[i]);return level;
         }
         public void ApplyOutputGains(float normalization)
         {
@@ -228,7 +255,12 @@ namespace MusicMidiPlayer.Audio
         }
         public void StopAll()
         {
-            for(int i=0;i<Capacity;i++)if(_active[i])StopSlot(i);
+            for(int i=0;i<Capacity;i++)if(_active[i])
+            {
+                // A kit toggle keeps the song generation. Let canceled tails/look-ahead restart.
+                if(!_live[i])_seen[_slotIndex[i]]=-1;
+                StopSlot(i);
+            }
         }
         private void StopSlot(int slot)
         {

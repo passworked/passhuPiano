@@ -7,6 +7,8 @@ namespace MusicMidiPlayer.Editor.Assets
     public sealed class PianoBankAsset : ScriptableObject
     {
         public string bankHash;
+        public int[] energyStarts = Array.Empty<int>(), energyCounts = Array.Empty<int>();
+        public float[] energyValues = Array.Empty<float>();
         public int velocityLayerCount = 1;
         public AudioClip[] clips = Array.Empty<AudioClip>();
         public int[] rootPitch = Array.Empty<int>(), lowPitch = Array.Empty<int>(), highPitch = Array.Empty<int>();

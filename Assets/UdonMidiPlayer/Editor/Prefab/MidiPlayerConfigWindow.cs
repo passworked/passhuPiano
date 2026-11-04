@@ -38,6 +38,9 @@ namespace MusicMidiPlayer.Editor.Prefab
             configuration = (MidiPlayerConfigurationAsset)EditorGUILayout.ObjectField(MidiEditorI18n.Tr("Saved configuration (optional)"), configuration, typeof(MidiPlayerConfigurationAsset), false);
             if (EditorGUI.EndChangeCheck() && configuration != null) { library = configuration.library; bank = configuration.bank; pianoModel = configuration.pianoModel; }
             library = (MidiLibraryAsset)EditorGUILayout.ObjectField(MidiEditorI18n.Tr("Library"), library, typeof(MidiLibraryAsset), false);
+            using (new EditorGUI.DisabledScope(library == null))
+                if (GUILayout.Button(MidiEditorI18n.Tr("Edit MIDI library")))
+                    MusicMidiPlayer.Editor.Import.MidiImportWindow.OpenLibrary(library);
             bank = (PianoBankAsset)EditorGUILayout.ObjectField(MidiEditorI18n.Tr("Piano bank"), bank, typeof(PianoBankAsset), false);
             pianoModel = (GameObject)EditorGUILayout.ObjectField(MidiEditorI18n.Tr("Piano model (optional)"), pianoModel, typeof(GameObject), false);
             if (configuration != null)

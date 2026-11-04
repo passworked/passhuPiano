@@ -7,12 +7,33 @@ namespace MusicMidiPlayer.Data
     public class PercussionBankData : UdonSharpBehaviour
     {
         public string bankHash;
+        // Flat 20 ms mean-square envelopes; repeated clips share one range.
+        public int[] energyStarts = new int[0], energyCounts = new int[0];
+        public float[] energyValues = new float[0];
+
         public AudioClip[] clips = new AudioClip[0];
         public int[] notes = new int[0], lowVelocity = new int[0], highVelocity = new int[0];
         public int[] roundRobin = new int[0], roundRobinCount = new int[0], referenceVelocity = new int[0];
         public int[] lanes = new int[0], frames = new int[0], noteOffsets = new int[0];
         public float[] gains = new float[0], peaks = new float[0];
         public int maxTailMs;
+
+        public float EnergyAt(int region, float sourceSeconds)
+        {
+            if (sourceSeconds < 0f || sourceSeconds >= clips[region].length) return 0f;
+            return ReadEnergy(region, sourceSeconds, peaks[region] * peaks[region]);
+        }
+
+        private float ReadEnergy(int index, float seconds, float fallback)
+        {
+            if (energyStarts == null || energyCounts == null || index < 0 || index >= energyStarts.Length || index >= energyCounts.Length) return fallback;
+            int first = energyStarts[index], count = energyCounts[index];
+            if (count < 2 || energyValues == null || first < 0 || first > energyValues.Length - count) return fallback;
+            float position = Mathf.Max(0f, seconds) * 50f;
+            int point = Mathf.Min(count - 1, Mathf.FloorToInt(position));
+            if (point == count - 1) return 0f;
+            return Mathf.Lerp(energyValues[first + point], energyValues[first + point + 1], position - point);
+        }
 
         public bool IsValid()
         {

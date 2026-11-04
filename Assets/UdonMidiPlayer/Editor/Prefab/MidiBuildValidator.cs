@@ -25,8 +25,11 @@ namespace MusicMidiPlayer.Editor.Prefab
         public bool OnBuildRequested(VRCSDKRequestedBuildType requestedBuildType, BuildTarget buildTarget)
         {
             if (requestedBuildType == VRCSDKRequestedBuildType.Avatar) return true;
-            try { MidiPlayerAudioSettings.ApplyNow(); Debug.Log(ValidateOpenPlayers()); return true; }
-            catch (Exception exception) { Debug.LogError("[Music MIDI Player] 构建已阻止：" + exception.Message); return false; }
+            // Full validation belongs to explicit authoring/export operations, not
+            // SDK builds: presentation checks must not block building the world.
+            try { MidiPlayerAudioSettings.ApplyNow(); }
+            catch (Exception exception) { Debug.LogWarning("[Music MIDI Player] 音频设置未能应用：" + exception.Message); }
+            return true;
         }
 
         public static string ValidateOpenPlayers()
@@ -59,6 +62,8 @@ namespace MusicMidiPlayer.Editor.Prefab
             var validationKeyboard = facade.keyboard != null ? facade.keyboard : facade.instrumentKeyboards[modelVariant];
             var validationWaterfall = facade.waterfall != null ? facade.waterfall : facade.instrumentWaterfalls[modelVariant];
             var validationPedals = facade.pedals != null ? facade.pedals : facade.instrumentPedals[modelVariant];
+            if (modelVariant == 8)
+            { validationKeyboard=facade.instrumentKeyboards[1]; validationWaterfall=facade.instrumentWaterfalls[1]; validationPedals=facade.instrumentPedals[1]; }
             Need(FindPlayerRoot(facade) == root.transform, "必须提供完整播放器根对象");
             var midiListener = facade.GetComponent<VRC.SDK3.Midi.VRCMidiListener>();
             var midiEvents = VRC.SDK3.Midi.VRCMidiListener.MidiEvents.NoteOn
@@ -68,7 +73,7 @@ namespace MusicMidiPlayer.Editor.Prefab
             Need(new SerializedObject(midiListener).FindProperty("behaviour").objectReferenceValue
                 == UdonSharpEditorUtility.GetBackingUdonBehaviour(facade), "MIDI 监听器须连接当前 Facade 的 UdonBehaviour");
             Need(facade.hardwareMidiChannelTargets != null && facade.hardwareMidiChannelTargets.Length == 16
-                && facade.hardwareMidiChannelTargets.All(t => t >= -1 && t <= 6),
+                && facade.hardwareMidiChannelTargets.All(t => t >= -1 && t <= 7 && t != 6),
                 "硬件 MIDI 通道映射须为16项：-1自动，0至6为乐器目标；第10通道固定鼓组");
             Bound(root, facade.library, "Facade.library"); Bound(root, facade.gate, "Facade.gate");
             Bound(root, facade.network, "Facade.network"); Bound(root, facade.clock, "Facade.clock");
@@ -78,7 +83,11 @@ namespace MusicMidiPlayer.Editor.Prefab
                 var drums=facade.voicePool.drums;
                 Bound(root,drums,"Percussion.voices");Bound(root,drums.bank,"Percussion.bank");Bound(root,facade.drumView,"Percussion.view");
                 Need(drums.output==facade.voicePool && drums.clock==facade.clock && facade.clock.drums==drums,"鼓组声音池/时钟接线不一致");
-                Need(drums.bank.IsValid() && drums.bank.bankHash==MidiPercussionBuilder.ComputeBankHash(),"鼓组音源或导入设置已变化，请重新应用鼓组");
+                AudioEnergyBaker.Validate(drums.bank.clips, drums.bank.energyStarts, drums.bank.energyCounts, drums.bank.energyValues);
+                RequireSerializedArray(drums.bank, "energyStarts", drums.bank.energyStarts);
+                RequireSerializedArray(drums.bank, "energyCounts", drums.bank.energyCounts);
+                RequireSerializedArray(drums.bank, "energyValues", drums.bank.energyValues);
+                Need(drums.bank.IsValid() && drums.bank.bankHash==MidiPercussionBuilder.ComputeBankHash(drums.bank),"鼓组音源或导入设置已变化，请重新应用鼓组");
                 Need(facade.drumView.bank==drums.bank && facade.drumView.lanes!=null
                     && facade.drumView.lanes.bank==drums.bank && facade.drumView.lanes.bars.Length==64
                     && facade.drumView.hitPoints.Length==9 && drums.hitPoints.Length==9,"鼓组模型/轨道接线不完整");
@@ -96,6 +105,29 @@ namespace MusicMidiPlayer.Editor.Prefab
             Need(validationWaterfall.volumeNoteMaterial != null && validationWaterfall.volumeNoteMaterial.shader != null
                 && validationWaterfall.volumeNoteMaterial.shader.name == "MusicMidiPlayer/WaterfallVolume", "体积音符材质缺失");
             var effects = validationWaterfall.effects;
+            if (effects.compactParticles)
+            {
+                Bound(root, effects.keyImpactRenderer, "Waterfall.keyImpactRenderer");
+                Bound(root, effects.keyImpactRootRenderer, "Waterfall.keyImpactRootRenderer");
+                Need(validationWaterfall.pianoImpactPresentation && validationKeyboard.pianoImpactPresentation
+                    && effects.hitParticles.Length == 1 && effects.symbolParticles.Length == 1
+                    && effects.hitLights.Length == 0 && effects.glowRenderers.Length == 0
+                    && effects.totalParticleBudget <= 192 && effects.totalSymbolBudget <= 32
+                    && effects.maxActiveLights == 0, "钢琴逐键命中或合并粒子预算未配置");
+                foreach (var pool in new[] { effects.hitParticles[0], effects.symbolParticles[0] })
+                {
+                    Bound(root, pool, "Waterfall.compactParticles");
+                    Need(!pool.collision.enabled && !pool.emission.enabled && !pool.main.playOnAwake
+                        && pool.main.simulationSpace == ParticleSystemSimulationSpace.World,
+                        "合并钢琴粒子须本地手动推进且不使用世界碰撞");
+                }
+                var sheet = effects.symbolParticles[0].textureSheetAnimation;
+                Need(sheet.enabled && sheet.numTilesX == 4 && sheet.numTilesY == 2
+                    && sheet.startFrame.constantMin == 0 && sheet.startFrame.constantMax < 0.75f
+                    && sheet.startFrame.constantMax > 0.74f, "单一符号池须覆盖六种原有图集符号");
+            }
+            else
+            {
             Need(effects.hitParticles != null && effects.hitParticles.Length == 12 && effects.hitLights != null
                 && effects.hitLights.Length == 8 && effects.maxActiveLights <= 4 && effects.totalParticleBudget <= 768,
                 "粒子池或实时灯光预算未配置");
@@ -128,6 +160,7 @@ namespace MusicMidiPlayer.Editor.Prefab
                 foreach (var mesh in meshes) { Need(mesh != null, "符号网格缺失"); glyphMeshes.Add(mesh); }
             }
             Need(glyphMeshes.Count == 6, "符号粒子池合计须覆盖全部6种音乐符号");
+            }
             foreach (var light in effects.hitLights)
             {
                 Bound(root, light, "Waterfall.hitLights");
@@ -159,7 +192,7 @@ namespace MusicMidiPlayer.Editor.Prefab
             bool multiInstrument = facade.instrumentRoots != null && facade.instrumentRoots.Length > 0;
             if (multiInstrument)
             {
-                int variants = facade.voicePool.strings == null ? 3 : 8;
+                int variants = facade.instrumentRoots.Length > 8 ? 9 : facade.voicePool.strings == null ? 3 : 8;
                 Need(facade.instrumentRoots.Length == variants && facade.instrumentBanks.Length == variants
                     && facade.instrumentKeyboards.Length == variants && facade.instrumentWaterfalls.Length == variants
                     && facade.instrumentPedals.Length == variants, "乐器选项接线不完整");
@@ -167,7 +200,8 @@ namespace MusicMidiPlayer.Editor.Prefab
                 var marimbaSource = AssetDatabase.LoadAssetAtPath<PianoBankAsset>(MidiInstrumentMigration.BankPath);
                 MidiInstrumentMigration.ValidateMarimbaBudget(marimbaSource); CompareBank(marimbaSource, facade.instrumentBanks[2]);
                 string[] events = { "_SelectDigitalPiano", "_SelectGrandPiano", "_SelectMarimba" };
-                Need(facade.playerUI.instrumentOptionButtons.Length == variants, "乐器菜单缺失");
+                int menuOptions = facade.instrumentRouter != null && facade.voicePool.drums != null ? 10 : variants;
+                Need(facade.playerUI.instrumentOptionButtons.Length == menuOptions, "乐器菜单缺失");
                 for (int option = 0; option < 3; option++)
                 {
                     Need(facade.HasInstrument(option), "无效乐器选项: " + option);
@@ -189,6 +223,14 @@ namespace MusicMidiPlayer.Editor.Prefab
                     CheckEvent(facade.playerUI.instrumentOptionButtons[option], "m_OnClick", facade.playerUI.instrumentOptionButtons[option].onClick, facade.playerUI, events[option]);
                 }
                 if (facade.voicePool.strings != null) ValidateStrings(root, facade);
+                if (variants > 8)
+                {
+                    CompareBank(AssetDatabase.LoadAssetAtPath<PianoBankAsset>(MidiMusicBoxBuilder.BankPath), facade.instrumentBanks[8]);
+                    Need(facade.HasInstrument(8) && facade.instrumentWaterfalls[8].rollOverDrum && facade.instrumentKeyboards[8].rotatingMechanism != null, "Music box mechanism or bank missing");
+                    Need(facade.instrumentKeyboards[8].instrumentTarget == 7 && facade.instrumentWaterfalls[8].instrumentTarget == 7, "Music box presentation routing mismatch");
+                    Need(facade.instrumentKeyboards[8].keyTransforms.Count(k => k != null) == 88, "Music box requires 88 physical tines");
+                    MidiMusicBoxBuilder.Measure(facade);
+                }
                 if (facade.instrumentRouter != null)
                 {
                     var router = facade.instrumentRouter;
@@ -205,17 +247,31 @@ namespace MusicMidiPlayer.Editor.Prefab
                     Bound(root, mapping.fileMappingEntry, "UI.fileMappingEntry");
                     Bound(root, mapping.fileMappingPanel.transform, "UI.fileMappingPanel");
                     Need(mapping.fileMappingEntry.transform.parent == mapping.transform && mapping.fileMappingPanel.transform.parent == mapping.transform
-                        && mapping.fileProgramButtons.Length == 16 && mapping.fileTargetButtons.Length == 7,
+                        && mapping.fileProgramButtons.Length == 16 && mapping.fileTargetButtons.Length == (variants > 8 ? 10 : 7),
                         "播放音色映射必须直接接入播放器，并包含16行与自动/六种乐器");
                     CheckEvent(mapping.fileMappingEntry, "m_OnClick", mapping.fileMappingEntry.onClick, mapping, "_OpenFileMapping");
+                    Need(mapping.fileTrackEnabledToggles.Length == 16, "音轨映射必须包含16个独立开关");
+                    Need(mapping.fileOctaveDownButtons.Length == 16 && mapping.fileOctaveUpButtons.Length == 16
+                        && mapping.fileOctaveValues.Length == 16 && mapping.fileAutoRangeToggle != null, "音轨八度及自动音域控件缺失");
+                    CheckEvent(mapping.fileAutoRangeToggle, "onValueChanged", mapping.fileAutoRangeToggle.onValueChanged, mapping, "_OnFileAutoRangeChanged");
                     for (int row = 0; row < 16; row++)
+                    {
                         CheckEvent(mapping.fileProgramButtons[row], "m_OnClick", mapping.fileProgramButtons[row].onClick, mapping, "_FileProgram" + row);
-                    for (int target = 0; target < 7; target++)
-                        CheckEvent(mapping.fileTargetButtons[target], "m_OnClick", mapping.fileTargetButtons[target].onClick, mapping, "_MidiTarget" + target);
-                    Need(router.enabledMask >= 0 && router.enabledMask <= 63 && router.pianoAppearance >= 0
+                        var trackToggle = mapping.fileTrackEnabledToggles[row];
+                        Bound(root, trackToggle, "UI.fileTrackEnabled");
+                        Need(trackToggle.group == null && trackToggle.graphic != null, "音轨开关必须使用独立复选框");
+                        CheckEvent(trackToggle, "onValueChanged", trackToggle.onValueChanged, mapping, "_FileTrackEnabled" + row);
+                        CheckEvent(mapping.fileOctaveDownButtons[row], "m_OnClick", mapping.fileOctaveDownButtons[row].onClick, mapping, "_FileOctaveDown" + row);
+                        CheckEvent(mapping.fileOctaveUpButtons[row], "m_OnClick", mapping.fileOctaveUpButtons[row].onClick, mapping, "_FileOctaveUp" + row);
+                    }
+                    for (int target = 0; target < mapping.fileTargetButtons.Length; target++)
+                        CheckEvent(mapping.fileTargetButtons[target], "m_OnClick", mapping.fileTargetButtons[target].onClick, mapping, target == 9 ? "_FileDrums" : "_MidiTarget" + target);
+                    Need(router.enabledMask >= 0 && (router.enabledMask & ~447) == 0 && router.pianoAppearance >= 0
                         && router.pianoAppearance <= 1, "乐器复选框状态无效");
-                    Need(facade.playerUI.instrumentToggles.Length == variants, "乐器复选框缺失");
-                    for (int i = 0; i < variants; i++)
+                    Need(facade.playerUI.instrumentToggles.Length == menuOptions, "乐器复选框缺失");
+                    if (menuOptions == 10)
+                        CheckEvent(facade.playerUI.instrumentToggles[9], "onValueChanged", facade.playerUI.instrumentToggles[9].onValueChanged, facade.playerUI, "_SelectDrums");
+                    for (int i = 0; i < menuOptions; i++)
                     {
                         var toggle = facade.playerUI.instrumentToggles[i];
                         Bound(root, toggle, "Instrument.toggle");
@@ -383,6 +439,10 @@ namespace MusicMidiPlayer.Editor.Prefab
             foreach (var bank in voices.banks)
             {
                 Bound(root, bank, "Strings.bank");
+                AudioEnergyBaker.Validate(AudioEnergyBaker.Clips(bank), bank.energyStarts, bank.energyCounts, bank.energyValues);
+                RequireSerializedArray(bank, "energyStarts", bank.energyStarts);
+                RequireSerializedArray(bank, "energyCounts", bank.energyCounts);
+                RequireSerializedArray(bank, "energyValues", bank.energyValues);
                 Need(bank.IsValid() && bank.bankHash == MidiStringsBuilder.BankHash(bank), "弦乐音源无效或哈希过期");
             }
             string[] events = { "_SelectViolin", "_SelectViola", "_SelectCello", "_SelectContrabass", "_SelectStrings" };
@@ -415,7 +475,7 @@ namespace MusicMidiPlayer.Editor.Prefab
             {
                 var rect=(RectTransform)controls.instrumentOptionButtons[i].transform;
                 Need(rect.parent==controls.instrumentDropdownScroll.content && Mathf.Approximately(rect.anchoredPosition.x,0)
-                    && Mathf.Approximately(rect.anchoredPosition.y,-20-i*40),"乐器须使用竖向下拉列表");
+                    && Mathf.Approximately(rect.anchoredPosition.y,-20-((i>7?i-1:i)-(i==9 && !facade.HasInstrument(8)?1:0))*40),"乐器须使用竖向下拉列表");
             }
             Bound(root,controls.stringsStyleDropdownButton,"UI.stringsStyleDropdownButton");
             Bound(root,controls.stringsStyleEntryLabel,"UI.stringsStyleEntryLabel");
@@ -583,6 +643,7 @@ namespace MusicMidiPlayer.Editor.Prefab
                 && Same(source.rootPitch, target.rootPitch) && Same(source.lowPitch, target.lowPitch) && Same(source.highPitch, target.highPitch)
                 && Same(source.sourceRate, target.sourceRate) && Same(source.sourceChannels, target.sourceChannels) && Same(source.sourceFrameCount, target.sourceFrameCount)
                 && Same(source.sourcePeak, target.sourcePeak) && Same(source.regionGain, target.regionGain) && Same(source.tuningCents, target.tuningCents) && Same(source.releaseDurationMs, target.releaseDurationMs)
+                && Same(source.energyStarts, target.energyStarts) && Same(source.energyCounts, target.energyCounts) && Same(source.energyValues, target.energyValues)
                 && Same(source.pitchToRegion, target.pitchToRegion), "运行音源数组/Hash与源配置不一致");
             var backing = UdonSharpEditorUtility.GetBackingUdonBehaviour(target);
             Need(backing != null, "音源缺少Udon backing，无法校验显式序列化变量");
@@ -599,6 +660,9 @@ namespace MusicMidiPlayer.Editor.Prefab
             RequireSerializedArray(target, "sourceChannels", target.sourceChannels);
             RequireSerializedArray(target, "sourceFrameCount", target.sourceFrameCount);
             RequireSerializedArray(target, "sourcePeak", target.sourcePeak);
+            RequireSerializedArray(target, "energyStarts", target.energyStarts);
+            RequireSerializedArray(target, "energyCounts", target.energyCounts);
+            RequireSerializedArray(target, "energyValues", target.energyValues);
             RequireSerializedArray(target, "regionGain", target.regionGain);
             RequireSerializedArray(target, "tuningCents", target.tuningCents);
             RequireSerializedArray(target, "releaseDurationMs", target.releaseDurationMs);

@@ -31,13 +31,13 @@ namespace MusicMidiPlayer.Audio
         private double[] _release = new double[64], _end = new double[64], _scheduled = new double[64];
         private float[] _releaseSeconds = new float[64];
         private PianoBankData[] _sampleBank = new PianoBankData[64];
+        private StringsBankData[] _stringsBank = new StringsBankData[64];
         private int[] _owners = new int[64];
         private Vector3[] _rest = new Vector3[64];
         private MidiSongData _song;
         private int _generation = -1;
         private bool _ready;
         private float _normalization = 1f;
-        private double _gainDsp;
         private int _outputBatchDepth;
         private bool _outputDirty;
         private int[] _expressionFrame = new int[16], _expressionMs = new int[16];
@@ -140,7 +140,7 @@ namespace MusicMidiPlayer.Audio
         public void NoteDown(int note, int ms, int generation)
         {
             if (_song == null || generation != _generation) return;
-            if (_song.channel[note] == 9) { if (output.drums != null) output.drums.NoteDown(note, ms, generation); return; }
+            if (router.IsFileDrum(note)) { if (output.drums != null) output.drums.NoteDown(note, ms, generation); return; }
             StartNote(note, ms, true);
         }
         private int LowerStart(int ms)
@@ -151,7 +151,7 @@ namespace MusicMidiPlayer.Audio
         }
         private PianoBankData SampleBank(int target)
         {
-            return router.facade.GetInstrumentBank(target == 0 ? router.pianoAppearance : 2);
+            return router.facade.GetInstrumentBank(target == 0 ? router.pianoAppearance : target == 7 ? 8 : 2);
         }
         public int StringsBankIndex(int target) { return target == 2 ? 0 : target == 6 ? 1 : target - 1; }
         public int EnsembleSection(int channel, int track)
@@ -163,12 +163,12 @@ namespace MusicMidiPlayer.Audio
         }
         private void StartNote(int note, int ms, bool attack)
         {
-            if (note < 0 || note >= _seen.Length || _seen[note] == _generation || _song.channel[note] == 9) return;
+            if (note < 0 || note >= _seen.Length || _seen[note] == _generation) return;
             int target = router.TargetForNote(note);
             if (target < 0) return;
             double age = System.Math.Max(0, (ms - _song.startMs[note]) * .001);
-            int style = router.ArticulationForTarget(target, router.notePrograms[note]);
-            int slot = StartVoice(target, _song.pitch[note], _song.velocity[note], _song.channel[note], style,
+            int style = router.ArticulationForNote(target, note);
+            int slot = StartVoice(target, router.PitchForNote(note), _song.velocity[note], _song.channel[note], style,
                 note, _song.trackIndex[note], false, age, (ms - _song.releaseMs[note]) * .001, (_song.startMs[note] - ms) * .001,
                 attack);
             if (slot >= 0) _seen[note] = _generation;
@@ -195,7 +195,7 @@ namespace MusicMidiPlayer.Audio
                 int id = identities[i], channel = _channel[i], pitch = pitches[i], velocity = velocities[i];
                 bool isLive = live[i];
                 int program = isLive ? (router.facade.LiveTargetOverride(id) == 0 ? router.livePrograms[channel] : 40) : router.notePrograms[id];
-                int style = router.ArticulationForTarget(target, program);
+                int style = isLive ? router.ArticulationForTarget(target, program) : router.ArticulationForNote(target, id);
                 if (style == articulations[i]) continue;
                 double age = System.Math.Max(0, dsp - starts[i]), ahead = System.Math.Max(0, _scheduled[i] - dsp), release = _release[i];
                 int track = isLive ? -1 : _song.trackIndex[id];
@@ -223,7 +223,7 @@ namespace MusicMidiPlayer.Audio
             StringsBankData str = null;
             int region;
             int section = target == 6 ? EnsembleSection(channel, track) : 0;
-            if (target < 2)
+            if ((target < 2 || target == 7))
             {
                 sample = SampleBank(target); if (sample == null) return -1;
                 region = sample.SelectRegion(pitch, velocity);
@@ -250,7 +250,7 @@ namespace MusicMidiPlayer.Audio
             AudioClip clip = sample != null ? sample.clips[region] : str.attacks[region];
             AudioClip loop = str == null ? null : str.loops[region];
             if (loop == null && age * ratio >= clip.length) return -1;
-            int needed = target < 2 ? 1 : 2;
+            int needed = (target < 2 || target == 7) ? 1 : 2;
             int slot = Allocate(needed, ahead > .001); if (slot < 0) return -1;
             int first = FreeSource(); _owners[first] = slot;
             int second = -1;
@@ -258,7 +258,7 @@ namespace MusicMidiPlayer.Audio
             _a[slot] = first; _b[slot] = second; targets[slot] = target; _region[slot] = region;
             identities[slot] = identity; pitches[slot] = pitch; velocities[slot] = velocity;
             articulations[slot] = style; _channel[slot] = channel; live[slot] = isLive; _sampleBank[slot] = sample;
-            sections[slot] = section;
+            sections[slot] = section; _stringsBank[slot] = str;
             _gain[slot] = sample != null ? (sample.velocityLayerCount == 4 ? 1 : Mathf.Pow(velocity / 127f, 1.6f)) * sample.regionGain[region]
                 : Mathf.Pow(velocity / 127f, 1.2f) * str.gains[region];
             _peak[slot] = sample != null ? sample.sourcePeak[region] : str.peaks[region];
@@ -288,12 +288,11 @@ namespace MusicMidiPlayer.Audio
                 }
             }
             ApplyLevel(slot, dsp);
-            ApplySlotVolume(slot);
             RequestOutputUpdate(); return slot;
         }
         private void ConfigureSource(int index, int slot, AudioClip clip, float ratio, bool loop)
         {
-            AudioSource source = output.voiceSources[index]; source.Stop(); source.clip = clip;
+            AudioSource source = output.voiceSources[index]; source.Stop(); source.volume = 0f; source.clip = clip;
             source.pitch = ratio; source.loop = loop; source.spatialBlend = output.worldSpaceAudio ? 1 : 0; source.dopplerLevel = 0;
             Transform origin = soundOrigins[targets[slot]];
             if (targets[slot] == 6) origin = router.facade.GetStringsView(7).bodies[sections[slot]];
@@ -375,7 +374,7 @@ namespace MusicMidiPlayer.Audio
             float phase = Mathf.Clamp01((float)((dsp - _release[slot]) / _releaseSeconds[slot]));
             float expression = live[slot] ? router.facade.LiveExpression(_channel[slot]) / 127f
                 : SongExpression(_channel[slot], (int)(output.clock.GetPositionSeconds() * 1000));
-            float onset = targets[slot] >= 2 ? Mathf.Clamp01((float)((dsp - starts[slot]) / .008)) : 1;
+            float onset = targets[slot] >= 2 && targets[slot] <= 5 ? Mathf.Clamp01((float)((dsp - starts[slot]) / .008)) : 1;
             if (dsp < _scheduled[slot]) onset = 1;
             return _gain[slot] * (1 - phase) * (1 - phase) * expression * onset;
         }
@@ -383,12 +382,26 @@ namespace MusicMidiPlayer.Audio
         {
             _outputDirty = false;
             double dsp = output.clock.GetFrameDspSeconds();
-            float total = output.drums == null ? 0 : output.drums.PeakSum();
-            for (int i = 0; i < 64; i++) if (active[i]) total += levels[i] * _peak[i];
-            float target = output.peakProtectionEnabled ? Mathf.Min(1, output.peakBudget / Mathf.Max(.0001f, total)) : 1;
-            if (!output.peakProtectionEnabled || target < _normalization) _normalization = target;
-            else _normalization = Mathf.Lerp(_normalization, target, 1 - Mathf.Exp(-(float)System.Math.Max(0, dsp - _gainDsp) / .08f));
-            _gainDsp = dsp;
+            float power = 0f;
+            float peakSum = output.drums == null ? 0f : output.drums.PeakSum();
+            float maxLevel = output.drums == null ? 0f : output.drums.MaxLevel();
+            for (int i = 0; i < 64; i++) if (active[i])
+            {
+                peakSum += levels[i] * _peak[i];
+                maxLevel = Mathf.Max(maxLevel, levels[i]);
+            }
+            if (output.peakProtectionEnabled)
+            {
+                power = output.drums == null ? 0f : output.drums.EnergySum(dsp);
+                for (int i = 0; i < 64; i++) if (active[i] && dsp >= _scheduled[i])
+                {
+                    float sourceSeconds = (float)(dsp - starts[i]) * output.voiceSources[_a[i]].pitch;
+                    float energy = _sampleBank[i] != null ? _sampleBank[i].EnergyAt(_region[i], sourceSeconds)
+                        : _stringsBank[i].EnergyAt(_region[i], sourceSeconds);
+                    power += levels[i] * levels[i] * energy;
+                }
+            }
+            _normalization = output.LimitOutputGain(output.CalculateCompressionGain(power, dsp), peakSum, maxLevel, dsp);
             for (int i = 0; i < 64; i++) if (active[i])
                 ApplySlotVolume(i);
             if (output.drums != null) output.drums.ApplyOutputGains(_normalization);

@@ -4,6 +4,8 @@
 
 - 只改当前需求；保留并行修改、GUID、`.meta`、曲目 ID 和引用，优先增量更新。
 - 主场景：`Assets/Scenes/VRCDefaultWorldScene.unity`；练习系统保持独立，不新建替代主场景。
+- 当前海底美术场景为 `Assets/Scenes/UnderwaterMusicGarden.unity`，不替代主场景；最多 8 件乐器，八音盒与钢琴同开时放琴上，无钢琴时用独立桌，见第 27 册。
+- 钟楼 `Assets/Scenes/ClockworkMaintenanceStreet.unity` 已标记为历史版本，保留场景、GUID 和资源；两个美术场景各自仅允许一个 Point Light，含未启用对象，见第 25 / 27 册。
 - 场景曲库与分发 Prefab 分开；日常加歌不自动同步 Prefab，不擅自 Apply 实例覆盖。
 - 沿用 `MusicMidiPlayer.*` 命名空间和现有架构，保持 Runtime/Editor 隔离。
 - Unity 操作与截图优先 MCP；浏览器显式使用 Chrome，禁止 Edge 或自动回退。
@@ -17,6 +19,8 @@
 - [乐器贡献规则](Docs/Contributing/README.md) · [机器可读政策](Docs/Contributing/instrument-policy.json) · [资源预算](Docs/Contributing/BUDGETS.md)
 
 - [文档总览](Docs/UdonMidiPlayer/README.md) · [详细维护约定](Docs/UdonMidiPlayer/17-maintenance-conventions.md)
+- [钟楼独立第二场景与单点光源](Docs/UdonMidiPlayer/25-clockwork-second-scene.md)
+- [海底音乐庭院与八乐器布局](Docs/UdonMidiPlayer/27-underwater-music-garden.md)
 - [UI 层级与绘制顺序](Docs/UdonMidiPlayer/15-ui-hierarchy.md) · [控制与 UI](Docs/UdonMidiPlayer/07-controls-and-ui.md)
 - [架构](Docs/UdonMidiPlayer/01-architecture.md) · [同步](Docs/UdonMidiPlayer/04-multiplayer-sync.md)
 - [MIDI 导入](Docs/UdonMidiPlayer/02-data-and-import.md) · [编辑器与 Prefab](Docs/UdonMidiPlayer/08-editor-and-prefab.md)

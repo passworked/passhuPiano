@@ -1,0 +1,54 @@
+// Execute through Unity MCP after the main scene's ClientSim startup has completed.
+var f=UnityEngine.Object.FindObjectOfType<MusicMidiPlayer.Logic.MidiPlayerFacade>();
+if(!UnityEditor.EditorApplication.isPlaying)throw new System.Exception("Enter Play mode first");
+VRC.Udon.UdonBehaviour Back(UdonSharp.UdonSharpBehaviour b){return UdonSharpEditor.UdonSharpEditorUtility.GetBackingUdonBehaviour(b);}
+object Call(VRC.Udon.UdonBehaviour b,string method,params object[] args)
+{
+    var p=((UdonSharp.UdonSharpProgramAsset)b.programSource).SerializedProgramAsset.RetrieveProgram();var symbols=p.SymbolTable.GetSymbols();
+    for(int a=0;a<args.Length;a+=2)foreach(var s in symbols)if(System.Text.RegularExpressions.Regex.IsMatch(s,"^__\\d+_"+(string)args[a]+"__param$"))b.SetProgramVariable(s,args[a+1]);
+    b.SendCustomEvent(p.EntryPoints.GetExportedSymbols().Contains(method)?method:"__0_"+method);
+    var ret=symbols.FirstOrDefault(s=>s.EndsWith("_"+method+"__ret"));return ret==null?null:b.GetProgramVariable(ret);
+}
+var checks=new System.Collections.Generic.List<string>();
+void Need(bool ok,string label){if(!ok)throw new System.Exception(label);checks.Add(label);}
+var facade=Back(f);var router=Back(f.instrumentRouter);var pool=Back(f.voicePool.ensemble);var clock=Back(f.clock);var seq=Back(f.sequencer);
+string error=null;
+try
+{
+    Need((bool)facade.GetProgramVariable("isReady")&&!(bool)facade.GetProgramVariable("isSongLoading"),"Main scene backing Udon is ready");
+    facade.enabled=false;Back(f.network).enabled=false;Call(facade,"CommandStop");
+    var song=(VRC.Udon.UdonBehaviour)facade.GetProgramVariable("_song");
+    Need(((byte[])song.GetProgramVariable("violinArticulations")).Length>0,"Actual MPC1 song decoded baked hints in backing Udon");
+    song.SetProgramVariable("isDecoded",true);song.SetProgramVariable("expressionOffsets",new int[17]);
+    song.SetProgramVariable("pitch",new[]{69,69,69});song.SetProgramVariable("velocity",new[]{100,100,64});song.SetProgramVariable("channel",new int[3]);song.SetProgramVariable("trackIndex",new int[3]);
+    song.SetProgramVariable("startMs",new[]{100,100,100});song.SetProgramVariable("keyUpMs",new[]{2000,2000,2000});song.SetProgramVariable("releaseMs",new[]{2500,2500,2500});
+    song.SetProgramVariable("eventMs",new[]{100,100,100});song.SetProgramVariable("eventKind",new int[3]);song.SetProgramVariable("eventNoteId",new[]{0,1,2});
+    song.SetProgramVariable("timbreEventIndex",new[]{0});song.SetProgramVariable("timbreKind",new[]{0});song.SetProgramVariable("timbreChannel",new[]{0});song.SetProgramVariable("timbreValue",new[]{40});
+    song.SetProgramVariable("violinArticulations",new byte[]{57}); // 1,2,3 in original-note order.
+    router.SetProgramVariable("fileProgramMap","");router.SetProgramVariable("fileTrackMap","");router.SetProgramVariable("autoTrackRouting",false);router.SetProgramVariable("enabledMask",4);router.SetProgramVariable("stringArticulationOverrides",0);
+    Call(router,"BeginBindSong","song",song);Call(router,"BindStep","budget",512);Call(pool,"BindSong","song",song);Call(seq,"BindSong","data",song);
+    for(int n=0;n<3;n++)Need((int)Call(router,"ArticulationForNote","target",2,"note",n)==n,"Automatic note "+n+" resolves baked style");
+    var programs=(int[])router.GetProgramVariable("notePrograms");programs[0]=45;programs[2]=55;router.SetProgramVariable("notePrograms",programs);
+    Need((int)Call(router,"ArticulationForNote","target",2,"note",0)==2,"Authored GM pizzicato wins over baked sustain");
+    Need((int)Call(router,"ArticulationForNote","target",2,"note",2)==1,"Authored GM spiccato wins over baked pizzicato");
+    router.SetProgramVariable("stringArticulationOverrides",1);Need((int)Call(router,"ArticulationForNote","target",2,"note",0)==0,"Manual sustain wins over authored GM");
+    programs=new[]{40,40,40};router.SetProgramVariable("notePrograms",programs);
+    Need((int)Call(router,"ArticulationForNote","target",3,"note",2)==0,"Viola keeps its existing automatic behavior");
+    router.SetProgramVariable("stringArticulationOverrides",0);
+    song.SetProgramVariable("violinArticulations",new byte[0]);Need((int)Call(router,"ArticulationForNote","target",2,"note",2)==0,"Legacy data without hints retains GM fallback");song.SetProgramVariable("violinArticulations",new byte[]{57});
+    clock.SetProgramVariable("_state",1);clock.SetProgramVariable("_frameDsp",UnityEngine.AudioSettings.dspTime);seq.SetProgramVariable("activeNoteIds",new[]{0,1,2});seq.SetProgramVariable("activeNoteCount",3);Call(pool,"RebuildAt","ms",120,"generation",987);
+    var active=(bool[])pool.GetProgramVariable("active");var ids=(int[])pool.GetProgramVariable("identities");var styles=(int[])pool.GetProgramVariable("articulations");
+    for(int n=0;n<3;n++){int id=n;Need(Enumerable.Range(0,64).Any(i=>active[i]&&ids[i]==id&&styles[i]==id),"Seek recovery starts correct sampled articulation "+n);}
+    router.SetProgramVariable("stringArticulationOverrides",1);Call(pool,"RefreshStringArticulation","target",2);
+    Need(Enumerable.Range(0,64).Where(i=>((bool[])pool.GetProgramVariable("active"))[i]).All(i=>((int[])pool.GetProgramVariable("articulations"))[i]==0),"Manual choice refreshes held violin voices");
+    router.SetProgramVariable("stringArticulationOverrides",0);Call(pool,"RefreshStringArticulation","target",2);
+    Need(Enumerable.Range(0,64).Where(i=>((bool[])pool.GetProgramVariable("active"))[i]).All(i=>((int[])pool.GetProgramVariable("articulations"))[i]==((int[])pool.GetProgramVariable("identities"))[i]),"Returning to automatic restores each held note's baked style");
+    var view=Back(f.GetStringsView(3));Call(view,"BindSong","song",song);Call(view,"Refresh","ms",120);Need(((int[])view.GetProgramVariable("_poseStyle"))[0]==1,"Violin bow pose reads the same per-note style as sound");
+    Call(pool,"StopAll");clock.SetProgramVariable("_state",2);Call(pool,"RebuildAt","ms",120,"generation",988);Need(!((bool[])pool.GetProgramVariable("active")).Any(x=>x),"Paused rebuild stays silent");
+    Need(f.voicePool.voiceSources.Length==64,"Physical source budget remains 64");
+    Call(song,"ReleaseDecodedData");Need(((byte[])song.GetProgramVariable("violinArticulations")).Length==0,"Unloading releases articulation bytes");
+}
+catch(System.Exception ex){error=ex.ToString();}
+finally{Call(pool,"StopAll");}
+var report=new{success=error==null,checks=checks.Count,passed=checks,error,scope="Unity Editor/ClientSim actual backing Udon; no real VRChat or listening test"};
+System.IO.Directory.CreateDirectory("Logs");System.IO.File.WriteAllText("Logs/violin-auto-playmode.json",Newtonsoft.Json.JsonConvert.SerializeObject(report,Newtonsoft.Json.Formatting.Indented));return report;

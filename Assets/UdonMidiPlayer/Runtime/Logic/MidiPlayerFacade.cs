@@ -26,8 +26,10 @@ namespace MusicMidiPlayer.Logic
         public MidiPerformanceInput performanceInput;
         public MidiDrumKitView drumView;
         public MidiInstrumentRouter instrumentRouter;
+        public MidiInstrumentFanLayout instrumentFanLayout;
+        public ClockworkMusicLink clockworkMusicLink;
         [Header("Hardware MIDI channel targets")]
-        [Tooltip("Index 0..15 = MIDI channel 1..16. -1: automatic; 0: piano; 1: marimba; 2: violin; 3: viola; 4: cello; 5: contrabass; 6: strings ensemble. Channel 10 always plays drums. Explicit targets must be enabled.")]
+        [Tooltip("Index 0..15 = MIDI channel 1..16. -1: automatic; 0: piano; 1: marimba; 2: violin; 3: viola; 4: cello; 5: contrabass; 6: retired; 7: music box. Channel 10 always plays drums. Explicit targets must be enabled.")]
         // New players follow the enabled instrument set on every melodic channel.
         // Explicit mappings and restored PlayerData remain authoritative for that player.
         public int[] hardwareMidiChannelTargets = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
@@ -37,14 +39,15 @@ namespace MusicMidiPlayer.Logic
         private bool[] _midiPreferenceDirtyChannels = new bool[16];
         private string _midiLastSaved = "";
         private int _routedViewGeneration = -1;
+        private string _presentationPlayerName;
         public bool IsLiveKeyHeld(int identity) { return identity >= 0 && identity < 2048 && _liveHeld[identity]; }
         public int LiveExpression(int channel) { return _liveExpression[channel]; }
-        // Zero follows MIDI Program routing; 1..7 pins a physical performance target.
+        // Zero follows MIDI Program routing; 1..8 pins a physical performance target.
         private int[] _liveTargetOverrides = new int[2048];
         public int LiveTargetOverride(int identity) { return _liveTargetOverrides[identity]; }
         public int InstrumentMask() { return instrumentRouter == null ? 1 << (selectedInstrument < 2 ? 0 : selectedInstrument - 1) : instrumentRouter.enabledMask; }
         public bool HasSelectedStrings() { return instrumentRouter != null ? (instrumentRouter.enabledMask & 60) != 0 : GetStringsView(selectedInstrument) != null; }
-        public bool IsInstrumentChecked(int index) { return instrumentRouter == null ? index == selectedInstrument : instrumentRouter.IsViewEnabled(index); }
+        public bool IsInstrumentChecked(int index) { return instrumentRouter == null ? index == selectedInstrument : index == 9 ? instrumentRouter.IsDrumsEnabled() : instrumentRouter.IsViewEnabled(index); }
         [HideInInspector] public int liveMidiEventSequence;
         // One controller/input/voice pool; presentation variants share it.
         public GameObject[] instrumentRoots = new GameObject[0];
@@ -53,6 +56,10 @@ namespace MusicMidiPlayer.Logic
         public MidiWaterfallView[] instrumentWaterfalls = new MidiWaterfallView[0];
         public PianoBankData[] instrumentBanks = new PianoBankData[0];
         public StringsView[] instrumentStrings = new StringsView[0];
+        public GameObject musicBoxTable;
+        public GameObject musicBoxSeat;
+        // The box's feet are 0.82 m above its root; the piano deck is 0.912 m high.
+        public Vector3 musicBoxGrandPianoOffset = new Vector3(0, .092f, -.29f);
         public int selectedInstrument;
         [HideInInspector] public string selectedSongId;
         [HideInInspector] public string lastError;
@@ -70,6 +77,7 @@ namespace MusicMidiPlayer.Logic
         private int _lastFrameMs;
         private bool _networkBlocked;
         private int _songLoadStage, _songLoadView, _songLoadPart;
+        private bool _routingOnlyLoad;
 
         private void Start()
         {
@@ -117,6 +125,7 @@ namespace MusicMidiPlayer.Logic
                 return;
             }
             int positionMs = (int)(clock.GetPositionSeconds() * 1000.0);
+            RefreshPerformancePalette();
             int state = clock.GetState();
             bool viewsRebuilt = false;
             if (state == 1 && !_naturalEnded)
@@ -182,7 +191,33 @@ namespace MusicMidiPlayer.Logic
 
         public bool CanReceiveLiveMidi()
         {
-            return isReady && !isSongLoading && !_networkBlocked && (practice != null || clock.GetState() == 0);
+            return isReady && (!isSongLoading || _routingOnlyLoad) && !_networkBlocked && (practice != null || clock.GetState() == 0);
+        }
+
+        private void RefreshPerformancePalette()
+        {
+            string displayName = "";
+            if (clock.GetState() == 0 && CanReceiveLiveMidi())
+            {
+                // The validated live sender is the transport owner, also on receiving clients.
+                // Practice is personal and always follows the local player.
+                VRC.SDKBase.VRCPlayerApi player = practice != null || network == null
+                    ? VRC.SDKBase.Networking.LocalPlayer : VRC.SDKBase.Networking.GetOwner(network.gameObject);
+                if (VRC.SDKBase.Utilities.IsValid(player)) displayName = player.displayName;
+            }
+            if (_presentationPlayerName == displayName) return;
+            _presentationPlayerName = displayName;
+            if (keyboard != null) keyboard.SetPerformancePalette(displayName);
+            foreach (PianoKeyboardView keys in instrumentKeyboards)
+                if (keys != null) keys.SetPerformancePalette(displayName);
+            foreach (StringsView stringsView in instrumentStrings)
+                if (stringsView != null) stringsView.SetPerformancePalette(displayName);
+            StringsView selectedStrings = GetStringsView(selectedInstrument);
+            if (selectedStrings != null) selectedStrings.SetPerformancePalette(displayName);
+            if (drumView != null) drumView.SetPerformancePalette(displayName);
+            if (waterfall != null) waterfall.RefreshPalette();
+            foreach (MidiWaterfallView fall in instrumentWaterfalls)
+                if (fall != null && fall != waterfall) fall.RefreshPalette();
         }
 
         public override void MidiNoteOn(int channel, int number, int velocity)
@@ -196,7 +231,7 @@ namespace MusicMidiPlayer.Logic
                 ? hardwareMidiChannelTargets[channel] : -1;
             if (instrumentRouter == null || channel == 9 || target == -1)
             { PerformNoteOn(channel, number, velocity); return; }
-            if (target < 0 || target > 6) return;
+            if (target < 0 || (target > 7 || target == 6)) return;
             int view = target == 0 ? instrumentRouter.pianoAppearance : target + 1;
             PerformInstrumentNoteOn(channel, number, velocity, view);
         }
@@ -204,7 +239,7 @@ namespace MusicMidiPlayer.Logic
         // Local device preference. Active notes retain the target sent with their NoteOn.
         public void SetHardwareMidiChannelTarget(int channel, int target)
         {
-            if (channel < 0 || channel >= 16 || channel == 9 || target < -1 || target > 6
+            if (channel < 0 || channel >= 16 || channel == 9 || target < -1 || (target > 7 || target == 6)
                 || hardwareMidiChannelTargets == null || hardwareMidiChannelTargets.Length != 16) return;
             if (hardwareMidiChannelTargets[channel] == target) return;
             hardwareMidiChannelTargets[channel] = target;
@@ -226,11 +261,11 @@ namespace MusicMidiPlayer.Logic
         public string EncodeMidiPreferences()
         {
             if (hardwareMidiChannelTargets == null || hardwareMidiChannelTargets.Length != 16) return "";
-            string value = "1", digits = "01234567";
+            string value = "1", digits = "012345678";
             for (int i = 0; i < 16; i++)
             {
                 int target = i == 9 ? -1 : hardwareMidiChannelTargets[i];
-                if (target < -1 || target > 6) return "";
+                if (target < -1 || (target > 7 || target == 6)) return "";
                 value += digits.Substring(target + 1, 1);
             }
             return value + (preferredMidiChannel >= 0 && preferredMidiChannel < 16 && preferredMidiChannel != 9
@@ -243,8 +278,8 @@ namespace MusicMidiPlayer.Logic
             int[] targets = new int[16];
             for (int i = 0; i < 16; i++)
             {
-                int digit = "01234567".IndexOf(encodedPreferences.Substring(i + 1, 1));
-                if (digit < 0) return false;
+                int digit = "012345678".IndexOf(encodedPreferences.Substring(i + 1, 1));
+                if (digit < 0 || digit == 7) return false;
                 targets[i] = digit - 1;
             }
             string last = encodedPreferences.Substring(17, 1);
@@ -330,7 +365,7 @@ namespace MusicMidiPlayer.Logic
             if (kind == 0) _LiveNoteOn(channel, number, value);
             else if (kind == 1) _LiveNoteOff(channel, number, value);
             else if (kind == 2) _LiveControlChange(channel, number, value);
-            else if (kind >= 3 && kind <= 9) StartLiveNote(channel, number, value, kind - 2);
+            else if (kind >= 3 && kind <= 10) StartLiveNote(channel, number, value, kind - 2);
         }
 
         public void _ApplyLiveMidiEvent(int packed, int sequence)
@@ -345,7 +380,7 @@ namespace MusicMidiPlayer.Logic
         }
 
         // Sparse snapshot: velocity/pedal in bits 0..7, identity in 8..19,
-        // explicit performance target + 1 in 20..22 (zero keeps MIDI routing).
+        // explicit performance target + 1 in 20..23 (zero keeps MIDI routing).
         public int[] _CaptureLiveMidi()
         {
             int count = 0;
@@ -364,6 +399,7 @@ namespace MusicMidiPlayer.Logic
         public void _RestoreLiveMidi(int[] data)
         {
             if (!CanReceiveLiveMidi() || data == null || data.Length > 2080) return;
+            RefreshPerformancePalette();
             int[] target = new int[2080];
             int[] overrides = new int[2048];
             for (int i = 0; i < data.Length; i++)
@@ -372,7 +408,7 @@ namespace MusicMidiPlayer.Logic
                 int direct = data[i] >> 20;
                 int value = data[i] & 255;
                 if (id < 0 || id >= 2080 || target[id] != 0
-                    || direct < 0 || direct > 7 || (id >= 2048 && direct != 0)
+                    || direct < 0 || (direct > 8 || direct == 7) || (id >= 2048 && direct != 0)
                     || (id < 2064 ? (value & 127) == 0 : value < 1 || value > 128)) return;
                 target[id] = value;
                 if (id < 2048) overrides[id] = direct;
@@ -408,7 +444,7 @@ namespace MusicMidiPlayer.Logic
                     if (instrumentRouter != null) RouteLiveVisual(id, held, value & 127, false);
                     else if (waterfall != null)
                     {
-                        if (held) waterfall.LiveNoteDown(id, id % 128);
+                        if (held) waterfall.LiveNoteDownVelocity(id, id % 128, value & 127);
                         else waterfall.LiveNoteUp(id);
                     }
                 }
@@ -436,11 +472,14 @@ namespace MusicMidiPlayer.Logic
         {
             if (velocity == 0) { _LiveNoteOff(channel, number, 0); return; }
             if (!CanReceiveLiveMidi() || channel < 0 || channel >= 16 || number < 0 || number > 127 || velocity < 0 || velocity > 127) return;
+            RefreshPerformancePalette();
             if (direct > 0 && (channel == 9 || instrumentRouter == null || !instrumentRouter.IsEnabled(direct - 1))) return;
             if (channel == 9)
             {
+                if (instrumentRouter != null && !instrumentRouter.IsDrumsEnabled()) return;
                 if (voicePool.drums != null) voicePool.drums.LiveNoteDown(number, velocity, liveMidiEventSequence++);
                 if (drumView != null) drumView.LiveHit(number, velocity, applyGeneration);
+                if (clockworkMusicLink != null) clockworkMusicLink.Pulse(8, number, velocity);
                 return;
             }
             int id = channel * 128 + number;
@@ -453,10 +492,12 @@ namespace MusicMidiPlayer.Logic
             int key = number - 21;
             if (key >= 0 && key < 88) sequencer.keyDownCount[key]++;
             voicePool.LiveNoteDown(id, number, velocity, applyGeneration);
+            if (clockworkMusicLink != null) clockworkMusicLink.Pulse(instrumentRouter == null
+                ? (selectedInstrument < 2 ? 0 : selectedInstrument - 1) : instrumentRouter.liveTargets[id], number, velocity);
             if (instrumentRouter != null) RouteLiveVisual(id, true, velocity, true);
             else
             {
-                if (waterfall != null) waterfall.LiveNoteDown(id, number);
+                if (waterfall != null) waterfall.LiveNoteDownVelocity(id, number, velocity);
                 if (waterfall != null && waterfall.effects != null) waterfall.effects.LiveHit(number, velocity, applyGeneration);
             }
         }
@@ -608,8 +649,11 @@ namespace MusicMidiPlayer.Logic
                 if (isReady && id != selectedSongId && library.FindSong(id) != null) ApplyState(id, 0, 0, clock.GetServerSeconds(), true);
                 return;
             }
-            if (!CanCommand() || id == selectedSongId || library.FindSong(id) == null) return;
-            if (ApplyState(id, 0, 0, clock.GetServerSeconds(), false)) network._CommitLocalState();
+            if (!CanCommand() || library.FindSong(id) == null) return;
+            bool sameSong = id == selectedSongId;
+            if (sameSong && clock.GetState() == 1) return;
+            double position = sameSong && clock.GetState() == 2 ? clock.GetPositionSeconds() : -3;
+            if (ApplyState(id, 1, position, clock.GetServerSeconds(), false)) network._CommitLocalState();
         }
 
         public void ApplyRemoteSnapshot(string hash, string id, int state, double position, double server, int writer, int sequence, bool forceRebuild)
@@ -731,6 +775,12 @@ namespace MusicMidiPlayer.Logic
         {
             if (instrumentRouter != null)
             {
+                if (index == 9)
+                {
+                    if (!isReady || isSongLoading || voicePool.drums == null || !CanCommand()) return;
+                    _ApplyInstrumentSelection(instrumentRouter.enabledMask ^ 256, instrumentRouter.pianoAppearance);
+                    network._CommitInstrumentState(); return;
+                }
                 if (!isReady || isSongLoading || !HasInstrument(index) || !CanCommand()) return;
                 int bit = 1 << instrumentRouter.TargetForView(index);
                 int mask = instrumentRouter.enabledMask;
@@ -798,7 +848,7 @@ namespace MusicMidiPlayer.Logic
             {
                 // Same-bank model changes must never restart sounding voices.
                 for (int i = 0; i < 2048; i++)
-                    if (_liveHeld[i] && waterfall != null) waterfall.LiveNoteDown(i, i % 128);
+                    if (_liveHeld[i] && waterfall != null) waterfall.LiveNoteDownVelocity(i, i % 128, _liveVelocity[i]);
                 if (keyboard != null) keyboard.RefreshLive((int)(Time.realtimeSinceStartup * 1000f), applyGeneration);
                 if (waterfall != null) waterfall.RefreshLive();
             }
@@ -826,6 +876,7 @@ namespace MusicMidiPlayer.Logic
             selectedSongId = id;
             clock.BindSong(next, voicePool.bank);
             isSongLoading = true;
+            _routingOnlyLoad = false;
             _songLoadStage = 0; _songLoadView = 0; _songLoadPart = 0;
             if (isSongLoading && !next.isDecoded && !next.BeginDecode())
             {
@@ -846,7 +897,7 @@ namespace MusicMidiPlayer.Logic
             }
             else if (_songLoadStage == 3)
             {
-                voicePool.BeginBindSong(next, sequencer);
+                if (!_routingOnlyLoad) voicePool.BeginBindSong(next, sequencer);
                 if (voicePool.drums != null) voicePool.drums.BeginBindSong(next);
                 _songLoadStage = 4;
             }
@@ -859,7 +910,7 @@ namespace MusicMidiPlayer.Logic
             else if (_songLoadStage == 5)
             {
                 if (drumView != null && !drumView.BindStep(16)) return false;
-                _songLoadStage = 6;
+                _songLoadStage = _routingOnlyLoad ? 7 : 6;
             }
             else if (_songLoadStage == 6)
             {
@@ -937,6 +988,7 @@ namespace MusicMidiPlayer.Logic
                 else if (BindDecodedSongStep())
                 {
                     isSongLoading = false;
+                    _routingOnlyLoad = false;
                     // Resume against the latest anchor, including time spent loading.
                     double now = clock.GetServerSeconds();
                     clock.ResyncLocalPhase(now, AudioSettings.dspTime);
@@ -972,6 +1024,7 @@ namespace MusicMidiPlayer.Logic
             clock.ApplyAnchor(state, position, server);
             clock.SampleFrame(clock.GetServerSeconds(), AudioSettings.dspTime);
             int ms = (int)(clock.GetPositionSeconds() * 1000.0);
+            RefreshPerformancePalette();
             if (state != 0 && !isSongLoading)
             {
                 sequencer.RebuildAt(ms, applyGeneration);
@@ -997,6 +1050,7 @@ namespace MusicMidiPlayer.Logic
 
         private void RebuildCurrent(int ms)
         {
+            RefreshPerformancePalette();
             int old = applyGeneration++;
             voicePool.CancelGeneration(old);
             sequencer.RebuildAt(ms, applyGeneration);
@@ -1031,13 +1085,25 @@ namespace MusicMidiPlayer.Logic
 
         public void _ApplyInstrumentSelection(int mask, int appearance)
         {
-            if (instrumentRouter == null || mask < 0 || mask > 63 || appearance < 0 || appearance > 1) return;
+            if (instrumentRouter == null || mask < 0 || (mask & ~447) != 0 || appearance < 0 || appearance > 1) return;
             if (mask == instrumentRouter.enabledMask && appearance == instrumentRouter.pianoAppearance) return;
+            bool drumsChanged = ((mask ^ instrumentRouter.enabledMask) & 256) != 0;
+            if (drumsChanged && voicePool.drums != null) voicePool.drums.StopAll();
+            // Toggling only drums must leave melodic voices, held keys and transport untouched.
+            if (((mask ^ instrumentRouter.enabledMask) & 191) == 0 && appearance == instrumentRouter.pianoAppearance)
+            {
+                instrumentRouter.enabledMask = mask;
+                if (instrumentFanLayout != null) ApplyRoutedRoots();
+                ApplyDrumSelection(true);
+                if (playerUI != null) playerUI.RefreshState();
+                return;
+            }
             int[] held = _CaptureLiveMidi();
             bool changedAudio = mask != instrumentRouter.enabledMask;
             if (changedAudio) { ClearMelodicLiveMidi(); voicePool.CancelGeneration(applyGeneration++); sequencer.Clear(applyGeneration); }
             ClearRoutedViews();
             instrumentRouter.enabledMask = mask; instrumentRouter.pianoAppearance = appearance;
+            if (drumsChanged) ApplyDrumSelection(false);
             instrumentRouter.ResolveSelection();
             // Retain a stable existing menu index for legacy integrations and the shared opening.
             selectedInstrument = appearance;
@@ -1053,32 +1119,93 @@ namespace MusicMidiPlayer.Logic
             if (instrumentRouter != null) instrumentRouter.RefreshKeyCounts((int)(clock.GetPositionSeconds() * 1000), CanReceiveLiveMidi());
             if (playerUI != null) playerUI.RefreshState();
         }
-        public string FileProgramMap() { return instrumentRouter == null ? "" : instrumentRouter.fileProgramMap; }
-        public void _ApplyRoutingState(int mask, int appearance, string map)
+        private void ApplyDrumSelection(bool recover)
         {
-            if (instrumentRouter == null || mask < 0 || mask > 63 || appearance < 0 || appearance > 1
-                || !instrumentRouter.IsValidFileProgramMap(map)) return;
-            if (mask != instrumentRouter.enabledMask)
+            bool enabled = instrumentRouter.IsDrumsEnabled();
+            if (drumView != null)
             {
-                instrumentRouter.fileProgramMap = map;
-                _ApplyInstrumentSelection(mask, appearance);
+                drumView.Clear(applyGeneration);
+                drumView.gameObject.SetActive(enabled && drumView.presentationEnabled);
             }
-            else
+            if (!recover || !enabled || isSongLoading || clock.GetState() == 0) return;
+            int ms = (int)(clock.GetPositionSeconds() * 1000);
+            if (voicePool.drums != null)
             {
-                _ApplyInstrumentSelection(mask, appearance); _ApplyFileProgramMap(map);
+                voicePool.ClaimPercussionSources();
+                voicePool.drums.RebuildAt(ms, applyGeneration);
             }
+            if (drumView != null) drumView.RebuildAt(ms, applyGeneration);
+        }
+        public string FileProgramMap() { return instrumentRouter == null ? "" : instrumentRouter.fileProgramMap; }
+        public string FileTrackMap() { return instrumentRouter == null ? "" : instrumentRouter.fileTrackMap; }
+        public bool AutoTrackRouting() { return instrumentRouter != null && instrumentRouter.autoTrackRouting; }
+        public void CommandAutoTrackRouting(bool enabled)
+        {
+            if (instrumentRouter == null || !CanCommand() || isSongLoading) return;
+            _ApplyRoutingState(InstrumentMask(), instrumentRouter.pianoAppearance, FileProgramMap(), FileTrackMap(), enabled);
+            network._CommitInstrumentState();
+        }
+        public void _ApplyRoutingState(int mask, int appearance, string map, string trackMap, bool automatic)
+        {
+            if (instrumentRouter == null || mask < 0 || (mask & ~447) != 0 || appearance < 0 || appearance > 1
+                || !instrumentRouter.IsValidFileProgramMap(map) || !instrumentRouter.IsValidFileTrackMap(trackMap)) return;
+            bool changed = automatic != AutoTrackRouting() || map != FileProgramMap() || trackMap != FileTrackMap();
+            bool routingChanged = automatic != AutoTrackRouting() || map != FileProgramMap()
+                || instrumentRouter.FileRoutingMap(trackMap) != instrumentRouter.FileRoutingMap(FileTrackMap());
+            instrumentRouter.fileProgramMap = map; instrumentRouter.fileTrackMap = trackMap;
+            instrumentRouter.autoTrackRouting = automatic; instrumentRouter.ResolveSelection();
+            if (routingChanged) RebindFileRouting(); else if (changed) RebuildFilePitch();
+            _ApplyInstrumentSelection(mask, appearance);
+            if (playerUI != null) playerUI.RefreshState();
+        }
+        public void CommandFileTrackTarget(int track, int target)
+        {
+            if (instrumentRouter == null || !CanCommand() || isSongLoading || track < 0 || track >= 65535
+                || target < -1 || (target > 8 || target == 6)) return;
+            string map = instrumentRouter.WithFileTrackTarget(track, target);
+            if (target >= 0 && (target == 8 ? !instrumentRouter.IsDrumsEnabled() : !instrumentRouter.IsEnabled(target)))
+            {
+                _ApplyRoutingState(instrumentRouter.enabledMask | (1 << target), instrumentRouter.pianoAppearance, FileProgramMap(), map, AutoTrackRouting());
+            }
+            else _ApplyFileTrackMap(map);
+            network._CommitInstrumentState();
+        }
+        public void CommandFileTrackEnabled(int track, bool enabled)
+        {
+            if (instrumentRouter == null || !CanCommand() || isSongLoading || track < 0 || track >= 65535) return;
+            string map = instrumentRouter.WithFileTrackEnabled(track, enabled);
+            if (map == FileTrackMap()) return;
+            _ApplyFileTrackMap(map); network._CommitInstrumentState();
+        }
+        public void CommandResetFileTrackMap()
+        {
+            if (instrumentRouter == null || !CanCommand() || isSongLoading) return;
+            _ApplyFileTrackMap(instrumentRouter.FileAutoRange() ? "P1" : ""); network._CommitInstrumentState();
+        }
+        public void CommandFileTrackOctave(int track, int octave)
+        {
+            if (instrumentRouter == null || !CanCommand() || isSongLoading || track < 0 || track >= 65535) return;
+            string map = instrumentRouter.WithFileTrackOctave(track, octave);
+            if (map == FileTrackMap()) return;
+            _ApplyFileTrackMap(map); network._CommitInstrumentState();
+        }
+        public void CommandFileAutoRange(bool enabled)
+        {
+            if (instrumentRouter == null || !CanCommand() || isSongLoading) return;
+            string map = instrumentRouter.WithFileAutoRange(enabled);
+            if (map == FileTrackMap()) return;
+            _ApplyFileTrackMap(map); network._CommitInstrumentState();
         }
         public void CommandFileProgramTarget(int program, int target)
         {
             if (instrumentRouter == null || !CanCommand() || isSongLoading || program < 0 || program > 127
-                || target < -1 || target > 5) return;
+                || target < -1 || (target > 8 || target == 6)) return;
             string map = FileProgramMap();
             if (map == "") map = new string('0', 128);
             map = map.Substring(0, program) + (target + 1).ToString() + map.Substring(program + 1);
-            if (target >= 0 && !instrumentRouter.IsEnabled(target))
+            if (target >= 0 && (target == 8 ? !instrumentRouter.IsDrumsEnabled() : !instrumentRouter.IsEnabled(target)))
             {
-                instrumentRouter.fileProgramMap = map;
-                _ApplyInstrumentSelection(instrumentRouter.enabledMask | (1 << target), instrumentRouter.pianoAppearance);
+                _ApplyRoutingState(instrumentRouter.enabledMask | (1 << target), instrumentRouter.pianoAppearance, map, FileTrackMap(), AutoTrackRouting());
             }
             else _ApplyFileProgramMap(map);
             network._CommitInstrumentState();
@@ -1090,18 +1217,56 @@ namespace MusicMidiPlayer.Logic
         }
         public void _ApplyFileProgramMap(string map)
         {
-            if (instrumentRouter == null || !instrumentRouter.IsValidFileProgramMap(map) || map == FileProgramMap()) return;
-            instrumentRouter.fileProgramMap = map; instrumentRouter.ResolveSelection();
-            if (isReady && !isSongLoading && clock.GetState() != 0)
-            {
-                ClearRoutedViews(); RebuildCurrent((int)(clock.GetPositionSeconds() * 1000));
-            }
+            ApplyFileMaps(map, FileTrackMap());
+        }
+        public void _ApplyFileTrackMap(string map)
+        {
+            ApplyFileMaps(FileProgramMap(), map);
+        }
+        private void ApplyFileMaps(string programMap, string trackMap)
+        {
+            if (instrumentRouter == null || !instrumentRouter.IsValidFileProgramMap(programMap)
+                || !instrumentRouter.IsValidFileTrackMap(trackMap)
+                || (programMap == FileProgramMap() && trackMap == FileTrackMap())) return;
+            bool routingChanged = programMap != FileProgramMap()
+                || instrumentRouter.FileRoutingMap(trackMap) != instrumentRouter.FileRoutingMap(FileTrackMap());
+            instrumentRouter.fileProgramMap = programMap; instrumentRouter.fileTrackMap = trackMap;
+            instrumentRouter.ResolveSelection();
+            if (routingChanged) RebindFileRouting(); else RebuildFilePitch();
             if (playerUI != null) playerUI.RefreshState();
+        }
+        private void RebuildFilePitch()
+        {
+            // Pitch edits leave drum indices and held live-input identities intact.
+            if (isReady && !isSongLoading && _song != null && _song.isDecoded
+                && instrumentRouter.IsSongReady(_song) && clock.GetState() != 0)
+                RebuildCurrent((int)(clock.GetPositionSeconds() * 1000));
+        }
+        private void RebindFileRouting()
+        {
+            if (!isReady || _song == null || !_song.isDecoded || !instrumentRouter.IsSongReady(_song)) return;
+            // Reuse the bounded loader for drum audio/lanes. Keep live melodic voices intact.
+            voicePool.CancelGeneration(applyGeneration++);
+            if (clock.GetState() != 0) { sequencer.Clear(applyGeneration); ClearRoutedViews(); }
+            _routingOnlyLoad = true; isSongLoading = true; _songLoadStage = 3;
         }
         private void ApplyRoutedRoots()
         {
+            if (instrumentFanLayout != null)
+            {
+                instrumentFanLayout.ApplyLayout();
+                for (int i = 0; i < instrumentRoots.Length; i++)
+                    if (instrumentRoots[i] != null) instrumentRoots[i].SetActive(instrumentRouter.IsViewEnabled(i));
+                if (voicePool.drums != null) voicePool.drums.RelocateSources();
+            }
+            else ApplyLegacyRoutedRoots();
+            voicePool.ensemble.soundOrigins[0] = instrumentKeyboards[instrumentRouter.pianoAppearance].transform;
+            voicePool.ensemble.RelocateSources();
+        }
+        private void ApplyLegacyRoutedRoots()
+        {
             int count = 0;
-            for (int t = 0; t < 7; t++) if (instrumentRouter.IsEnabled(t)) count++;
+            for (int t = 0; t < 8; t++) if (instrumentRouter.IsEnabled(t)) count++;
             for (int i = 0; i < instrumentRoots.Length; i++) if (instrumentRoots[i] != null)
             {
                 if (i < instrumentRouter.viewRestPositions.Length)
@@ -1109,8 +1274,14 @@ namespace MusicMidiPlayer.Logic
                         + (count > 1 ? instrumentRouter.stageOffsets[instrumentRouter.TargetForView(i)] : Vector3.zero);
                 instrumentRoots[i].SetActive(instrumentRouter.IsViewEnabled(i));
             }
-            voicePool.ensemble.soundOrigins[0] = instrumentKeyboards[instrumentRouter.pianoAppearance].transform;
-            voicePool.ensemble.RelocateSources();
+            if (instrumentRoots.Length > 8 && instrumentRoots[8] != null)
+            {
+                bool onGrandPiano = instrumentRouter.IsViewEnabled(1) && instrumentRoots[1] != null;
+                if (onGrandPiano)
+                    instrumentRoots[8].transform.position = instrumentRoots[1].transform.TransformPoint(musicBoxGrandPianoOffset);
+                if (musicBoxTable != null) musicBoxTable.SetActive(!onGrandPiano);
+                if (musicBoxSeat != null) musicBoxSeat.SetActive(!onGrandPiano);
+            }
         }
         private void ClearRoutedViews()
         {
@@ -1163,7 +1334,9 @@ namespace MusicMidiPlayer.Logic
                 if (!down) fall.LiveNoteUp(id);
                 else if (instrumentRouter.TargetForView(i) == target)
                 {
-                    fall.LiveNoteDown(id, id % 128);
+                    if (down && hit && instrumentKeyboards[i] != null)
+                        instrumentKeyboards[i].PluckLive(id % 128, (int)(Time.realtimeSinceStartup * 1000));
+                    fall.LiveNoteDownVelocity(id, id % 128, velocity);
                     if (hit && fall.effects != null) fall.effects.LiveHit(id % 128, velocity, applyGeneration);
                 }
             }

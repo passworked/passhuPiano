@@ -73,6 +73,7 @@ namespace MusicMidiPlayer.Editor.Prefab
                 for(int style=0;style<3;style++) for(int pitch=0;pitch<128;pitch++)
                     data.pitchToRegion[style*128+pitch]=Enumerable.Range(0,rows.Length).Where(i=>rows[i].articulation==style)
                         .OrderBy(i=>Math.Abs(pitch-rows[i].root)).ThenBy(i=>rows[i].root).First();
+                AudioEnergyBaker.Bake(data);
                 data.bankHash=BankHash(data);
                 if(!data.IsValid()) throw new InvalidOperationException("Invalid strings bank: "+data.bankId);
                 pool.banks[b]=data;
@@ -121,7 +122,8 @@ namespace MusicMidiPlayer.Editor.Prefab
 
         public static string BankHash(StringsBankData bank)
         {
-            var text=new System.Text.StringBuilder(bank.bankId+":strings-v1");
+            AudioEnergyBaker.Validate(AudioEnergyBaker.Clips(bank), bank.energyStarts, bank.energyCounts, bank.energyValues);
+            var text=new System.Text.StringBuilder(bank.bankId+":strings-v1:" + AudioEnergyBaker.Format);
             for(int i=0;i<bank.attacks.Length;i++)
             {
                 text.Append(':').Append(bank.roots[i]).Append(':').Append(bank.articulations[i]).Append(':').Append(bank.releaseMs[i]);
@@ -129,6 +131,7 @@ namespace MusicMidiPlayer.Editor.Prefab
                 foreach(var clip in new[]{bank.attacks[i],bank.loops[i]}) if(clip!=null)
                 { string path=AssetDatabase.GetAssetPath(clip); text.Append(':').Append(MidiContentHash.Bytes(File.ReadAllBytes(path))).Append(':').Append(MidiContentHash.Bytes(File.ReadAllBytes(path+".meta"))); }
             }
+            text.Append(AudioEnergyBaker.Fingerprint(bank.energyStarts, bank.energyCounts, bank.energyValues));
             foreach(int r in bank.pitchToRegion) text.Append(':').Append(r);
             return MidiContentHash.Bytes(System.Text.Encoding.UTF8.GetBytes(text.ToString()));
         }

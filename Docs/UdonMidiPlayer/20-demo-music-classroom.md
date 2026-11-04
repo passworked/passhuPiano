@@ -23,7 +23,18 @@ Assets/Scenes/VRCDefaultWorldScene.unity 中增加 DemoMusicClassroom 根节点�
 座椅与播放器 Prefab 覆盖；不更新分发 Prefab，不改同步或播放逻辑，不增加多乐器合奏支持。
 现有其他乐器对象也不因本次美术任务删除或重接线。
 
-教室围绕原播放器坐标建模：琴位在原点，控制面板保留在左侧。出生点和玩家功能不移动。
+教室围绕原播放器坐标建模：琴位在原点。2026-11-02 按用户要求，主场景控制面板移至后墙中央，
+当时世界坐标为 `(0, 1.35, -5.05)`、Y 旋转 `180°`，正面朝向室内；该位置现由下述入口侧墙布局取代。
+同次删除 SoloViolin、Viola、Cello、Contrabass 和旧 StringsEnsemble 下全部 5 个 PerformanceSeat
+（含座椅模型、Station 与交互碰撞器），保留钢琴和马林巴座椅。出生点不移动，分发 Prefab 不更新。
+此次布局已通过 Unity Editor 截图及面板前方碰撞检查，未进行真实 VRChat 验收。
+2026-11-04 按用户要求，将同一主控制面板移至入口侧墙两门之间，世界坐标
+`(4.94, 1.35, -1.075)`、Y 旋转 `90°`，正面朝向教室。保留原对象、
+`0.0018` 缩放、组件与全部接线；不更新分发 Prefab。Unity Editor 渲染及序列化比较
+确认仅面板 RectTransform 改动，两门通道射线抽样均无实体碰撞阻挡，面板 BoxCollider
+仍为 trigger。截图与检查记录分别在 `Captures/EntrancePanel/`、`Logs/EntrancePanel/`；
+未运行 Play Mode、构建或真实 VRChat 客户端验收。
+
 原 Floor 对象及 Collider 保留，仅隐藏原地面 Renderer，表面改由新木地板呈现。
 新增碰撞器只负责建筑边界和家具。两处侧门保留约 1.14 m 的通行净宽，
 走廊末端和外窗有边界碰撞。

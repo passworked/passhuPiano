@@ -133,6 +133,7 @@ namespace MusicMidiPlayer.Editor.Prefab
                 effects.hitLights[i] = light;
             }
             ConfigureReflection(host, width, view.viewHeight);
+            if (view.instrumentTarget == 0) MidiPianoImpactBuilder.Configure(view);
             EditorUtility.SetDirty(view); EditorUtility.SetDirty(effects);
             UdonSharpEditorUtility.CopyProxyToUdon(effects, ProxySerializationPolicy.All);
             UdonSharpEditorUtility.CopyProxyToUdon(view, ProxySerializationPolicy.RootOnly);

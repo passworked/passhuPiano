@@ -16,6 +16,7 @@ namespace MusicMidiPlayer.Views
         public bool presentationEnabled=true;
         [HideInInspector] public int processedHitCount;
         private MidiSongData _song;
+        private string _performancePlayerName = "";
         private int _generation=-1,_lastMs,_noteCursor;
         private bool _ready,_hasPosition,_liveMode,_openHat;
         private int[] _ringCursor=new int[9];
@@ -27,6 +28,8 @@ namespace MusicMidiPlayer.Views
         private MaterialPropertyBlock _properties;
         private Vector3[] _headDelta,_hatDelta;
         private Color[] _glowColors;
+        private Color[] _channelColors = new Color[16];
+        private bool IsEnabled() { return presentationEnabled && (lanes == null || lanes.instrumentRouter == null || lanes.instrumentRouter.IsDrumsEnabled()); }
         private void Initialize()
         {
             if(_ready)return;
@@ -59,16 +62,29 @@ namespace MusicMidiPlayer.Views
         {
             // Same canonical source-MIDI palette as PianoKeyboardView, including strings-only presentation.
             string text=_song==null || string.IsNullOrEmpty(_song.sourceHash)?"MusicMidiPlayer":_song.sourceHash.ToLowerInvariant();
+            if(!string.IsNullOrEmpty(_performancePlayerName))text=_performancePlayerName;
             uint seed=2166136261u;
             for(int i=0;i<text.Length;i++)seed=(seed^(uint)text[i])*16777619u;
             uint tone=seed*1664525u+1013904223u;
-            float hue=(seed&0x00ffffffu)/16777216f;
+            float hue=((seed&0x00ffffffu)*(360f/16777216f))/360f;
             float saturation=.70f+.18f*((tone&0x0000ffffu)/65535f);
             float value=.90f+.10f*((tone>>16)/65535f);
             Color color=Color.HSVToRGB(hue,saturation*.82f,value);
             for(int i=0;i<_glowColors.Length;i++)_glowColors[i]=color;
-            if(lanes!=null)lanes.SetPalette(color);
+            for(int channel=0;channel<16;channel++)
+                _channelColors[channel]=Color.HSVToRGB(Mathf.Repeat(hue+channel*.38196601125f,1f),saturation*.82f,value);
+            if(lanes!=null){lanes.SetPalette(color);lanes.SetChannelPalette(_channelColors);}
         }
+        public void SetPerformancePalette(string displayName)
+        {
+            Initialize();displayName=displayName??"";
+            if(_performancePlayerName==displayName)return;
+            _performancePlayerName=displayName;ApplySongPalette();
+        }
+        public Color FileChannelColor(int channel)
+        { Initialize(); return _channelColors[Mathf.Clamp(channel,0,15)]; }
+        public Color CurrentPaletteColor()
+        { Initialize(); return _glowColors.Length > 0 ? _glowColors[0] : Color.white; }
         private int Upper(int ms)
         {
             int lo=0,hi=_song==null || lanes==null?0:lanes.noteIds.Length;
@@ -83,44 +99,46 @@ namespace MusicMidiPlayer.Views
         }
         public void RebuildAt(int ms,int generation)
         {
-            Clear(generation);_lastMs=ms;_hasPosition=true;_noteCursor=Upper(ms);
+            Clear(generation);if(!IsEnabled())return;
+            _lastMs=ms;_hasPosition=true;_noteCursor=Upper(ms);
             if(_song!=null)
             {
                 int first=Upper(ms-1900);
                 // Restore residual motion without replaying historical attack effects.
                 for(int i=Mathf.Max(first,_noteCursor-256);i<_noteCursor;i++)
-                {int n=lanes.noteIds[i];Record(_song.pitch[n],_song.velocity[n],_song.startMs[n]);}
+                {int n=lanes.noteIds[i];Record(lanes.DrumPitch(n),_song.velocity[n],_song.startMs[n],_song.channel[n]);}
                 for(int i=_noteCursor-1;i>=0;i--)
-                {int n=lanes.noteIds[i];if(_song.pitch[n]==42 || _song.pitch[n]==44 || _song.pitch[n]==46)
-                    {_openHat=_song.pitch[n]==46;break;}}
+                {int n=lanes.noteIds[i], pitch=lanes.DrumPitch(n);if(pitch==42 || pitch==44 || pitch==46)
+                    {_openHat=pitch==46;break;}}
             }
             ApplyPose(ms);if(lanes!=null)lanes.Refresh(ms);
         }
         public void Refresh(int ms,int generation)
         {
-            Initialize();if(!presentationEnabled){Clear(generation);return;}
+            Initialize();if(!IsEnabled()){Clear(generation);return;}
             if(_liveMode || !_hasPosition || generation!=_generation || ms<_lastMs || ms-_lastMs>150)
             {RebuildAt(ms,generation);return;}
             int end=Upper(ms);
             for(int i=Mathf.Max(_noteCursor,end-64);i<end;i++)
             {int n=lanes.noteIds[i];if(ms-_song.startMs[n]<=80)
-                {Record(_song.pitch[n],_song.velocity[n],_song.startMs[n]);processedHitCount++;}}
+                {Record(lanes.DrumPitch(n),_song.velocity[n],_song.startMs[n],_song.channel[n]);processedHitCount++;}}
             _noteCursor=end;_lastMs=ms;ApplyPose(ms);if(lanes!=null)lanes.Refresh(ms);
         }
         public void LiveHit(int pitch,int velocity,int generation)
         {
-            Initialize();if(!presentationEnabled)return;
-            if(!_liveMode || generation!=_generation){Clear(generation);_liveMode=true;}
-            int ms=(int)(Time.realtimeSinceStartup*1000f);Record(pitch,velocity,ms);processedHitCount++;
+            Initialize();if(!IsEnabled())return;
+            if(!_liveMode || generation!=_generation){Clear(generation);_liveMode=true;ApplySongPalette();}
+            int ms=(int)(Time.realtimeSinceStartup*1000f);Record(pitch,velocity,ms,-1);processedHitCount++;
             ApplyPose(ms);if(lanes!=null)lanes.LiveHit(pitch,velocity);
         }
         public void RefreshLive()
         {
-            if(!_liveMode)return;ApplyPose((int)(Time.realtimeSinceStartup*1000f));if(lanes!=null)lanes.RefreshLive();
+            if(!IsEnabled() || !_liveMode)return;ApplyPose((int)(Time.realtimeSinceStartup*1000f));if(lanes!=null)lanes.RefreshLive();
         }
-        private void Record(int pitch,int velocity,int ms)
+        private void Record(int pitch,int velocity,int ms,int channel)
         {
             int lane=bank==null?-1:bank.Lane(pitch);if(lane<0)return;
+            if(channel>=0 && lane<_glowColors.Length)_glowColors[lane]=_channelColors[Mathf.Clamp(channel,0,15)];
             int slot=lane*8+_ringCursor[lane];_ringCursor[lane]=(_ringCursor[lane]+1)%8;
             _times[slot]=ms;_strength[slot]=Mathf.Sqrt(velocity/127f);
             if(pitch==46)_openHat=true;if(pitch==42 || pitch==44)_openHat=false;

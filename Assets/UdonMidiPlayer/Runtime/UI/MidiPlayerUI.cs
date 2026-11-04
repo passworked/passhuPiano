@@ -14,6 +14,8 @@ namespace MusicMidiPlayer.UI
     public class MidiPlayerUI : UdonSharpBehaviour
     {
         public MidiPlayerFacade facade;
+        public MidiCreditsPanel creditsPanel;
+        public UdonSharpBehaviour[] languageListeners = new UdonSharpBehaviour[0];
         public GameObject drumVisibilitySelectionMark;
         public TMP_Text drumVisibilityLabel;
         public void _ToggleDrumVisibility()
@@ -21,7 +23,7 @@ namespace MusicMidiPlayer.UI
             if(facade==null || facade.drumView==null)return;
             var view=facade.drumView;
             view.presentationEnabled=!view.presentationEnabled;
-            view.gameObject.SetActive(view.presentationEnabled);
+            view.gameObject.SetActive(view.presentationEnabled && (facade.instrumentRouter == null || facade.instrumentRouter.IsDrumsEnabled()));
             if(drumVisibilitySelectionMark!=null)drumVisibilitySelectionMark.SetActive(view.presentationEnabled);
         }
         public Button instrumentButton;
@@ -50,6 +52,8 @@ namespace MusicMidiPlayer.UI
         public void _SelectViola() { SelectInstrument(4); }
         public void _SelectCello() { SelectInstrument(5); }
         public void _SelectContrabass() { SelectInstrument(6); }
+        public void _SelectMusicBox() { SelectInstrument(8); }
+        public void _SelectDrums() { SelectInstrument(9); }
         public void _SelectStrings() { SelectInstrument(7); }
         public void _StringsSustain() { SelectStringsStyle(0); }
         public void _StringsSpiccato() { SelectStringsStyle(1); }
@@ -130,19 +134,33 @@ namespace MusicMidiPlayer.UI
         public TMP_Text fileMappingEntryLabel, fileMappingTitle, fileMappingHint, fileMappingBack, fileMappingReset, fileMappingPage;
         public TMP_Text fileMappingPrevious, fileMappingNext, fileChoiceTitle;
         public Button fileMappingEntry, fileResetButton, filePreviousButton, fileNextButton;
+        public Button fileProgramTab, fileTrackTab;
+        public TMP_Text fileProgramTabLabel, fileTrackTabLabel;
+        public GameObject fileProgramTabMark, fileTrackTabMark;
+        public Toggle fileAutoTrackToggle;
+        public Toggle[] fileTrackEnabledToggles = new Toggle[0];
+        public Toggle fileAutoRangeToggle;
+        public TMP_Text fileAutoRangeLabel;
+        public Button[] fileOctaveDownButtons = new Button[0], fileOctaveUpButtons = new Button[0];
+        public TMP_Text[] fileOctaveValues = new TMP_Text[0], fileOctaveHeadings = new TMP_Text[0];
+        public TMP_Text fileAutoTrackLabel;
+        public RectTransform fileMappingHintRect;
         public Button[] fileProgramButtons = new Button[0], fileTargetButtons = new Button[0];
         public TMP_Text[] fileProgramLabels = new TMP_Text[0], fileProgramValues = new TMP_Text[0], fileTargetLabels = new TMP_Text[0];
         public GameObject[] fileTargetMarks = new GameObject[0];
         public RectTransform fileChoiceContent, fileChoiceTitleRect;
+        public ScrollRect fileTargetScroll;
+        public void _FileDrums() { SelectMidiTarget(8); }
         private int[] _filePrograms = new int[128];
         private int _fileCount, _filePage, _fileProgram, _fileSignature;
-        private bool _fileRefreshed;
+        private bool _fileRefreshed, _fileTracks;
         private string _fileSong = "", _fileMap = "", _fileChoiceSong = "";
         public void _OpenFileMapping()
         {
             if (fileMappingPanel == null || facade == null || facade.instrumentRouter == null) return;
             bool open = !fileMappingPanel.activeSelf;
             _CloseInstrumentPanel(); _CloseLanguagePanel(); _CloseSettingsPanel();
+            _CloseFileChoices();
             fileMappingPanel.SetActive(open); _filePage = 0; RefreshFileMapping(true);
         }
         public void _CloseFileChoices() { if (fileChoicePanel != null) fileChoicePanel.SetActive(false); }
@@ -150,7 +168,25 @@ namespace MusicMidiPlayer.UI
         {
             _CloseFileChoices(); if (fileMappingPanel != null) fileMappingPanel.SetActive(false);
         }
-        public void _ResetFileMapping() { facade.CommandResetFileProgramMap(); _CloseFileChoices(); RefreshFileMapping(true); }
+        public void _FileByProgram() { _fileTracks = false; _filePage = 0; _CloseFileChoices(); RefreshFileMapping(true); }
+        public void _FileByTrack() { _fileTracks = true; _filePage = 0; _CloseFileChoices(); RefreshFileMapping(true); }
+        public void _OnAutoTrackRoutingChanged()
+        {
+            if (fileAutoTrackToggle == null || fileMappingPanel == null || !fileMappingPanel.activeSelf || !_fileTracks) return;
+            facade.CommandAutoTrackRouting(fileAutoTrackToggle.isOn);
+            _CloseFileChoices(); RefreshFileMapping(true);
+        }
+        public void _OnFileAutoRangeChanged()
+        {
+            if (fileAutoRangeToggle == null || fileMappingPanel == null || !fileMappingPanel.activeSelf || !_fileTracks) return;
+            facade.CommandFileAutoRange(fileAutoRangeToggle.isOn);
+            _CloseFileChoices(); RefreshFileMapping(true);
+        }
+        public void _ResetFileMapping()
+        {
+            if (_fileTracks) facade.CommandResetFileTrackMap(); else facade.CommandResetFileProgramMap();
+            _CloseFileChoices(); RefreshFileMapping(true);
+        }
         public void _FilePrevious() { _filePage = Mathf.Max(0, _filePage - 1); _CloseFileChoices(); RefreshFileMapping(true); }
         public void _FileNext() { _filePage = Mathf.Min(Mathf.Max(0, (_fileCount - 1) / 16), _filePage + 1); _CloseFileChoices(); RefreshFileMapping(true); }
         public void _FileProgram0() { OpenFileProgram(0); }
@@ -169,15 +205,92 @@ namespace MusicMidiPlayer.UI
         public void _FileProgram13() { OpenFileProgram(13); }
         public void _FileProgram14() { OpenFileProgram(14); }
         public void _FileProgram15() { OpenFileProgram(15); }
+        public void _FileTrackEnabled0() { SetFileTrackEnabled(0); }
+        public void _FileTrackEnabled1() { SetFileTrackEnabled(1); }
+        public void _FileTrackEnabled2() { SetFileTrackEnabled(2); }
+        public void _FileTrackEnabled3() { SetFileTrackEnabled(3); }
+        public void _FileTrackEnabled4() { SetFileTrackEnabled(4); }
+        public void _FileTrackEnabled5() { SetFileTrackEnabled(5); }
+        public void _FileTrackEnabled6() { SetFileTrackEnabled(6); }
+        public void _FileTrackEnabled7() { SetFileTrackEnabled(7); }
+        public void _FileTrackEnabled8() { SetFileTrackEnabled(8); }
+        public void _FileTrackEnabled9() { SetFileTrackEnabled(9); }
+        public void _FileTrackEnabled10() { SetFileTrackEnabled(10); }
+        public void _FileTrackEnabled11() { SetFileTrackEnabled(11); }
+        public void _FileTrackEnabled12() { SetFileTrackEnabled(12); }
+        public void _FileTrackEnabled13() { SetFileTrackEnabled(13); }
+        public void _FileTrackEnabled14() { SetFileTrackEnabled(14); }
+        public void _FileTrackEnabled15() { SetFileTrackEnabled(15); }
+        public void _FileOctaveDown0() { ChangeFileOctave(0, -1); }
+        public void _FileOctaveDown1() { ChangeFileOctave(1, -1); }
+        public void _FileOctaveDown2() { ChangeFileOctave(2, -1); }
+        public void _FileOctaveDown3() { ChangeFileOctave(3, -1); }
+        public void _FileOctaveDown4() { ChangeFileOctave(4, -1); }
+        public void _FileOctaveDown5() { ChangeFileOctave(5, -1); }
+        public void _FileOctaveDown6() { ChangeFileOctave(6, -1); }
+        public void _FileOctaveDown7() { ChangeFileOctave(7, -1); }
+        public void _FileOctaveDown8() { ChangeFileOctave(8, -1); }
+        public void _FileOctaveDown9() { ChangeFileOctave(9, -1); }
+        public void _FileOctaveDown10() { ChangeFileOctave(10, -1); }
+        public void _FileOctaveDown11() { ChangeFileOctave(11, -1); }
+        public void _FileOctaveDown12() { ChangeFileOctave(12, -1); }
+        public void _FileOctaveDown13() { ChangeFileOctave(13, -1); }
+        public void _FileOctaveDown14() { ChangeFileOctave(14, -1); }
+        public void _FileOctaveDown15() { ChangeFileOctave(15, -1); }
+        public void _FileOctaveUp0() { ChangeFileOctave(0, 1); }
+        public void _FileOctaveUp1() { ChangeFileOctave(1, 1); }
+        public void _FileOctaveUp2() { ChangeFileOctave(2, 1); }
+        public void _FileOctaveUp3() { ChangeFileOctave(3, 1); }
+        public void _FileOctaveUp4() { ChangeFileOctave(4, 1); }
+        public void _FileOctaveUp5() { ChangeFileOctave(5, 1); }
+        public void _FileOctaveUp6() { ChangeFileOctave(6, 1); }
+        public void _FileOctaveUp7() { ChangeFileOctave(7, 1); }
+        public void _FileOctaveUp8() { ChangeFileOctave(8, 1); }
+        public void _FileOctaveUp9() { ChangeFileOctave(9, 1); }
+        public void _FileOctaveUp10() { ChangeFileOctave(10, 1); }
+        public void _FileOctaveUp11() { ChangeFileOctave(11, 1); }
+        public void _FileOctaveUp12() { ChangeFileOctave(12, 1); }
+        public void _FileOctaveUp13() { ChangeFileOctave(13, 1); }
+        public void _FileOctaveUp14() { ChangeFileOctave(14, 1); }
+        public void _FileOctaveUp15() { ChangeFileOctave(15, 1); }
+        private void ChangeFileOctave(int row, int delta)
+        {
+            int index = _filePage * 16 + row;
+            if (!_fileTracks || fileMappingPanel == null || !fileMappingPanel.activeInHierarchy
+                || facade.isSongLoading || index >= _fileCount || _fileSong != facade.selectedSongId) return;
+            int track = _filePrograms[index];
+            facade.CommandFileTrackOctave(track, facade.instrumentRouter.FileTrackOctave(track) + delta);
+            _CloseFileChoices(); RefreshFileMapping(true);
+        }
+        private void SetFileTrackEnabled(int row)
+        {
+            int index = _filePage * 16 + row;
+            if (!_fileTracks || fileMappingPanel == null || !fileMappingPanel.activeInHierarchy
+                || facade.isSongLoading || index >= _fileCount || row >= fileTrackEnabledToggles.Length
+                || _fileSong != facade.selectedSongId) return;
+            facade.CommandFileTrackEnabled(_filePrograms[index], fileTrackEnabledToggles[row].isOn);
+            _CloseFileChoices(); RefreshFileMapping(true);
+        }
         private void OpenFileProgram(int row)
         {
             int index = _filePage * 16 + row;
             if (fileMappingPanel == null || !fileMappingPanel.activeInHierarchy || facade.isSongLoading
                 || index >= _fileCount || _fileSong != facade.selectedSongId) return;
-            _fileProgram = _filePrograms[index]; _fileChoiceSong = facade.selectedSongId;
+            _fileProgram = _filePrograms[index];
+            _fileChoiceSong = facade.selectedSongId;
             fileChoicePanel.SetActive(true); RefreshFileMapping(true);
+            if (fileTargetScroll != null) fileTargetScroll.verticalNormalizedPosition = 1;
         }
         private string FileProgramName(int program) { return (program + 1).ToString("000") + " · " + Tr("gm." + program.ToString()); }
+        private string FileSourceName(int source)
+        {
+            if (!_fileTracks) return FileProgramName(source);
+            string label = Tr("file.track").Replace("{track}", (source + 1).ToString());
+            string name = facade.instrumentRouter.FileTrackName(source);
+            return string.IsNullOrEmpty(name) ? label : label + " · " + name;
+        }
+        private int FileSourceTarget(int source)
+        { return _fileTracks ? facade.instrumentRouter.FileTrackTarget(source) : facade.instrumentRouter.FileProgramTarget(source); }
         private void RefreshFileMapping(bool force)
         {
             if (force && fileMappingEntryLabel != null) fileMappingEntryLabel.text = Tr("file.entry");
@@ -185,42 +298,109 @@ namespace MusicMidiPlayer.UI
             var router = facade.instrumentRouter;
             bool can = facade.isReady && !facade.isSongLoading && facade.gate.CanControl() && facade.network.CanAcceptCommands();
             int signature = (facade.InstrumentMask() * 31 + _loadedLanguage) * 31 + _filePage * 4 + (can ? 1 : 0) + (facade.isSongLoading ? 2 : 0);
-            string map = facade.FileProgramMap();
+            signature = signature * 2 + (_fileTracks ? 1 : 0);
+            signature = signature * 2 + (router.autoTrackRouting ? 1 : 0);
+            string map = _fileTracks ? facade.FileTrackMap() : facade.FileProgramMap();
             if (_fileSong != facade.selectedSongId) { _filePage = 0; _CloseFileChoices(); }
             if (!force && _fileRefreshed && signature == _fileSignature && _fileSong == facade.selectedSongId && map == _fileMap) return;
             _fileRefreshed = true; _fileSignature = signature; _fileSong = facade.selectedSongId; _fileMap = map;
             _fileCount = 0;
+            int sourceCount = _fileTracks ? router.usedFileTracks.Length : 128;
+            if (_filePrograms.Length < sourceCount) _filePrograms = new int[sourceCount];
             if (!facade.isSongLoading)
-                for (int p = 0; p < 128; p++) if (router.usedFilePrograms[p]) _filePrograms[_fileCount++] = p;
+                for (int p = 0; p < sourceCount; p++)
+                    if (_fileTracks ? router.usedFileTracks[p] : router.usedFilePrograms[p]) _filePrograms[_fileCount++] = p;
             _filePage = Mathf.Clamp(_filePage, 0, Mathf.Max(0, (_fileCount - 1) / 16));
             fileMappingTitle.text = Tr("file.title"); fileMappingBack.text = Tr("midi.back"); fileMappingReset.text = Tr("file.reset");
-            fileMappingHint.text = facade.isSongLoading ? Tr("file.loading") : _fileCount == 0 ? Tr("file.empty") : Tr("file.hint");
+            if (fileProgramTabLabel != null) fileProgramTabLabel.text = Tr("file.by_program");
+            if (fileTrackTabLabel != null) fileTrackTabLabel.text = Tr("file.by_track");
+            if (fileProgramTabMark != null) fileProgramTabMark.SetActive(!_fileTracks);
+            if (fileTrackTabMark != null) fileTrackTabMark.SetActive(_fileTracks);
+            if (fileAutoTrackToggle != null)
+            {
+                fileAutoTrackToggle.gameObject.SetActive(_fileTracks);
+                fileAutoTrackToggle.SetIsOnWithoutNotify(router.autoTrackRouting);
+                fileAutoTrackToggle.interactable = can;
+                fileAutoTrackLabel.text = Tr("file.auto_track");
+                fileMappingHintRect.anchoredPosition = new Vector2(0, _fileTracks ? -177 : 174);
+                fileMappingHintRect.sizeDelta = new Vector2(920, _fileTracks ? 22 : 30);
+            }
+            if (fileAutoRangeToggle != null)
+            {
+                fileAutoRangeToggle.gameObject.SetActive(_fileTracks);
+                fileAutoRangeToggle.SetIsOnWithoutNotify(router.FileAutoRange());
+                fileAutoRangeToggle.interactable = can;
+                fileAutoRangeLabel.text = Tr("file.auto_range");
+            }
+            for (int i = 0; i < fileOctaveHeadings.Length; i++)
+            { fileOctaveHeadings[i].gameObject.SetActive(_fileTracks); fileOctaveHeadings[i].text = Tr("file.octave"); }
+            fileMappingHint.text = facade.isSongLoading ? Tr("file.loading") : _fileCount == 0
+                ? Tr(_fileTracks ? "file.track_empty" : "file.empty") : Tr(_fileTracks ? "file.pitch_hint" : "file.hint");
             fileMappingPrevious.text = Tr("file.previous"); fileMappingNext.text = Tr("file.next");
             fileMappingPage.text = (_filePage + 1).ToString() + " / " + Mathf.Max(1, (_fileCount + 15) / 16).ToString();
-            fileResetButton.interactable = can && map != "";
+            fileResetButton.interactable = can && map != "" && (!_fileTracks || map != "P1");
             filePreviousButton.interactable = _filePage > 0; fileNextButton.interactable = (_filePage + 1) * 16 < _fileCount;
             for (int i = 0; i < fileProgramButtons.Length; i++)
             {
                 int index = _filePage * 16 + i; bool visible = index < _fileCount;
+                if (i < fileTrackEnabledToggles.Length)
+                    fileTrackEnabledToggles[i].gameObject.SetActive(visible && _fileTracks);
+                if (i < fileOctaveDownButtons.Length)
+                {
+                    fileOctaveDownButtons[i].gameObject.SetActive(visible && _fileTracks);
+                    fileOctaveUpButtons[i].gameObject.SetActive(visible && _fileTracks);
+                    fileOctaveValues[i].gameObject.SetActive(visible && _fileTracks);
+                }
                 fileProgramButtons[i].gameObject.SetActive(visible); if (!visible) continue;
-                int p = _filePrograms[index], target = router.FileProgramTarget(p);
-                fileProgramLabels[i].text = FileProgramName(p);
-                string name = MidiTargetName(target);
-                if (target >= 0 && !router.IsEnabled(target)) name = Tr("midi.unavailable").Replace("{instrument}", name);
+                int p = _filePrograms[index], target = FileSourceTarget(p);
+                var rowRect = (RectTransform)fileProgramButtons[i].transform;
+                rowRect.anchoredPosition = new Vector2((i < 8 ? -242 : 242) + (_fileTracks ? -52 : 0), (_fileTracks ? 124 : 132) - i % 8 * (_fileTracks ? 38 : 40));
+                rowRect.sizeDelta = new Vector2(_fileTracks ? 276 : 456, 36);
+                var sourceRect = (RectTransform)rowRect.Find("Source"); var valueRect = (RectTransform)rowRect.Find("Value");
+                sourceRect.anchoredPosition = _fileTracks ? new Vector2(0, 8) : new Vector2(-93, 0);
+                sourceRect.sizeDelta = _fileTracks ? new Vector2(256, 22) : new Vector2(250, 30);
+                valueRect.anchoredPosition = _fileTracks ? new Vector2(0, -9) : new Vector2(130, 0);
+                valueRect.sizeDelta = _fileTracks ? new Vector2(256, 22) : new Vector2(178, 30);
+                fileProgramLabels[i].fontSizeMax = _fileTracks ? 14 : 17;
+                fileProgramValues[i].fontSizeMax = _fileTracks ? 14 : 17;
+                if (i < fileTrackEnabledToggles.Length && _fileTracks)
+                {
+                    fileTrackEnabledToggles[i].SetIsOnWithoutNotify(router.IsFileTrackEnabled(p));
+                    fileTrackEnabledToggles[i].interactable = can;
+                }
+                if (i < fileOctaveDownButtons.Length && _fileTracks)
+                {
+                    int octave = router.FileTrackOctave(p);
+                    fileOctaveValues[i].text = (octave > 0 ? "+" : "") + octave.ToString();
+                    bool melodic = target != 8 && !(target < 0 && router.AutoTrackProgram(p) >= 128);
+                    fileOctaveDownButtons[i].interactable = can && melodic && octave > -10;
+                    fileOctaveUpButtons[i].interactable = can && melodic && octave < 10;
+                }
+                fileProgramLabels[i].text = FileSourceName(p);
+                string name = target < 0 && _fileTracks ? Tr("file.follow_program") : MidiTargetName(target);
+                if (target < 0 && _fileTracks && router.autoTrackRouting && router.fileProgramMap == "")
+                {
+                    int role = router.AutoTrackProgram(p), automaticTarget = router.AutoTrackTarget(p);
+                    if (role >= 128) name = Tr("file.auto_value").Replace("{instrument}", Tr("midi.drums"));
+                    else if (role >= 0) name = Tr("file.auto_value").Replace("{instrument}", MidiTargetName(automaticTarget));
+                }
+                if (target >= 0 && (target == 8 ? !router.IsDrumsEnabled() : !router.IsEnabled(target))) name = Tr("midi.unavailable").Replace("{instrument}", name);
+                if (_fileTracks && !router.IsFileTrackEnabled(p)) name = Tr("file.track_off").Replace("{instrument}", name);
                 fileProgramValues[i].text = name; fileProgramButtons[i].interactable = can;
             }
             if (fileChoicePanel == null || !fileChoicePanel.activeSelf) return;
-            fileChoiceTitle.text = FileProgramName(_fileProgram);
-            float height = 72 + 7 * 40;
+            fileChoiceTitle.text = FileSourceName(_fileProgram);
+            float height = 72 + 280;
             fileChoiceContent.sizeDelta = new Vector2(456, height);
             fileChoiceTitleRect.anchoredPosition = new Vector2(0, height * .5f - 26);
             int row = 0;
             for (int i = 0; i < fileTargetButtons.Length; i++)
             {
-                bool enabled = true; fileTargetButtons[i].gameObject.SetActive(true);
-                fileTargetButtons[i].interactable = can; fileTargetLabels[i].text = MidiTargetName(i - 1);
-                fileTargetMarks[i].SetActive(router.FileProgramTarget(_fileProgram) == i - 1);
-                if (enabled) ((RectTransform)fileTargetButtons[i].transform).anchoredPosition = new Vector2(0, height * .5f - 72 - row++ * 40);
+                bool enabled = i != 7; fileTargetButtons[i].gameObject.SetActive(enabled);
+                fileTargetButtons[i].interactable = can;
+                fileTargetLabels[i].text = _fileTracks && i == 0 ? Tr(router.autoTrackRouting ? "file.automatic" : "file.follow_program") : MidiTargetName(i - 1);
+                fileTargetMarks[i].SetActive(FileSourceTarget(_fileProgram) == i - 1);
+                if (enabled) ((RectTransform)fileTargetButtons[i].transform).anchoredPosition = new Vector2(0, -20 - row++ * 40);
             }
         }
 
@@ -321,6 +501,7 @@ namespace MusicMidiPlayer.UI
         public void _MidiTarget4() { SelectMidiTarget(3); }
         public void _MidiTarget5() { SelectMidiTarget(4); }
         public void _MidiTarget6() { SelectMidiTarget(5); }
+        public void _MidiTarget8() { SelectMidiTarget(7); }
         public void _MidiTarget7() { SelectMidiTarget(6); }
         private void OpenMidiChannel(int channel)
         {
@@ -332,12 +513,13 @@ namespace MusicMidiPlayer.UI
             if (fileMappingPanel != null && fileMappingPanel.activeInHierarchy)
             {
                 if (fileChoicePanel == null || !fileChoicePanel.activeSelf || _fileChoiceSong != facade.selectedSongId) return;
-                facade.CommandFileProgramTarget(_fileProgram, target);
+                if (_fileTracks) facade.CommandFileTrackTarget(_fileProgram, target);
+                else facade.CommandFileProgramTarget(_fileProgram, target);
                 _CloseFileChoices(); RefreshFileMapping(true); return;
             }
             if (midiPerformancePanel != null && midiPerformancePanel.activeInHierarchy)
             {
-                if (_midiLearnState == 0 || _midiLearnChannel < 0 || target < 0 || target > 6
+                if (_midiLearnState == 0 || _midiLearnChannel < 0 || target < 0 || (target > 7 || target == 6)
                     || !facade.instrumentRouter.IsEnabled(target)) return;
                 facade.SetHardwareMidiChannelTarget(_midiLearnChannel, target);
                 facade.RememberMidiChannel(_midiLearnChannel); _midiLearnState = 2;
@@ -350,7 +532,7 @@ namespace MusicMidiPlayer.UI
         }
         private string MidiTargetName(int target)
         {
-            return target < 0 ? Tr("midi.auto") : target == 0 ? Tr("midi.piano") : InstrumentName(target + 1);
+            return target < 0 ? Tr("midi.auto") : target == 8 ? Tr("midi.drums") : target == 0 ? Tr("midi.piano") : InstrumentName(target + 1);
         }
         private void RefreshMidiMapping(bool force)
         {
@@ -376,7 +558,7 @@ namespace MusicMidiPlayer.UI
             if (midiChoicePanel == null || !midiChoicePanel.activeSelf) return;
             midiChoiceTitle.text = Tr("midi.channel").Replace("{channel}", (_midiChannel + 1).ToString());
             int count = 1;
-            for (int t = 0; t < 7; t++) if (facade.instrumentRouter.IsEnabled(t)) count++;
+            for (int t = 0; t < 8; t++) if (facade.instrumentRouter.IsEnabled(t)) count++;
             float height = 72 + count * 40;
             midiChoiceContent.sizeDelta = new Vector2(456, height);
             midiChoiceTitleRect.anchoredPosition = new Vector2(0, height * .5f - 26);
@@ -404,7 +586,7 @@ namespace MusicMidiPlayer.UI
             midiPerformanceRescanButton.interactable = _midiLearnChannel >= 0;
             string key = _midiLearnState == 0 ? "midi.press_key" : _midiLearnState == 1 ? "midi.choose_instrument" : canPlay ? "midi.ready" : "midi.configured";
             midiPerformancePrompt.text = Tr(key).Replace("{instrument}", MidiTargetName(target));
-            midiPerformanceHint.text = Tr(_midiLearnDrum ? "midi.use_keyboard" : facade.InstrumentMask() == 0 ? "midi.enable_instrument"
+            midiPerformanceHint.text = Tr(_midiLearnDrum ? "midi.use_keyboard" : (facade.InstrumentMask() & 191) == 0 ? "midi.enable_instrument"
                 : _midiLearnState == 0 ? "midi.keyboard_hint" : _midiLearnState == 1 ? "midi.input_found" : canPlay ? "midi.change_anytime"
                 : facade.clock.GetState() != 0 ? "midi.playback_wait" : "midi.control_wait");
             int row = 0;
@@ -697,12 +879,26 @@ namespace MusicMidiPlayer.UI
         {
             LoadLanguage();
             RefreshMidiMapping(true);
+            if (creditsPanel != null) creditsPanel.Refresh();
+            for (int i = 0; i < languageListeners.Length; i++)
+                if (languageListeners[i] != null) languageListeners[i].SendCustomEvent("RefreshLanguage");
             if(drumVisibilityLabel!=null)drumVisibilityLabel.text=Tr("settings.show_drums");
             for (int i = 0; i < localizedLabels.Length && i < localizedKeys.Length; i++)
                 if (localizedLabels[i] != null) localizedLabels[i].text = Tr(localizedKeys[i]);
             if (librarySearchPlaceholder != null) librarySearchPlaceholder.text = Tr("library.search_placeholder");
             if (allSongsTitleLabel != null) allSongsTitleLabel.text = Tr("library.all_songs");
             if (allSongsSummaryLabel != null) allSongsSummaryLabel.text = SongCount(songButtons.Length);
+            for (int i = 0; i < folderButtons.Length; i++)
+            {
+                if (folderButtons[i] == null) continue;
+                Transform title = folderButtons[i].transform.Find("Label");
+                if (title == null) continue;
+                TMP_Text label = title.GetComponent<TMP_Text>();
+                if (label == null) continue;
+                string path = folderButtons[i].folderPath;
+                int slash = path.LastIndexOf('/');
+                label.text = LocalizedFolderName(slash < 0 ? path : path.Substring(slash + 1));
+            }
             for (int i = 0; i < folderSummaryLabels.Length && i < folderButtons.Length; i++)
             {
                 if (folderSummaryLabels[i] == null || folderButtons[i] == null) continue;
@@ -775,7 +971,7 @@ namespace MusicMidiPlayer.UI
             if (libraryEmptyLabel != null) libraryEmptyLabel.text = Tr(searching ? "library.no_results" : "library.empty");
             bool hasFolder = _openFolder >= 0 && _openFolder < folderButtons.Length && folderButtons[_openFolder] != null;
             if (libraryPathLabel != null)
-                libraryPathLabel.text = searching ? Tr("library.search_results") : hasFolder ? folderButtons[_openFolder].folderPath.Replace("/", " / ")
+                libraryPathLabel.text = searching ? Tr("library.search_results") : hasFolder ? LocalizedFolderPath(folderButtons[_openFolder].folderPath)
                     : Tr(_openFolder == -2 ? "library.all_songs" : "library.root");
             int count = songButtons.Length;
             if (hasFolder)
@@ -788,6 +984,36 @@ namespace MusicMidiPlayer.UI
             }
             if (libraryCountLabel != null)
                 libraryCountLabel.text = Tr("library.count").Replace("{count}", (searching ? _searchResultCount : count).ToString("00"));
+        }
+
+        public string LocalizedFolderName(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return "";
+            string key = "";
+            switch (name.ToLowerInvariant())
+            {
+                case "合成器浪潮": case "synthwave": key = "library.folder.synthwave"; break;
+                case "edm": key = "library.folder.edm"; break;
+                case "游戏音乐": key = "library.folder.game_music"; break;
+                case "东方": key = "library.folder.touhou"; break;
+                case "classic": key = "library.folder.classical"; break;
+                case "sample": key = "library.folder.samples"; break;
+                case "demo": key = "library.folder.demo"; break;
+                case "drums": key = "library.folder.drums"; break;
+            }
+            if (key.Length == 0) return name;
+            string translated = Tr(key);
+            return translated == key ? name : translated;
+        }
+
+        public string LocalizedFolderPath(string path)
+        {
+            if (string.IsNullOrEmpty(path)) return "";
+            string[] segments = path.Split('/');
+            string result = "";
+            for (int i = 0; i < segments.Length; i++)
+                result += (i == 0 ? "" : " / ") + LocalizedFolderName(segments[i]);
+            return result;
         }
 
         public void _OnLibrarySearchChanged()
@@ -1174,7 +1400,7 @@ namespace MusicMidiPlayer.UI
         {
             return Tr(index == 0 ? "instrument.digital" : index == 1 ? "instrument.grand" : index == 2 ? "instrument.marimba"
                 : index == 3 ? "instrument.violin" : index == 4 ? "instrument.viola" : index == 5 ? "instrument.cello"
-                : index == 6 ? "instrument.contrabass" : "instrument.strings");
+                : index == 6 ? "instrument.contrabass" : index == 8 ? "instrument.music_box" : index == 9 ? "midi.drums" : "instrument.strings");
         }
 
         private void UpdateInstrumentDropdownLayout()
@@ -1183,8 +1409,9 @@ namespace MusicMidiPlayer.UI
             bool style = facade.HasSelectedStrings();
             bool inline = facade.instrumentRouter != null && stringStyleEntries.Length == 4;
             float styleHeight = style && !inline ? 56 : 0;
-            int count = facade.instrumentRouter != null && instrumentOptionButtons.Length == 8 ? 7 : instrumentOptionButtons.Length;
-            float listHeight = Mathf.Min(320, count * 40, 400 - 16 - styleHeight);
+            int count = facade.instrumentRouter != null && instrumentOptionButtons.Length >= 8 ? instrumentOptionButtons.Length - 1 : instrumentOptionButtons.Length;
+            if (instrumentOptionButtons.Length == 10 && !facade.HasInstrument(8)) count--;
+            float listHeight = Mathf.Min(360, count * 40, 400 - 16 - styleHeight);
             float height = listHeight + 16 + styleHeight;
             if (inline)
             {

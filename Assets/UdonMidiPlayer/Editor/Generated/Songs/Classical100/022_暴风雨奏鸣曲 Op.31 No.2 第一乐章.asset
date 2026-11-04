@@ -72,4 +72,4 @@ MonoBehaviour:
   maxKeyPolyphony: 8
   maxActivePolyphony: 50
   estimatedDataBytes: 191848
-  packedDataBytes: 35984
+  packedDataBytes: 36704

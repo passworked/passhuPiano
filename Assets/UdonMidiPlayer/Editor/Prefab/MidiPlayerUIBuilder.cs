@@ -246,7 +246,7 @@ namespace MusicMidiPlayer.Editor.Prefab
             ((RectTransform)ui.measureSnapSelectionMark.transform).sizeDelta = new Vector2(436, 3);
             ((RectTransform)ui.measureSnapSelectionMark.transform).anchoredPosition = new Vector2(-218, -13);
             ui.measureSnapSelectionMark.SetActive(ui.snapProgressToMeasures);
-            ui.peakProtectionSelectionMark = LandingOption(panel, ui, "PeakProtection", "Peak protection", -226, font, "_TogglePeakProtection");
+            ui.peakProtectionSelectionMark = LandingOption(panel, ui, "PeakProtection", "Volume leveling", -226, font, "_TogglePeakProtection");
             ((RectTransform)panel.Find("PeakProtection")).anchoredPosition = new Vector2(-226, -240);
             ((RectTransform)panel.Find("PeakProtection")).sizeDelta = new Vector2(216, 34);
             ((RectTransform)ui.peakProtectionSelectionMark.transform).anchoredPosition = new Vector2(-92, -13);
@@ -279,7 +279,7 @@ namespace MusicMidiPlayer.Editor.Prefab
         {
             Transform parent=ui.transform;
             TMP_FontAsset font=ui.titleLabel.font;
-            string[] captions={"Digital piano","White grand piano","Marimba","Violin","Viola","Cello","Double Bass","String Ensemble"};
+            string[] captions={"Digital piano","White grand piano","Marimba","Violin","Viola","Cello","Double Bass","String Ensemble","Music box","Drums"};
             Transform libraryName=parent.Find("LibraryName");
             if(libraryName!=null) libraryName.gameObject.SetActive(false);
             RectTransform entry=Rect(Child(parent,"Instrument",true),new Vector2(138,210),new Vector2(204,44));
@@ -287,7 +287,7 @@ namespace MusicMidiPlayer.Editor.Prefab
             Button button=Get<Button>(entry); button.targetGraphic=entryImage;
             button.colors=Colors(Color.white,new Color(2,3,3),new Color(1.5f,2,2),Muted);
             Listen(button.onClick,ui,"_ToggleInstrumentPanel"); ui.instrumentButton=button;
-            ui.instrumentEntryLabel=Label(entry,"Label",captions[Mathf.Clamp(ui.facade.selectedInstrument,0,7)],new Vector2(-92,0),new Vector2(164,32),17,Accent,font);
+            ui.instrumentEntryLabel=Label(entry,"Label",captions[Mathf.Clamp(ui.facade.selectedInstrument,0,8)],new Vector2(-92,0),new Vector2(164,32),17,Accent,font);
             ui.instrumentEntryLabel.alignment=TextAlignmentOptions.MidlineLeft;
             ui.instrumentEntryLabel.enableAutoSizing = true;
             ui.instrumentEntryLabel.fontSizeMin = 12; ui.instrumentEntryLabel.fontSizeMax = 17;
@@ -300,9 +300,11 @@ namespace MusicMidiPlayer.Editor.Prefab
             Image hit=Get<Image>(overlay); hit.sprite=null; hit.color=Color.clear; hit.raycastTarget=true;
             Button dismiss=Get<Button>(overlay); dismiss.targetGraphic=hit; dismiss.transition=Selectable.Transition.None;
             Listen(dismiss.onClick,ui,"_CloseInstrumentPanel");
-            int options=ui.facade.instrumentRoots.Length==8?8:3;
-            int visibleOptions=options==8?7:options;
-            float listHeight=Mathf.Min(320,visibleOptions*40);
+            int options=ui.facade.instrumentRoots.Length>=8?ui.facade.instrumentRoots.Length:3;
+            if (ui.facade.instrumentRouter != null && ui.facade.voicePool.drums != null) options = 10;
+            int visibleOptions=options>=8?options-1:options;
+            if (options == 10 && !ui.facade.HasInstrument(8)) visibleOptions--;
+            float listHeight=Mathf.Min(360,visibleOptions*40);
             bool hasStyle=ui.facade.HasSelectedStrings();
             float panelHeight=listHeight+16+(hasStyle && ui.facade.instrumentRouter==null?56:0);
             Image panel=Box(overlay,"Content",new Vector2(138,180-panelHeight*.5f),new Vector2(280,panelHeight),Tile);
@@ -321,15 +323,16 @@ namespace MusicMidiPlayer.Editor.Prefab
             ui.instrumentDropdownScroll=scroll; ui.instrumentDropdownViewport=viewport;
             ui.instrumentOptionButtons=new Button[options]; ui.instrumentLabels=new TMP_Text[options]; ui.instrumentSelectionMarks=new GameObject[options];
             ui.instrumentToggles = new Toggle[options];
-            string[] methods={"_SelectDigitalPiano","_SelectGrandPiano","_SelectMarimba","_SelectViolin","_SelectViola","_SelectCello","_SelectContrabass","_SelectStrings"};
-            string[] names={"DigitalPiano","GrandPiano","Marimba","Violin","Viola","Cello","Contrabass","Strings"};
+            string[] methods={"_SelectDigitalPiano","_SelectGrandPiano","_SelectMarimba","_SelectViolin","_SelectViola","_SelectCello","_SelectContrabass","_SelectStrings","_SelectMusicBox","_SelectDrums"};
+            string[] names={"DigitalPiano","GrandPiano","Marimba","Violin","Viola","Cello","Contrabass","Strings","MusicBox","Drums"};
             for(int i=0;i<options;i++)
             {
                 Transform prior=content.Find(names[i]) ?? panel.transform.Find(names[i]);
                 if(prior==null) prior=Child(content,names[i],true);
                 if(prior.parent!=content) prior.SetParent(content,false);
-                RectTransform option=Rect(prior,new Vector2(0,-20-i*40),new Vector2(264,38));
-                option.gameObject.SetActive(i < visibleOptions);
+                int row = (i>7?i-1:i) - (i == 9 && !ui.facade.HasInstrument(8) ? 1 : 0);
+                RectTransform option=Rect(prior,new Vector2(0,-20-row*40),new Vector2(264,38));
+                option.gameObject.SetActive(i != 7 && (i != 8 || ui.facade.HasInstrument(8)));
                 option.anchorMin=option.anchorMax=new Vector2(0,1);
                 Image image=Get<Image>(option); Paint(image,Inset); image.raycastTarget=true;
                 Button choice=Get<Button>(option); choice.targetGraphic=image; choice.colors=button.colors; Listen(choice.onClick,ui,methods[i]);
@@ -355,7 +358,7 @@ namespace MusicMidiPlayer.Editor.Prefab
                     Listen(toggle.onValueChanged, ui, methods[i]); ui.instrumentToggles[i] = toggle;
                 }
             }
-            if(options==8)
+            if(options>=8)
             {
                 RectTransform styles=Rect(Child(panel.transform,"StringsStyle",true),new Vector2(-132,-panelHeight*.5f+30),new Vector2(264,44));
                 styles.SetAsLastSibling();

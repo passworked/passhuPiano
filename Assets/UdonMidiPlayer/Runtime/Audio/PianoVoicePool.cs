@@ -21,8 +21,17 @@ namespace MusicMidiPlayer.Audio
         [Range(0f, 2f)] public float localVolume = 0.15f;
         public bool muted;
         public bool worldSpaceAudio = true;
-        [Range(0.05f, 1f)] public float peakBudget = 0.8f;
-        public bool peakProtectionEnabled;
+        // Kept for existing serialized assets; energy compression uses the settings below.
+        [HideInInspector] public float peakBudget = 0.8f;
+        // Retain the serialized toggle/callback identity used by existing player UIs.
+        public bool peakProtectionEnabled = true;
+        public float compressionThresholdDb = -16f;
+        public float compressionRatio = 4f;
+        public float compressionKneeDb = 6f;
+        public float compressionMaxReductionDb = 18f;
+        public float compressionMakeupDb = 3f;
+        public float compressionReleaseSeconds = 0.18f;
+        [HideInInspector] public float compressionGain = 1f;
         public float retireFadeSeconds = 0.005f;
         public bool useDspScheduling = true;
         [HideInInspector] public int activeVoiceCount;
@@ -64,6 +73,7 @@ namespace MusicMidiPlayer.Audio
         private int[] _slotToken;
         private int[] _slotRegion;
         private double[] _slotStartDsp;
+        private float[] _slotSampleOffset;
         private float[] _slotRawGain;
         private float[] _slotBaseGain;
         private int[] _slotReleaseMs;
@@ -82,6 +92,8 @@ namespace MusicMidiPlayer.Audio
         private int _pendingCount;
         private float _normalization = 1f;
         private double _lastGainDsp;
+        private float _headroomGain = 1f;
+        private double _lastHeadroomDsp;
         private bool[] _worldSpatialize;
         private bool[] _worldBypassReverbZones;
 
@@ -96,6 +108,7 @@ namespace MusicMidiPlayer.Audio
             _slotToken = new int[count];
             _slotRegion = new int[count];
             _slotStartDsp = new double[count];
+            _slotSampleOffset = new float[count];
             _slotRawGain = new float[count];
             _slotBaseGain = new float[count];
             _slotReleaseMs = new int[count];
@@ -190,7 +203,14 @@ namespace MusicMidiPlayer.Audio
             peakProtectionEnabled = enabled;
             if (ensemble != null) { ensemble.UpdateOutput(); return; }
             Initialize();
-            ApplyOutputGains(FrameDsp());
+            RefreshOutput();
+        }
+
+        public void RefreshOutput()
+        {
+            if (ensemble != null) { ensemble.UpdateOutput(); return; }
+            if (strings != null && strings.activeStrings) { strings.RefreshOutput(); return; }
+            Initialize(); ApplyOutputGains(FrameDsp());
         }
 
         public void SetLocalOutput(float volume, bool mute)
@@ -200,7 +220,7 @@ namespace MusicMidiPlayer.Audio
             muted = mute;
             if (ensemble != null) { ensemble.UpdateOutput(); return; }
             Initialize();
-            ApplyOutputGains(FrameDsp());
+            RefreshOutput();
         }
 
         public void PrepareWindow(int fromExclusiveMs, int toInclusiveMs, int generation,
@@ -426,6 +446,7 @@ namespace MusicMidiPlayer.Audio
             _slotGeneration[slot] = generation;
             _slotToken[slot]++;
             _slotStartDsp[slot] = AudioSettings.dspTime;
+            _slotSampleOffset[slot] = 0f;
             _slotAttackUntilDsp[slot] = _slotStartDsp[slot] + AttackProtectionMs * 0.001;
             _slotVelocity[slot] = velocity;
             _slotState[slot] = SlotSounding;
@@ -569,9 +590,7 @@ namespace MusicMidiPlayer.Audio
 
         private void ApplyStartedGain(int slot, double dsp)
         {
-            // A new slot only needs its own volume when peak protection is off.
-            if (peakProtectionEnabled) ApplyOutputGains(dsp);
-            else voiceSources[slot].volume = muted ? 0f : Mathf.Clamp01(localVolume * _slotRawGain[slot]);
+            ApplyOutputGains(dsp);
         }
 
         private void RequestNote(int note, int positionMs, double songSeconds, double dsp, bool preserveAttack)
@@ -770,6 +789,7 @@ namespace MusicMidiPlayer.Audio
             _slotPeak[slot] = Mathf.Max(0.0001f, bank.sourcePeak[region]);
             double targetDsp = dsp + _song.startMs[note] * 0.001 - songSeconds;
             _slotStartDsp[slot] = System.Math.Max(dsp, targetDsp);
+            _slotSampleOffset[slot] = sourceFrame / (float)bank.sourceRate[region];
             _slotAttackUntilDsp[slot] = _slotStartDsp[slot] + AttackProtectionMs * 0.001 - age;
             bool scheduled = useDspScheduling && targetDsp > dsp + 0.001;
             _slotState[slot] = scheduled ? SlotScheduled : SlotSounding;
@@ -826,29 +846,83 @@ namespace MusicMidiPlayer.Audio
             _noteState[note] = NoteFinished;
         }
 
-        private void ApplyOutputGains(double dsp)
+        // Power is estimated before the local volume slider, so moving it stays predictable.
+        // Immediate reduction catches newly starting chords; recovery is deliberately slower.
+        public float CalculateCompressionGain(float power, double dsp)
         {
             float target = 1f;
             if (peakProtectionEnabled)
             {
-                float sum = drums == null ? 0f : drums.PeakSum();
-                for (int i = 0; i < _capacity; i++)
-                    if (_slotState[i] != SlotFree) sum += _slotRawGain[i] * _slotPeak[i];
-                target = Mathf.Min(1f, Mathf.Max(0.01f, peakBudget) / Mathf.Max(0.0001f, sum));
+                float above = 10f * Mathf.Log10(Mathf.Max(0.0000000001f, power)) - compressionThresholdDb;
+                float knee = Mathf.Max(0f, compressionKneeDb);
+                float slope = 1f - 1f / Mathf.Max(1f, compressionRatio);
+                float reduction = 0f;
+                if (knee > 0f && above > -knee * 0.5f && above < knee * 0.5f)
+                    reduction = slope * (above + knee * 0.5f) * (above + knee * 0.5f) / (2f * knee);
+                else if (above >= knee * 0.5f) reduction = slope * above;
+                reduction = Mathf.Clamp(reduction, 0f, Mathf.Max(0f, compressionMaxReductionDb));
+                target = Mathf.Pow(10f, -reduction * 0.05f);
             }
-            if (!peakProtectionEnabled) _normalization = 1f;
-            else if (target < _normalization) _normalization = target;
+            if (!peakProtectionEnabled || target < _normalization) _normalization = target;
             else
             {
                 float elapsed = (float)System.Math.Max(0.0, dsp - _lastGainDsp);
-                _normalization = Mathf.Lerp(_normalization, target, 1f - Mathf.Exp(-elapsed / 0.08f));
+                _normalization = Mathf.Lerp(_normalization, target, 1f - Mathf.Exp(-elapsed / Mathf.Max(0.01f, compressionReleaseSeconds)));
             }
             _lastGainDsp = dsp;
+            compressionGain = _normalization * (peakProtectionEnabled ? Mathf.Pow(10f, compressionMakeupDb * 0.05f) : 1f);
+            return compressionGain;
+        }
+
+        // One common attenuation preserves the mix and velocity ratios. Keep this safety
+        // active when RMS leveling is bypassed. Full-clip peaks deliberately bound even
+        // correlated/unison voices; this is conservative, not a post-spatializer DSP limiter.
+        public float LimitOutputGain(float gain, float peakSum, float maxLevel, double dsp)
+        {
+            float master = Mathf.Clamp(localVolume, 0f, 2f);
+            // Baked peaks use source PCM. Standalone Vorbis decoding measured up to
+            // 1.214x that peak in the current drum bank; reserve 25% for codec/resampling overshoot.
+            float target = Mathf.Min(1f, 0.8413951f / Mathf.Max(0.000001f, master * gain * peakSum * 1.25f));
+            // Also avoid flattening individual velocity ratios at AudioSource.volume's 1 limit.
+            target = Mathf.Min(target, 1f / Mathf.Max(0.000001f, master * gain * maxLevel));
+            if (target < _headroomGain) _headroomGain = target;
+            else
+            {
+                float elapsed = (float)System.Math.Max(0.0, dsp - _lastHeadroomDsp);
+                _headroomGain = Mathf.Lerp(_headroomGain, target, 1f - Mathf.Exp(-elapsed / Mathf.Max(0.01f, compressionReleaseSeconds)));
+            }
+            _lastHeadroomDsp = dsp;
+            compressionGain = gain * _headroomGain;
+            return compressionGain;
+        }
+
+        private void ApplyOutputGains(double dsp)
+        {
+            float power = 0f;
+            float peakSum = drums == null ? 0f : drums.PeakSum();
+            float maxLevel = drums == null ? 0f : drums.MaxLevel();
+            for (int i = 0; i < _capacity; i++)
+                if (_slotState[i] != SlotFree && voiceSources[i] != null)
+                {
+                    peakSum += _slotRawGain[i] * _slotPeak[i];
+                    maxLevel = Mathf.Max(maxLevel, _slotRawGain[i]);
+                }
+            if (peakProtectionEnabled)
+            {
+                power = drums == null ? 0f : drums.EnergySum(dsp);
+                for (int i = 0; i < _capacity; i++)
+                    if (_slotState[i] != SlotFree && voiceSources[i] != null && dsp >= _slotStartDsp[i])
+                    {
+                        float age = _slotSampleOffset[i] + (float)(dsp - _slotStartDsp[i]) * voiceSources[i].pitch;
+                        power += _slotRawGain[i] * _slotRawGain[i] * bank.EnergyAt(_slotRegion[i], age);
+                    }
+            }
+            float gain = LimitOutputGain(CalculateCompressionGain(power, dsp), peakSum, maxLevel, dsp);
             float master = muted ? 0f : Mathf.Clamp(localVolume, 0f, 2f);
             for (int i = 0; i < _capacity; i++)
                 if (_slotState[i] != SlotFree && voiceSources[i] != null)
-                    voiceSources[i].volume = Mathf.Clamp01(master * _normalization * _slotRawGain[i]);
-            if (drums != null) drums.ApplyOutputGains(_normalization);
+                    voiceSources[i].volume = Mathf.Clamp01(master * gain * _slotRawGain[i]);
+            if (drums != null) drums.ApplyOutputGains(gain);
         }
 
         private int UpperBoundStart(int timeMs)

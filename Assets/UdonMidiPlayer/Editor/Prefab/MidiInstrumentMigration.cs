@@ -120,6 +120,7 @@ namespace MusicMidiPlayer.Editor.Prefab
             }
             if (player.voicePool.drums != null && player.voicePool.drums.bank != null)
                 text += ":gm-drums-v1:" + player.voicePool.drums.bank.bankHash;
+            if (player.instrumentBanks.Length > 8 && player.instrumentBanks[8] != null) text += ":music-box-v1:" + player.instrumentBanks[8].bankHash;
             if (player.instrumentRouter != null) text += ":" + MidiInstrumentRoutingBuilder.RulesVersion + ":" + player.instrumentRouter.rulesHash;
             return MidiContentHash.Bytes(System.Text.Encoding.UTF8.GetBytes(text));
         }
@@ -145,10 +146,24 @@ namespace MusicMidiPlayer.Editor.Prefab
             MidiDataBaker.PrepareBank(marimba);
             ValidateMarimbaBudget(marimba);
             MidiDataBaker.CopyBankToRuntime(marimba, facade.instrumentBanks[2]);
+            if (facade.instrumentBanks.Length > 8 && facade.instrumentBanks[8] != null)
+            {
+                var musicBox = AssetDatabase.LoadAssetAtPath<PianoBankAsset>(MidiMusicBoxBuilder.BankPath);
+                MidiDataBaker.PrepareBank(musicBox);
+                MidiDataBaker.CopyBankToRuntime(musicBox, facade.instrumentBanks[8]);
+                UdonSharpEditorUtility.CopyProxyToUdon(facade.instrumentBanks[8], ProxySerializationPolicy.All);
+                EditorUtility.SetDirty(facade.instrumentBanks[8]);
+            }
             facade.instrumentBanks[0] = facade.library.bank; facade.instrumentBanks[1] = facade.library.bank;
             if (facade.voicePool.strings != null)
                 foreach (var bank in facade.voicePool.strings.banks)
-                { bank.bankHash = MidiStringsBuilder.BankHash(bank); UdonSharpEditorUtility.CopyProxyToUdon(bank, ProxySerializationPolicy.All); EditorUtility.SetDirty(bank); }
+                { AudioEnergyBaker.Bake(bank); bank.bankHash = MidiStringsBuilder.BankHash(bank); UdonSharpEditorUtility.CopyProxyToUdon(bank, ProxySerializationPolicy.All); EditorUtility.SetDirty(bank); }
+            if (facade.voicePool.drums != null && facade.voicePool.drums.bank != null)
+            {
+                var drums = facade.voicePool.drums.bank;
+                AudioEnergyBaker.Bake(drums); drums.bankHash = MidiPercussionBuilder.ComputeBankHash(drums);
+                UdonSharpEditorUtility.CopyProxyToUdon(drums, ProxySerializationPolicy.All); EditorUtility.SetDirty(drums);
+            }
             facade.voicePool.bank = facade.GetInstrumentBank(facade.selectedInstrument);
             facade.library.catalogHash = InstrumentCatalogHash(facade, MidiContentHash.Catalog(config.library, config.bank));
             facade.network.catalogHash = facade.library.catalogHash;

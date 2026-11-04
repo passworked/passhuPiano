@@ -1,1 +1,3 @@
 University of Iowa Musical Instrument Samples, yarn ff, 60 real roots C2–C7, one velocity layer. Original labelled Eb2 measures D2; Eb2 uses nearest root. 48kHz stereo Vorbis q4, leading silence removed as audition, full tails. One auxiliary C8 clip derived from C7 supports MIDI127 within AudioSource pitch limit; not an additional recording. Constant gain matches audition reference. See LICENSE.txt.
+
+2026-11-04 loudness calibration (instrument-loudness-v1): requested +6 dB fixed linear gain, capped per clip at -1.5 dBFS decoded 4x peak. Original velocity response, pitch and decay retained; no waveform limiting. Per-file applied gain and original hashes: BANK-MAPPING.json.

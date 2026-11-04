@@ -1,0 +1,10 @@
+Tool: built-in image_gen.imagegen
+Date: 2026-11-03
+Output: passhu-piano-world-cover-zh-v1.png
+Edit target: passhu-piano-world-cover-v1.png
+
+Edit the attached existing world cover into a Chinese-title variant. Keep the 4:3 canvas and original composition, reference piano-P logo silhouette, logo size and location, blue/cyan palette, dark navy subtle technical grid background and restrained MIDI-note line ornament unchanged. Preserve the central inscribed 16:9 crop-safe area containing all meaningful content.
+Change only typography:
+1. Replace the entire Japanese headline with exact Simplified Chinese "帕休的钢琴". Five characters: 帕 休 的 钢 琴. Large off-white clean modern medium-bold sans-serif Chinese typography, well-formed correct characters, single line, visually balanced with the emblem to its left. Retain approximately the previous title's height and vertical position, with a comfortable balanced line width.
+2. Keep English subtitle text exactly "PASSHU'S PIANO" but make it substantially narrower and more compact: remove the original excessive letter spacing, use tight professional normal tracking with slightly condensed clean sans serif. Target total subtitle width about 52–60 percent of the new Chinese title width. It should read as one coherent compact subtitle centered beneath the Chinese headline. Keep the subdued pale cyan color and similar vertical position. Do not stretch the English to match title width.
+No Japanese text remains. No other words, no watermark. This is a precise restrained typography revision of the existing cover, not a new design. Output an opaque PNG, exact 4:3 landscape.

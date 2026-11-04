@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using MusicMidiPlayer.Data;
 using MusicMidiPlayer.Editor.Assets;
 using UdonSharpEditor;
@@ -196,6 +197,12 @@ namespace MusicMidiPlayer.Editor.Baking
         public static void PrepareBank(PianoBankAsset bank)
         {
             if (bank == null || bank.clips == null || bank.clips.Length == 0) throw new InvalidOperationException("音源没有采样");
+            MidiAudioPacking.BakeWithSourcePcm(bank.clips.Where(clip => clip != null).Select(AssetDatabase.GetAssetPath),
+                () => PrepareBankFromImportedClips(bank));
+        }
+
+        private static void PrepareBankFromImportedClips(PianoBankAsset bank)
+        {
             int count = bank.clips.Length;
             if ((bank.velocityLayerCount != 1 && bank.velocityLayerCount != 3 && bank.velocityLayerCount != 4) || count % bank.velocityLayerCount != 0)
                 throw new InvalidOperationException("Velocity layers must be 1, 3 or 4 with equal region counts.");
@@ -232,6 +239,7 @@ namespace MusicMidiPlayer.Editor.Baking
                 if (i < perLayer)
                     for (int p = bank.lowPitch[i]; p <= bank.highPitch[i]; p++) bank.pitchToRegion[p - 21] = i;
             }
+            AudioEnergyBaker.Bake(bank.clips, out bank.energyStarts, out bank.energyCounts, out bank.energyValues);
             bank.maxReleaseMs = 0;
             foreach (int release in bank.releaseDurationMs) bank.maxReleaseMs = Math.Max(bank.maxReleaseMs, release);
             ValidateBank(bank, false);
@@ -250,6 +258,7 @@ namespace MusicMidiPlayer.Editor.Baking
             foreach (int[] array in integerArrays) if (array == null || array.Length != count) throw new InvalidOperationException("钢琴音源数组长度不一致");
             if (bank.sourcePeak == null || bank.sourcePeak.Length != count || bank.regionGain == null || bank.regionGain.Length != count || bank.tuningCents == null || bank.tuningCents.Length != count || bank.pitchToRegion == null || bank.pitchToRegion.Length != 88)
                 throw new InvalidOperationException("音源增益或映射数组无效");
+            AudioEnergyBaker.Validate(bank.clips, bank.energyStarts, bank.energyCounts, bank.energyValues);
             int maxRelease = 0;
             for (int i = 0; i < count; i++)
             {
@@ -341,6 +350,8 @@ namespace MusicMidiPlayer.Editor.Baking
         public static void CopyBankToRuntime(PianoBankAsset source, PianoBankData target)
         {
             ValidateBank(source);
+            target.energyStarts = Clone(source.energyStarts); target.energyCounts = Clone(source.energyCounts);
+            target.energyValues = (float[])source.energyValues.Clone();
             target.velocityLayerCount = source.velocityLayerCount;
             target.bankHash = source.bankHash; target.clips = (AudioClip[])source.clips.Clone();
             target.rootPitch = Clone(source.rootPitch); target.lowPitch = Clone(source.lowPitch); target.highPitch = Clone(source.highPitch);

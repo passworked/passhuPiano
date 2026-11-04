@@ -8,7 +8,7 @@ import { root, read, write } from './release.mjs';
 const version = read('VERSION').trim();
 const policy = JSON.parse(read('Assets/UdonMidiPlayer/Documentation/ReleasePolicy.json'));
 const manifest = JSON.parse(read(`Releases/${version}/package-assets.json`));
-const directory = path.join(root, 'Logs/Release/package-inspection');
+const directory = path.resolve(root, process.argv[2] || 'Logs/Release/package-inspection');
 const actual = new Set(), errors = [], records = new Map([...policy.music, ...policy.songs, ...policy.audio].map(x => [x.path, x]));
 const ids = new Set(policy.songs.map(x => x.songId));
 let audio = 0, music = 0;

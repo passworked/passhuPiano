@@ -194,7 +194,7 @@ namespace MusicMidiPlayer.Audio
             _attackEnd[slot]=start+data.attacks[r].length/ratio-age;
             _end[slot]=data.loops[r] != null ? double.MaxValue : _attackEnd[slot];
             sounding[slot]=true;
-            attack.Stop(); body.Stop();
+            attack.Stop(); body.Stop(); attack.volume=body.volume=0f;
             if (section >= 0 && section < soundOrigins.Length && soundOrigins[section] != null)
             { Vector3 point = soundOrigins[section].TransformPoint(new Vector3(0,-.045f,.08f)); attack.transform.position=point; body.transform.position=point; }
             attack.clip=data.attacks[r]; attack.loop=false; attack.pitch=ratio;
@@ -213,6 +213,7 @@ namespace MusicMidiPlayer.Audio
                 body.PlayScheduled(System.Math.Max(start,_attackEnd[slot]));
             }
             ApplySlot(slot,start);
+            RefreshOutput();
         }
 
         public void UpdateVoices(int ms,int nextGeneration)
@@ -224,17 +225,35 @@ namespace MusicMidiPlayer.Audio
                 if((!_live[i] && (clock.GetState()!=1 || nextGeneration!=generation)) || dsp>=_end[i]) { StopSlot(i); continue; }
                 StringsBankData data=banks[_bank[i]];
                 if(_release[i]>=0 && dsp>=_release[i]+data.releaseMs[_region[i]]*.001) { StopSlot(i); continue; }
-                ApplySlot(i,dsp); activeVoiceCount++;
+                activeVoiceCount++;
             }
-            if(output.peakProtectionEnabled)
+            RefreshOutput();
+        }
+
+        public void RefreshOutput()
+        {
+            double dsp = clock.GetFrameDspSeconds();
+            float power = output.peakProtectionEnabled && output.drums != null ? output.drums.EnergySum(dsp) : 0f;
+            float peakSum = output.drums == null ? 0f : output.drums.PeakSum();
+            float maxLevel = output.drums == null ? 0f : output.drums.MaxLevel();
+            for (int i = 0; i < 32; i++) if (sounding[i])
             {
-                float total=output.drums==null?0:output.drums.PeakSum();
-                for(int i=0;i<32;i++) if(sounding[i]) total+=levels[i]*banks[_bank[i]].peaks[_region[i]];
-                float norm=Mathf.Min(1f,output.peakBudget/Mathf.Max(.0001f,total));
-                for(int i=0;i<32;i++) if(sounding[i])
-                { output.voiceSources[i*2].volume*=norm; output.voiceSources[i*2+1].volume*=norm; }
-                if(output.drums!=null)output.drums.ApplyOutputGains(norm);
+                ApplySlot(i, dsp);
+                peakSum += levels[i] * banks[_bank[i]].peaks[_region[i]];
+                maxLevel = Mathf.Max(maxLevel, levels[i]);
+                if (output.peakProtectionEnabled)
+                {
+                    float age = (float)(dsp - starts[i]) * output.voiceSources[i * 2].pitch;
+                    power += levels[i] * levels[i] * banks[_bank[i]].EnergyAt(_region[i], age);
+                }
             }
+            float gain = output.LimitOutputGain(output.CalculateCompressionGain(power, dsp), peakSum, maxLevel, dsp);
+            for (int i = 0; i < 32; i++) if (sounding[i])
+            {
+                float volume = output.muted ? 0f : Mathf.Clamp01(output.localVolume * levels[i] * gain);
+                output.voiceSources[i * 2].volume = output.voiceSources[i * 2 + 1].volume = volume;
+            }
+            if (output.drums != null) output.drums.ApplyOutputGains(gain);
         }
 
         private void ApplySlot(int slot,double dsp)
@@ -243,9 +262,7 @@ namespace MusicMidiPlayer.Audio
             float attack=Mathf.Clamp01((float)((dsp-starts[slot])/.008));
             float expression=_live[slot]?_expression[_channel[slot]]:_song.ExpressionAt(_channel[slot],(int)(clock.GetPositionSeconds()*1000))/127f;
             levels[slot]=_baseGain[slot]*(1-release)*(1-release)*expression*attack;
-            float volume=output.muted?0:Mathf.Clamp01(output.localVolume*levels[slot]);
             AudioSource a=output.voiceSources[slot*2], b=output.voiceSources[slot*2+1];
-            a.volume=b.volume=volume;
             int priority=release>0?200:96+(int)Mathf.Clamp((float)(dsp-starts[slot]),0,64);
             a.priority=b.priority=priority;
         }

@@ -50,6 +50,8 @@ namespace MusicMidiPlayer.Editor.Assets
         public override void OnInspectorGUI()
         {
             MidiEditorI18n.DrawLanguageSelector();
+            if (GUILayout.Button(MidiEditorI18n.Tr("Edit MIDI library")))
+                MusicMidiPlayer.Editor.Import.MidiImportWindow.OpenLibrary((MidiLibraryAsset)target);
             serializedObject.Update();
             using (new EditorGUI.DisabledScope(true))
                 EditorGUILayout.ObjectField(MidiEditorI18n.Tr("Script"), MonoScript.FromScriptableObject((MidiLibraryAsset)target), typeof(MonoScript), false);

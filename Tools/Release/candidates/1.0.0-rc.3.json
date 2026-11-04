@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0-rc.3",
+  "reason": "Release the golden-angle playback and MIDI library editor candidate; preserve but exclude concurrently authored, unfinished underwater scene content.",
+  "excludedPaths": [
+    "Assets/Scenes/UnderwaterMusicGarden.unity",
+    "Assets/UdonMidiPlayer/Editor/SceneArt/UnderwaterMusicGardenBuilder.cs",
+    "Docs/UdonMidiPlayer/27-underwater-music-garden.md"
+  ],
+  "excludedPrefixes": [
+    "Assets/Scenes/UnderwaterMusicGarden/",
+    "ArtSource/UnderwaterMusicGarden/"
+  ]
+}

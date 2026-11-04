@@ -43,7 +43,8 @@ namespace MusicMidiPlayer.Editor.Prefab
                 settings.compressionFormat = AudioCompressionFormat.PCM;
                 settings.sampleRateSetting = AudioSampleRateSetting.PreserveSampleRate;
                 importer.defaultSampleSettings = settings;
-                foreach (string platform in new[] { "Standalone", "Android" })
+                if (key == "piano") MidiAudioPacking.Configure(importer);
+                else foreach (string platform in new[] { "Standalone", "Android" })
                     if (importer.ContainsSampleSettingsOverride(platform)) importer.ClearSampleSettingOverride(platform);
                 importer.SaveAndReimport();
             }
@@ -65,7 +66,9 @@ namespace MusicMidiPlayer.Editor.Prefab
                 sourceQuality = 4, encodedSourceBytes = paths.Sum(p => new FileInfo(p).Length),
                 decodedFloat32EstimateBytes = bank.clips.Sum(c => (double)c.samples * c.channels * 4),
                 observedEditorClipMemoryBytes = bank.clips.Sum(c => UnityEngine.Profiling.Profiler.GetRuntimeMemorySizeLong(c)),
-                bank.bankHash, note = "PCM / DecompressOnLoad; source Ogg q4 is not build/download size."
+                bank.bankHash, note = key == "piano"
+                    ? "Standalone: Vorbis quality 70; default: PCM. Both use DecompressOnLoad. Source Ogg q4 is not build/download size."
+                    : "PCM / DecompressOnLoad; source Ogg q4 is not build/download size."
             }, Newtonsoft.Json.Formatting.Indented));
             AssetDatabase.SaveAssetIfDirty(bank);
             return bank;

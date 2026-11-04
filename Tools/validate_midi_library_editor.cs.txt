@@ -1,0 +1,101 @@
+// Run as an execute_code method body in Unity. Temporary fixture assets only; no Play Mode.
+if (EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isCompiling) return "Deferred: Editor must be idle and outside Play Mode.";
+var checks = new List<string>();
+Action<bool,string> check = (ok,name) => { if(!ok) throw new Exception(name); checks.Add(name); };
+string temp = "Assets/UdonMidiPlayer/Editor/RegressionTemp/MidiLibrary-" + Guid.NewGuid().ToString("N");
+string cache = "Library/MidiLibraryValidation-" + Guid.NewGuid().ToString("N");
+System.IO.Directory.CreateDirectory(cache);
+MusicMidiPlayer.Editor.Import.MidiImportService.EnsureFolder(temp);
+var window = ScriptableObject.CreateInstance<MusicMidiPlayer.Editor.Import.MidiImportWindow>();
+var type = window.GetType(); var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+Action<string,object[]> invoke = (name,args) => { try {type.GetMethod(name,flags).Invoke(window,args);} catch(System.Reflection.TargetInvocationException e){throw new Exception(name+": "+e.InnerException, e.InnerException);} };
+Func<string,object> field = name => type.GetField(name,flags).GetValue(window);
+Func<int,byte[]> midi = extra => {
+    var track = new List<byte>();
+    for(int i=0;i<extra;i++) track.AddRange(new byte[]{0,0xb0,11,100});
+    track.AddRange(new byte[]{0,0x90,60,100,0x83,0x60,0x80,60,0,0,0xff,0x2f,0});
+    var bytes = new List<byte>(new byte[]{77,84,104,100,0,0,0,6,0,0,0,1,1,224,77,84,114,107,0,0,0,(byte)track.Count});
+    bytes.AddRange(track);return bytes.ToArray();
+};
+string[] scenePaths = {"Assets/Scenes/VRCDefaultWorldScene.unity","Assets/Scenes/ClockworkMaintenanceStreet.unity"};
+var sceneHashes = scenePaths.ToDictionary(p=>p,p=>MusicMidiPlayer.Editor.Baking.MidiContentHash.Bytes(System.IO.File.ReadAllBytes(p)));
+try {
+    var a=midi(0);var b=midi(2);
+    var parsed=MusicMidiPlayer.Editor.Import.SmfParser.Parse(a,new MusicMidiPlayer.Editor.Import.MidiImportSettings{excludePercussion=false});
+    check(parsed.sourceEventCount==3,"raw source event count includes EndOfTrack");
+    check(MusicMidiPlayer.Editor.Import.SmfParser.Parse(b).sourceEventCount==5,"raw controls participate in version comparison");
+    string source=temp+"/source.mid";System.IO.File.WriteAllBytes(source,a);AssetDatabase.ImportAsset(source);
+    var song=MusicMidiPlayer.Editor.Import.MidiImportService.ImportAsset(source,temp,new MusicMidiPlayer.Editor.Import.MidiImportSettings{excludePercussion=false});
+    song.title="Verified title";song.author="Verified author";song.contentHash=MusicMidiPlayer.Editor.Baking.MidiContentHash.Song(song);EditorUtility.SetDirty(song);AssetDatabase.SaveAssetIfDirty(song);
+    string songId=song.songId,sourceGuid=song.sourceGuid,assetGuid=AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(song));
+    var library=ScriptableObject.CreateInstance<MusicMidiPlayer.Editor.Assets.MidiLibraryAsset>();AssetDatabase.CreateAsset(library,temp+"/library.asset");
+    MusicMidiPlayer.Editor.Import.MidiLibraryEditing.AddSong(library,song,"Game/Miku");
+    MusicMidiPlayer.Editor.Import.MidiLibraryEditing.AddSong(library,song,"Other");
+    check(library.songs.Length==1&&library.folders.Length==2,"membership references one song across multiple folders");
+    library.defaultSongId=songId;EditorUtility.SetDirty(library);AssetDatabase.SaveAssetIfDirty(library);
+    invoke("SetLibrary",new object[]{library});
+    string external=cache+"/duplicate_with_ugly_name.mid";System.IO.File.WriteAllBytes(external,a);
+    invoke("AddPath",new object[]{external});
+    check(library.songs.Length==1,"adding input changes draft only");
+    invoke("SaveAndApply",Array.Empty<object>());
+    check(library.songs.Length==1&&library.songs[0]==song,"exact hash duplicate reuses original identity");
+    check(song.title=="Verified title"&&song.author=="Verified author","duplicate filename defaults preserve verified metadata");
+    check((bool)field("dirty")==false,"successful save clears draft dirty state: "+field("message"));
+    string playlist=MusicMidiPlayer.Editor.Import.MidiLibraryEditing.ExportPlaylist(library);
+    var restored=ScriptableObject.CreateInstance<MusicMidiPlayer.Editor.Assets.MidiLibraryAsset>();
+    try {
+        MusicMidiPlayer.Editor.Import.MidiLibraryEditing.ImportPlaylist(restored,playlist);
+        check(restored.songs[0]==song&&restored.folders[0].path=="Game/Miku"&&restored.defaultSongId==songId,"JSON round trip preserves order, default and nested membership");
+        bool rejected=false;try{MusicMidiPlayer.Editor.Import.MidiLibraryEditing.ImportPlaylist(restored,playlist.Replace(assetGuid,new string('0',32)));}catch{rejected=true;}
+        check(rejected&&restored.songs[0]==song,"missing JSON dependency rejected before mutation");
+    }finally{UnityEngine.Object.DestroyImmediate(restored);}
+    MusicMidiPlayer.Editor.Import.MidiLibraryEditing.RenameSource(song,"Clean filename");
+    check(song.sourceGuid==sourceGuid&&song.sourcePath.EndsWith("Clean filename.mid")&&AssetDatabase.AssetPathToGUID(song.sourcePath)==sourceGuid,"source rename retains source GUID and updates path");
+    string replacement=cache+"/replacement.mid";System.IO.File.WriteAllBytes(replacement,b);
+    MusicMidiPlayer.Editor.Import.MidiLibraryEditing.ReplaceSource(song,replacement);
+    check(song.songId==songId&&song.sourceGuid==sourceGuid&&AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(song))==assetGuid,"source replacement retains songId and both asset GUIDs");
+    check(song.title=="Verified title"&&song.author=="Verified author"&&song.sourceHash==MusicMidiPlayer.Editor.Baking.MidiContentHash.Bytes(b),"replacement preserves metadata and updates source hash");
+    var oldHash=song.contentHash;
+    System.IO.File.WriteAllBytes(replacement,new byte[]{1,2,3});bool bad=false;
+    try{MusicMidiPlayer.Editor.Import.MidiLibraryEditing.ReplaceSource(song,replacement);}catch{bad=true;}
+    check(bad&&song.contentHash==oldHash&&System.IO.File.ReadAllBytes(song.sourcePath).SequenceEqual(b),"invalid replacement leaves successful source and song intact");
+    MusicMidiPlayer.Editor.Baking.MidiDataBaker.ValidateSong(song);
+    check(library.folders.All(f=>f.songs[0]==song),"all folder references survive rename and replacement");
+    var duplicate=UnityEngine.Object.Instantiate(song);AssetDatabase.CreateAsset(duplicate,temp+"/duplicate.asset");duplicate.songId=AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(duplicate));
+    library.songs=new[]{song,duplicate};library.defaultSongId=duplicate.songId;library.folders[0].songs=new[]{duplicate,song};
+    check(MusicMidiPlayer.Editor.Import.MidiLibraryEditing.Deduplicate(library)==1&&library.defaultSongId==songId&&library.folders[0].songs.Length==1,"dedup repairs memberships and default without deleting assets");
+    check(System.IO.File.Exists(AssetDatabase.GetAssetPath(duplicate)),"dedup retains source song assets");
+    EditorUtility.SetDirty(library);AssetDatabase.SaveAssetIfDirty(library);
+    invoke("SetLibrary",new object[]{library});
+    var folderList=(System.Collections.IList)field("folders");
+    type.GetField("folderIndex",flags).SetValue(window,0);invoke("RenameFolder",new object[]{"Music/Miku"});
+    check(library.folders[0].path=="Game/Miku","folder rename is draft only");
+    invoke("SaveAndApply",Array.Empty<object>());
+    check(library.folders[0].path=="Music/Miku","folder rename persists without source reparse");
+    invoke("SetLibrary",new object[]{library});library.title="Parallel edit";
+    bool conflict=false;try{invoke("SaveAndApply",Array.Empty<object>());}catch{conflict=true;}
+    check(conflict&&library.title=="Parallel edit","parallel library edits are not overwritten");
+    string zip=cache+"/songs.zip";
+    System.IO.File.WriteAllBytes(zip,Convert.FromBase64String("UEsDBBQAAAAIACq9ZF1sHMSQJQAAACMAAAASAAAAR2FtZS9NaWt1L1NvbmcubWlk8w3JSGFgYGBjYGBgZHzgG1KUzcDAwMswwSalOaHBhoHhvz4DAFBLAQIUABQAAAAIACq9ZF1sHMSQJQAAACMAAAASAAAAAAAAAAAAAAAAAAAAAABHYW1lL01pa3UvU29uZy5taWRQSwUGAAAAAAEAAQBAAAAAVQAAAAAA"));
+    var inputs=new List<MusicMidiPlayer.Editor.Import.MidiLibraryEditing.Input>();
+    MusicMidiPlayer.Editor.Import.MidiLibraryEditing.ReadInputs(zip,inputs,"Imported",true);
+    check(inputs.Count==1&&inputs[0].folder=="Imported/Game/Miku","ZIP import preserves optional nested folders");
+    string unsafeZip=cache+"/unsafe.zip";
+    System.IO.File.WriteAllBytes(unsafeZip,Convert.FromBase64String("UEsDBBQAAAAIACq9ZF1sHMSQJQAAACMAAAANAAAALi4vZXNjYXBlLm1pZPMNyUhhYGBgY2BgYGR84BtSlM3AwMDLMMEmpTmhwYaB4b8+AwBQSwECFAAUAAAACAAqvWRdbBzEkCUAAAAjAAAADQAAAAAAAAAAAAAAAAAAAAAALi4vZXNjYXBlLm1pZFBLBQYAAAAAAQABADsAAABQAAAAAAA="));
+    bool unsafeRejected=false;try{MusicMidiPlayer.Editor.Import.MidiLibraryEditing.ReadInputs(unsafeZip,inputs);}catch{unsafeRejected=true;}
+    check(unsafeRejected,"ZIP traversal is rejected");
+    invoke("SetLibrary",new object[]{library});
+    System.IO.File.WriteAllBytes(external,midi(3));invoke("AddPath",new object[]{external});
+    var draft=(System.Collections.IList)field("rows");
+    var newRow=draft[draft.Count-1];newRow.GetType().GetField("title").SetValue(newRow,song.title);
+    invoke("SelectVersions",Array.Empty<object>());
+    check(draft.Count==1,"explicit same-title grouping selects one version");
+    var chosen=draft[0];check(chosen.GetType().GetField("song").GetValue(chosen)==song&&chosen.GetType().GetField("input").GetValue(chosen)!=null,"higher event version keeps existing identity as replacement plan");
+    foreach(var p in scenePaths)check(sceneHashes[p]==MusicMidiPlayer.Editor.Baking.MidiContentHash.Bytes(System.IO.File.ReadAllBytes(p)),"authoring scene unchanged: "+p);
+    var report=new{success=true,scope="Isolated Editor source, library and draft operations; no Play Mode or VRChat client",checks=checks.ToArray()};
+    System.IO.Directory.CreateDirectory("Logs/Release/rc3");System.IO.File.WriteAllText("Logs/Release/rc3/midi-library-validation.json",Newtonsoft.Json.JsonConvert.SerializeObject(report,Newtonsoft.Json.Formatting.Indented));
+    return report;
+}finally{
+    UnityEngine.Object.DestroyImmediate(window);
+    AssetDatabase.DeleteAsset(temp);
+}

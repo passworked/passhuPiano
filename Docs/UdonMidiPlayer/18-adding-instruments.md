@@ -142,3 +142,7 @@
 - 烘焙与边界：[MidiStringsBuilder](../../Assets/UdonMidiPlayer/Editor/Prefab/MidiStringsBuilder.cs)、[MidiPercussionBuilder](../../Assets/UdonMidiPlayer/Editor/Prefab/MidiPercussionBuilder.cs)、[MidiInstrumentMigration](../../Assets/UdonMidiPlayer/Editor/Prefab/MidiInstrumentMigration.cs)、[MidiBuildValidator](../../Assets/UdonMidiPlayer/Editor/Prefab/MidiBuildValidator.cs)。
 
 2026-11-02：新增或重导入音源须通过 `AudioEnergyBaker` 生成 20 ms 的 `energyStarts/energyCounts/energyValues`，在实际源时间轴上取能量，并接入现有共享压缩系数。包络纳入 bank 哈希与构建前 backing Udon 数组校验，不新增逐帧 PCM 读取；持续音循环、变调、释放和未来预约分别按第 13 册处理。
+
+## 当前追加实例：八音盒（2026-11-04）
+
+新增目标7／模型8，保留停用目标6／模型7的身份。六目标定长假设已按实际链路扩展至七活动目标，详见[八音盒记录](24-music-box.md)；上文六／七目标历史快照不替代本次代码。实现覆盖bank能量与哈希、GM排序、轨道关键字、两类文件映射、共享声音池、实时事件／稀疏快照、输入及四份语言。只安装主场景，不自动扩展分发Prefab／练习系统。

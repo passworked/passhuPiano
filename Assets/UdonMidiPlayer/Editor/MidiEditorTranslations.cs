@@ -11,6 +11,9 @@ namespace MusicMidiPlayer.Editor
         {
             return new Dictionary<string, string[]>(StringComparer.Ordinal)
             {
+                { "Energy offsets", new[] { "能量包络偏移", "能量包絡偏移", "エネルギー包絡のオフセット" } },
+                { "Energy point counts", new[] { "能量包络点数", "能量包絡點數", "エネルギー包絡の点数" } },
+                { "Sample energy (20 ms)", new[] { "采样能量（20 ms）", "取樣能量（20 ms）", "サンプルエネルギー（20 ms）" } },
                 { "Author (optional)", new[] { "作者（可为空）", "作者（可留空）", "作者（任意）" } },
                 { "Editor language", new[] { "编辑器语言", "編輯器語言", "エディターの言語" } },
                 { "Auto (Editor / OS)", new[] { "自动（编辑器 / 系统）", "自動（編輯器 / 系統）", "自動（エディター / OS）" } },

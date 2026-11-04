@@ -1,0 +1,13 @@
+Tool: built-in image_gen.imagegen
+Date: 2026-11-03
+Output: passhu-piano-world-cover-zh-v2.png
+Reference: passhu-piano-world-cover-zh-v1.png
+
+Use case: ads-marketing / logo-brand.
+Redesign this Chinese piano-world cover with much better art direction: quiet, musical, refined, extremely minimal. The attached old cover is ONLY a reference for the distinctive piano-P symbol and the exact wording. Discard the old oversized horizontal lockup and all its grid/line decoration.
+Canvas exactly 4:3 landscape, ideally 1536x1152. All essential content inside centered inscribed 16:9 safe area (middle 75% of height), and well away from its edges.
+New visual direction: a beautiful understated cover for a small personal virtual piano world, with the precision of boutique audio software. Full-bleed smooth matte charcoal-navy background #101722, almost flat, softly illuminated by a very broad extremely faint cool-blue ambient gradient behind the central symbol. No visible light source or spotlight. Plenty of unoccupied space.
+Composition: one modest vertically stacked emblem-and-type composition precisely centered, with optical balance. Logo centered at x=50%, y around 42%, about 17% of canvas width and 24% of canvas height. Retain the original recognizable P-shaped piano silhouette, the lower rounded keyboard cutouts, the three small ascending MIDI capsules within. Clean crisp solid muted ice-blue logo, with ONLY its top MIDI capsule a brighter pale cyan accent. Elegant and restrained, no bevel, no glow, no metallic shine. Logo is smaller than before and feels carefully placed.
+Below the logo with a generous clear gap, one beautiful Chinese headline in clean modern Simplified Chinese sans serif, REGULAR weight rather than bold, natural well-proportioned characters, subtly open but not excessive spacing. Off-white #E4E9EF. Total title width about 34% of canvas width, individual character height about 6% of canvas height. Headline centered around y=62%. Exact text "帕休的钢琴". Characters precisely 帕 休 的 钢 琴. No Japanese.
+Small English subtitle centered below at y around 69%: exact "PASSHU'S PIANO", subdued blue-gray #8C9EAF, fine regular sans serif, compact normal letter spacing, its total width about 19% of canvas width. Clearly subordinate to Chinese title.
+Only these two text lines. No decorative horizontal lines, no decorative duplicated notes below, no grid, no borders, no HUD, no circuits, no crosshairs, no extra labels, no slogans, no watermark, no objects, no photo or 3D piano. The technical character comes from precise geometry, clean typography, alignment and restrained cool color. The musical gentleness comes from spacing, soft ambient blue and quiet composition. Deliver one finished cover, not a mockup, no external frame.

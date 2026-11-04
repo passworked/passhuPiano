@@ -1,0 +1,467 @@
+{
+  "author": "rbnuser",
+  "license": "CC0-1.0",
+  "source": "https://freesound.org/people/rbnuser/packs/19724/",
+  "acquired": "2026-11-04",
+  "format": "48 kHz mono Vorbis q5; PCM import",
+  "recordedRoots": 12,
+  "sources": [
+    {
+      "pitch": 74,
+      "id": 347414,
+      "url": "https://cdn.freesound.org/previews/347/347414_4551235-hq.mp3",
+      "pageUrl": "https://freesound.org/people/rbnuser/sounds/347414/",
+      "file": "Downloads/MusicBox/347414.mp3",
+      "sha256": "d77286c54bfcfaf302480bbe08c763cc81d26c0651a07790ab2be0171b3fc73a",
+      "measuredCents": -9
+    },
+    {
+      "pitch": 79,
+      "id": 347413,
+      "url": "https://cdn.freesound.org/previews/347/347413_4551235-hq.mp3",
+      "pageUrl": "https://freesound.org/people/rbnuser/sounds/347413/",
+      "file": "Downloads/MusicBox/347413.mp3",
+      "sha256": "f20e21121f55d27cb864313cae792bcd15a062e0cb420513c3ffebb96ba54fd1",
+      "measuredCents": -4.5
+    },
+    {
+      "pitch": 81,
+      "id": 347412,
+      "url": "https://cdn.freesound.org/previews/347/347412_4551235-hq.mp3",
+      "pageUrl": "https://freesound.org/people/rbnuser/sounds/347412/",
+      "file": "Downloads/MusicBox/347412.mp3",
+      "sha256": "7eee1a1320aea2dc8e8078004c1f2bcd60e1c4a71d4b0cc475663a1015dbc451",
+      "measuredCents": 1.5
+    },
+    {
+      "pitch": 84,
+      "id": 347418,
+      "url": "https://cdn.freesound.org/previews/347/347418_4551235-hq.mp3",
+      "pageUrl": "https://freesound.org/people/rbnuser/sounds/347418/",
+      "file": "Downloads/MusicBox/347418.mp3",
+      "sha256": "1bcfc87f2463a21e37548c53c1e9d1a8b59b1d9304ae865e5cb5070ab05c5497",
+      "measuredCents": -7
+    },
+    {
+      "pitch": 86,
+      "id": 347417,
+      "url": "https://cdn.freesound.org/previews/347/347417_4551235-hq.mp3",
+      "pageUrl": "https://freesound.org/people/rbnuser/sounds/347417/",
+      "file": "Downloads/MusicBox/347417.mp3",
+      "sha256": "e54aa37b3926c9fbc43168142c6bccc52b85fdee4fb4a513508e66ac5ce67a3a",
+      "measuredCents": -15.5
+    },
+    {
+      "pitch": 93,
+      "id": 347416,
+      "url": "https://cdn.freesound.org/previews/347/347416_4551235-hq.mp3",
+      "pageUrl": "https://freesound.org/people/rbnuser/sounds/347416/",
+      "file": "Downloads/MusicBox/347416.mp3",
+      "sha256": "8a68c626ba2d3dc4bee6a7e626fef221c2bb522774d9b71822652d48fb776f91",
+      "measuredCents": -4.5
+    },
+    {
+      "pitch": 95,
+      "id": 347415,
+      "url": "https://cdn.freesound.org/previews/347/347415_4551235-hq.mp3",
+      "pageUrl": "https://freesound.org/people/rbnuser/sounds/347415/",
+      "file": "Downloads/MusicBox/347415.mp3",
+      "sha256": "e59eeb47c82fe8074a21a4cc6a3c4718ac514a6140e1ceba6499728724cadc7c",
+      "measuredCents": -6
+    },
+    {
+      "pitch": 96,
+      "id": 347420,
+      "url": "https://cdn.freesound.org/previews/347/347420_4551235-hq.mp3",
+      "pageUrl": "https://freesound.org/people/rbnuser/sounds/347420/",
+      "file": "Downloads/MusicBox/347420.mp3",
+      "sha256": "b24d02730ccaac75af516b52d05f7c691684c07e33684b0f7ba667285e820e58",
+      "measuredCents": -9.5
+    },
+    {
+      "pitch": 98,
+      "id": 347419,
+      "url": "https://cdn.freesound.org/previews/347/347419_4551235-hq.mp3",
+      "pageUrl": "https://freesound.org/people/rbnuser/sounds/347419/",
+      "file": "Downloads/MusicBox/347419.mp3",
+      "sha256": "56db43c15003d7db00c84480adb95b778b40ba4ca107c36749e77ac08273dcd0",
+      "measuredCents": -12
+    },
+    {
+      "pitch": 100,
+      "id": 347422,
+      "url": "https://cdn.freesound.org/previews/347/347422_4551235-hq.mp3",
+      "pageUrl": "https://freesound.org/people/rbnuser/sounds/347422/",
+      "file": "Downloads/MusicBox/347422.mp3",
+      "sha256": "382465c4cca7b19e42978c413a8da90553fffc61cab039f724af046da266ab1d",
+      "measuredCents": -11
+    },
+    {
+      "pitch": 102,
+      "id": 347421,
+      "url": "https://cdn.freesound.org/previews/347/347421_4551235-hq.mp3",
+      "pageUrl": "https://freesound.org/people/rbnuser/sounds/347421/",
+      "file": "Downloads/MusicBox/347421.mp3",
+      "sha256": "99d987c6e00f4faacdf6cc5e79cf4d2339eb1a94983c5b2380fd51e1797c5801",
+      "measuredCents": -6
+    },
+    {
+      "pitch": 103,
+      "id": 347423,
+      "url": "https://cdn.freesound.org/previews/347/347423_4551235-hq.mp3",
+      "pageUrl": "https://freesound.org/people/rbnuser/sounds/347423/",
+      "file": "Downloads/MusicBox/347423.mp3",
+      "sha256": "b5b91736580bd965e66e6f278a02e016bd9ff2a35e984e6081ad8896eeb2c086",
+      "measuredCents": 0
+    }
+  ],
+  "rows": [
+    {
+      "pitch": 21,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_021.ogg",
+      "sourceId": 347414,
+      "sourcePitch": 74,
+      "sourceDetuneCents": -9,
+      "derived": true,
+      "sha256": "60874f81acd3700afef163dca06162b3e4499b0a6d50333b8e21c56104956a8e",
+      "bytes": 76780,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 14.9824944391626,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -1.6790471870083117,
+        "originalTruePeakDb": -16.6824944391626,
+        "originalSha256": "822bae1c095d7412a2848a2293c844efcf7b128ae212c207e59ef494305c5640"
+      }
+    },
+    {
+      "pitch": 33,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_033.ogg",
+      "sourceId": 347414,
+      "sourcePitch": 74,
+      "sourceDetuneCents": -9,
+      "derived": true,
+      "sha256": "49cf183e1fd5cec7e9bdebf7a695c2dec3a55e45b55dbd6b7019270cc1937708",
+      "bytes": 51136,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 15,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -1.8275823148544335,
+        "originalTruePeakDb": -16.892195503591577,
+        "originalSha256": "5f5ef3fca731a888898db9a86661600da2db45d7c5644fa2ce1d665cf758cb1d"
+      }
+    },
+    {
+      "pitch": 45,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_045.ogg",
+      "sourceId": 347414,
+      "sourcePitch": 74,
+      "sourceDetuneCents": -9,
+      "derived": true,
+      "sha256": "4afe3258902c5166303a37d5de3fdf55bcb6b6f3f421c19fecc0f01254a02828",
+      "bytes": 34066,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 15,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -1.975527542068765,
+        "originalTruePeakDb": -16.905872533080952,
+        "originalSha256": "e5b3b495c668c139c1148c7146655186fc24b3b765af0cf05005cb955e3119f9"
+      }
+    },
+    {
+      "pitch": 57,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_057.ogg",
+      "sourceId": 347414,
+      "sourcePitch": 74,
+      "sourceDetuneCents": -9,
+      "derived": true,
+      "sha256": "396fe5ea5aad7dd981007733142b9e7671549d13a459a6f4937a38496d20bc66",
+      "bytes": 25416,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 15,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -1.654160717654463,
+        "originalTruePeakDb": -16.988663690181454,
+        "originalSha256": "5ee2d276794ed918a2cfd0019d6e9ed01c11a763fe570eaea900c4e49bef8111"
+      }
+    },
+    {
+      "pitch": 69,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_069.ogg",
+      "sourceId": 347414,
+      "sourcePitch": 74,
+      "sourceDetuneCents": -9,
+      "derived": true,
+      "sha256": "a89fa5e8b83d72e0cb4b6c9c88cd1f6d9feabe320608d312dc25cbf22f0f3962",
+      "bytes": 19350,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 15,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -2.0137504316752644,
+        "originalTruePeakDb": -17.032994158587215,
+        "originalSha256": "48e006ae3848a12b093c0262d48b27ccef84f3945657e3012ca94723d479eeaa"
+      }
+    },
+    {
+      "pitch": 74,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_074.ogg",
+      "sourceId": 347414,
+      "sourcePitch": 74,
+      "sourceDetuneCents": -9,
+      "derived": false,
+      "sha256": "a0bf9f7603bf0ab64b4a8b08432141859a807e744c18546b0d36d0af5314e315",
+      "bytes": 17705,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 15,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -1.9897135808680781,
+        "originalTruePeakDb": -16.842943718244626,
+        "originalSha256": "b17d17208707fd6bda657b618730634f78030cf166a36db7d087734d69bad907"
+      }
+    },
+    {
+      "pitch": 79,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_079.ogg",
+      "sourceId": 347413,
+      "sourcePitch": 79,
+      "sourceDetuneCents": -4.5,
+      "derived": false,
+      "sha256": "0c89e75779934cfc545a346714313472a5eb5cf2645fef672f1dff546696bf52",
+      "bytes": 13753,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 13.311662766890123,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -1.9546558871640145,
+        "originalTruePeakDb": -15.011662766890122,
+        "originalSha256": "5651a457e6d9c6d6f5d7fc884c9b36e603595a4b4789409b17ce44052394c8ce"
+      }
+    },
+    {
+      "pitch": 81,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_081.ogg",
+      "sourceId": 347412,
+      "sourcePitch": 81,
+      "sourceDetuneCents": 1.5,
+      "derived": false,
+      "sha256": "bd6753a7afe3bba7cab461b579026e82230eca0d42d3e37e644b6f033b0b1929",
+      "bytes": 15309,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 12.52156000650688,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -2.0657205052843666,
+        "originalTruePeakDb": -14.221560006506879,
+        "originalSha256": "71e4a9cdab631b795cf3cc4972a248ddbfd1f5bcc804985e5f392a360842bc56"
+      }
+    },
+    {
+      "pitch": 84,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_084.ogg",
+      "sourceId": 347418,
+      "sourcePitch": 84,
+      "sourceDetuneCents": -7,
+      "derived": false,
+      "sha256": "28ee84ef3699e6da0414a43ef65f8a81f9a135757fad49951957efa421d53db3",
+      "bytes": 17250,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 12.504897276126922,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -2.266517402469071,
+        "originalTruePeakDb": -14.204897276126921,
+        "originalSha256": "471494d79e33e5106c28a1a18f0a4f8e109112d1de88551d5a133156c5ffff97"
+      }
+    },
+    {
+      "pitch": 86,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_086.ogg",
+      "sourceId": 347417,
+      "sourcePitch": 86,
+      "sourceDetuneCents": -15.5,
+      "derived": false,
+      "sha256": "14616df0e5b80a5c85ac52518c2374a412a30358465287089308f6d2795f550f",
+      "bytes": 15848,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 10.364519673345406,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -1.950894173542552,
+        "originalTruePeakDb": -12.064519673345405,
+        "originalSha256": "3a602561f952ef49ad319efe4d0f3788cca8fb18b9941ffab8f970b70277d096"
+      }
+    },
+    {
+      "pitch": 93,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_093.ogg",
+      "sourceId": 347416,
+      "sourcePitch": 93,
+      "sourceDetuneCents": -4.5,
+      "derived": false,
+      "sha256": "b91aaa997f4438fbff3802ae82d5f52cf21a1b87f393f5c8400fa6d56d21313b",
+      "bytes": 17043,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 7.569099499906332,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -1.9682649413780968,
+        "originalTruePeakDb": -9.269099499906332,
+        "originalSha256": "75d21a4c8df4b2a1d05144ffaa700e5e09bcd2c2f91010c7a2751a9f9eba6b61"
+      }
+    },
+    {
+      "pitch": 95,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_095.ogg",
+      "sourceId": 347415,
+      "sourcePitch": 95,
+      "sourceDetuneCents": -6,
+      "derived": false,
+      "sha256": "8de9152d6166a499d104510cfe160c1cb04d8df3e28ad45d273d102f722256e0",
+      "bytes": 15009,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 8.12098678504984,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -1.5312190789178182,
+        "originalTruePeakDb": -9.82098678504984,
+        "originalSha256": "df17df3d9d966d0f45eb6bcddc1312d814fb0e670daad65d4cb5358799c5b515"
+      }
+    },
+    {
+      "pitch": 96,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_096.ogg",
+      "sourceId": 347420,
+      "sourcePitch": 96,
+      "sourceDetuneCents": -9.5,
+      "derived": false,
+      "sha256": "a93a4574ab9fe4a3a292ff2a7519db1093ef5be8843ae3ea66862cbfeded7ab0",
+      "bytes": 12943,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 12.681426163271208,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -1.9927816283089796,
+        "originalTruePeakDb": -14.381426163271207,
+        "originalSha256": "19ede19c5ce450948ef2376dcc269b52ed149866e331109c2d5c5b5b04d7f286"
+      }
+    },
+    {
+      "pitch": 98,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_098.ogg",
+      "sourceId": 347419,
+      "sourcePitch": 98,
+      "sourceDetuneCents": -12,
+      "derived": false,
+      "sha256": "375d26a54eea887b960d8282ee8482df21a06b017bf1a2f05830da581f8fb13c",
+      "bytes": 10931,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 1.6790266732028536,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -1.8115942905098572,
+        "originalTruePeakDb": -3.3790266732028535,
+        "originalSha256": "7f75bcff44a36460062eb90d35eb6daefa6c65408229fdc763789f5317e6faf3"
+      }
+    },
+    {
+      "pitch": 100,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_100.ogg",
+      "sourceId": 347422,
+      "sourcePitch": 100,
+      "sourceDetuneCents": -11,
+      "derived": false,
+      "sha256": "661e3d0258db9892aaf5bb0bc5ff83885424caf1cdb3066c79ab689210a81c20",
+      "bytes": 15233,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 9.449676350794732,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -1.9136244935222329,
+        "originalTruePeakDb": -11.149676350794731,
+        "originalSha256": "dfbaf918c149e034642d297b31d44676ce01b21d67f5f8b72973ad648c76d501"
+      }
+    },
+    {
+      "pitch": 102,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_102.ogg",
+      "sourceId": 347421,
+      "sourcePitch": 102,
+      "sourceDetuneCents": -6,
+      "derived": false,
+      "sha256": "663f286769fcaf49ea2583e493bb64572a5c652c7703bebcf0148a2111dff72f",
+      "bytes": 8445,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 4.495555772169934,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -2.3818258530333027,
+        "originalTruePeakDb": -6.195555772169934,
+        "originalSha256": "8973762f12660f06796faaeb4700c4263abe4f45d81d0c10bb5ac32124a383f4"
+      }
+    },
+    {
+      "pitch": 103,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_103.ogg",
+      "sourceId": 347423,
+      "sourcePitch": 103,
+      "sourceDetuneCents": 0,
+      "derived": false,
+      "sha256": "318b86c0d123b3880d661f450f654a80804b0a6161cc6e1eb5e8145c724e4e15",
+      "bytes": 11213,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 6.753029564091058,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -1.5369652075713764,
+        "originalTruePeakDb": -9.35017494766739,
+        "originalSha256": "f146436ea99e3f24db5a6815fb6550f360cb51434d6557bc9758983c23f331b9"
+      }
+    },
+    {
+      "pitch": 108,
+      "file": "Assets/UdonMidiPlayer/Audio/MusicBox/MusicBox_108.ogg",
+      "sourceId": 347423,
+      "sourcePitch": 103,
+      "sourceDetuneCents": 0,
+      "derived": true,
+      "sha256": "8ecd50b9a835f9b4dc840254a3fdc7859077a5a26a51b38e46bbfc9c75e98d52",
+      "bytes": 10130,
+      "loudnessCalibration": {
+        "version": "instrument-loudness-v1",
+        "requestedGainDb": 15,
+        "appliedGainDb": 7.876052037410392,
+        "ceilingDb": -1.5,
+        "decodedTruePeakDb": -2.5939073671730544,
+        "originalTruePeakDb": -9.576052037410392,
+        "originalSha256": "b0ac51031d0e9f09f23c35d85c4e7124d247e3e2712ceb0f35dd0cb4cf7c0f3e"
+      }
+    }
+  ],
+  "loudnessCalibration": {
+    "version": "instrument-loudness-v1",
+    "method": "fixed linear bank gain capped per clip by decoded 4x peak; no limiter or velocity normalization",
+    "ceilingDb": -1.5
+  }
+}

@@ -29,6 +29,7 @@ namespace MusicMidiPlayer.Editor.Import
             public readonly byte[] data;
             public int position, end;
             public int track = -1, eventIndex = -1;
+            public int totalEvents;
             public Reader(byte[] bytes) { data = bytes; end = bytes.Length; }
             public MidiImportException Error(string message)
             {
@@ -130,6 +131,7 @@ namespace MusicMidiPlayer.Editor.Import
             BuildPedalTimeline(source, result, settings, warnings);
             BuildExpressionTimeline(source, result, settings);
             result.format = format;
+            result.sourceEventCount = reader.totalEvents;
             result.ppq = division;
             result.measureStartMs = BuildMeasures(source, endTick, division, duration);
             result.tempoChangeCount = tempoCount;
@@ -259,6 +261,7 @@ namespace MusicMidiPlayer.Editor.Import
                 }
                 else throw r.Error("SMF 内含非法系统状态: " + status.ToString("X2"));
                 order++;
+                r.totalEvents++;
             }
             if (!ended) warnings.Add("轨道 " + r.track + " 缺少 EndOfTrack，使用完整数据块末尾");
             if (unsupported.Count > 0)

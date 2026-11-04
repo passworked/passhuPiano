@@ -48,7 +48,7 @@ Shader "MusicMidiPlayer/WaterfallMusicSymbol"
                 UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
                 o.position = UnityObjectToClipPos(v.vertex);
-                o.color = half4(_Color.rgb, v.color.a * _Color.a);
+                o.color = v.color * _Color;
                 o.uv = v.uv;
                 return o;
             }

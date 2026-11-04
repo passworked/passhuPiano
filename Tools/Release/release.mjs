@@ -25,10 +25,18 @@ const audioGroups = [
   { prefix: 'Assets/UdonMidiPlayer/Audio/SalamanderV9/', license: 'CC-BY-3.0', author: 'Alexander Holm; FreePats / Roberto', source: 'https://freepats.zenvoid.org/Piano/acoustic-grand-piano.html', notices: ['ORIGINAL-README.txt'] },
   { prefix: 'Assets/UdonMidiPlayer/Audio/SelectedQ4/Marimba/', license: 'LicenseRef-Iowa-MIS-Unrestricted', author: 'Lawrence Fritts; Andrew Thierauf; University of Iowa', source: 'https://theremin.music.uiowa.edu/MIS.html', notices: ['LICENSE.txt', 'ATTRIBUTION.txt'] },
   { prefix: 'Assets/UdonMidiPlayer/Audio/Strings/', license: 'CC0-1.0', author: 'Versilian Studios / Sam Gossner; Ivy Audio / Simon Dalzell', source: 'https://versilian-studios.com/vsco-community/', notices: ['LICENSE', 'ATTRIBUTION.txt', 'ORIGINAL-README.md'] },
-  { prefix: 'Assets/UdonMidiPlayer/Audio/VirtuosityDrums/', license: 'CC0-1.0', author: 'Versilian Studios LLC; Karoryfer Samples; Austin McMahon', source: 'https://github.com/sfzinstruments/virtuosity_drums/tree/9f04cf9a734527edfbb0a4eee1f674e45bbf71bc', notices: ['LICENSE.txt', 'ATTRIBUTION.txt'] }
+  { prefix: 'Assets/UdonMidiPlayer/Audio/VirtuosityDrums/', license: 'CC0-1.0', author: 'Versilian Studios LLC; Karoryfer Samples; Austin McMahon', source: 'https://github.com/sfzinstruments/virtuosity_drums/tree/9f04cf9a734527edfbb0a4eee1f674e45bbf71bc', notices: ['LICENSE.txt', 'ATTRIBUTION.txt'] },
+  { prefix: 'Assets/UdonMidiPlayer/Audio/MusicBox/', license: 'CC0-1.0', author: 'rbnuser', source: 'https://freesound.org/people/rbnuser/packs/19724/', notices: ['LICENSE.txt', 'ATTRIBUTION.txt'] }
 ];
 
 function excludedPublicFile(p) {
+  const scopePath = `Tools/Release/candidates/${read('VERSION').trim()}.json`;
+  if (fs.existsSync(path.join(root, scopePath))) {
+    const scope = JSON.parse(read(scopePath));
+    if (scope.version !== read('VERSION').trim()) throw Error('Invalid candidate scope');
+    const name = p.replace(/\.meta$/, '');
+    if (scope.excludedPaths.includes(name) || scope.excludedPrefixes.some(prefix => name.startsWith(prefix) || name === prefix.replace(/\/$/, ''))) return true;
+  }
   const rules = JSON.parse(read('Tools/Release/public-exclusions.json'));
   return rules.groups.some(g => g.paths.includes(p) || g.prefixes.some(prefix => p.startsWith(prefix)));
 }
@@ -93,6 +101,9 @@ export function inventory() {
     write(`Assets/UdonMidiPlayer/Documentation/${dst}`, read(src).replaceAll('(Licenses/', '('));
   }
   write('Assets/UdonMidiPlayer/Documentation/VERSION.txt', read('VERSION'));
+  if (fs.existsSync(path.join(root, 'Docs/MIDI_IMPORT.md')))
+    write('Assets/UdonMidiPlayer/Documentation/MidiImport.md', read('Docs/MIDI_IMPORT.md')
+      .replace('[GETTING_STARTED](GETTING_STARTED.md)', 'repository `Docs/GETTING_STARTED.md`'));
   if (fs.existsSync(path.join(root, 'Docs/UdonMidiPlayer/22-release-implementation.md')))
     write('Assets/UdonMidiPlayer/Documentation/ReleaseWorkflow.md', read('Docs/UdonMidiPlayer/22-release-implementation.md')
       .replaceAll('(../../THIRD_PARTY_NOTICES.md)', '(THIRD_PARTY_NOTICES.md)')

@@ -1,6 +1,6 @@
 # 安装、使用与开发入口
 
-面向 `passworked/passhuPiano` 的私有源码使用者。记录的开发基线为 Unity **2022.3.22f1**、VRChat Worlds SDK **3.10.5**；它不是所有平台、后续 SDK 或客户端的兼容保证。当前源码 `1.0.0-rc.2`，没有正式 v1.0 稳定包。
+面向 `passworked/passhuPiano` 的私有源码使用者。记录的开发基线为 Unity **2022.3.22f1**、VRChat Worlds SDK **3.10.5**；它不是所有平台、后续 SDK 或客户端的兼容保证。当前源码 `1.0.0-rc.3`，没有正式 v1.0 稳定包。
 
 ## 获取工程
 
@@ -28,6 +28,8 @@
 | 修改模型 | `ArtSource/` 中对应源文件及制作脚本 | 保留导入资源的 `.meta`；重跑生成器可能覆盖手工模型 |
 
 ## 配置与曲库
+
+逐步加歌、分类整理、ZIP 导入、去重和重导入，请阅读 [Unity MIDI 导入教程](MIDI_IMPORT.md)。日常入口为 **Tools → Music MIDI Player → Import MIDI / Edit Library**；新增与源文件维护先进入草稿，再统一“保存并应用”。
 
 在自己的目标场景放入相应 Prefab，使用 **Tools → Music MIDI Player → Configure Player** 选择目标、源曲库及音源，再由配置工具烘焙运行数据与接线。使用项目现有导入工具添加自己具有使用权的 MIDI，填写曲名 / 作者，保留既有 songId 与重导入映射。
 

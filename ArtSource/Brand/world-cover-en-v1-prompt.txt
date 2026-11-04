@@ -1,0 +1,9 @@
+Tool: built-in image_gen.imagegen
+Date: 2026-11-03
+Output: passhu-piano-world-cover-en-v1.png
+Edit target: passhu-piano-world-cover-zh-v2.png
+
+Edit this existing minimal piano-world cover to an English-only typography variant. Preserve the exact 4:3 landscape canvas, smooth dark charcoal-navy blue background with its very faint ambient gradient, generous negative space, and the recognizable ice-blue piano-P logo with cyan upper MIDI capsule. Keep the logo geometry, size, position and color unchanged.
+Replace BOTH existing text lines with just ONE line of text: "PASSHU'S PIANO".
+No Chinese characters, no Japanese characters, no second subtitle line. Place this sole English title centered beneath the logo with a generous balanced gap, near y=61% of canvas height. Use elegant clean modern geometric sans serif, light-to-regular weight, off-white #E4E9EF, restrained normal-to-slightly-open tracking, compact and carefully kerned rather than excessively spaced. The title should be legible, moderately sized, total width approximately 34% of canvas width, with letter cap height about 3.8% of canvas height. The title must feel like the primary name now, rather than a tiny subtitle. Optically center the full emblem-and-title composition as a calm refined identity.
+Keep all essential content inside the centered inscribed 16:9 safe area (middle 75% of height). Preserve the quiet precise technical music identity. No decorative lines, no grid, no extra notes outside the logo, no borders, no other writing, no watermark. Deliver the finished opaque cover image.

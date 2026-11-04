@@ -1,0 +1,13 @@
+Tool: built-in image_gen.imagegen
+Date: 2026-11-03
+Output: passhu-piano-world-cover-en-v4-warm.png
+Reference: passhu-piano-world-cover-en-v3-balanced.png
+
+Use case: text-preserving color edit / logo-brand.
+Create a WARM COLORWAY of the attached piano-world cover. The user likes this composition (80/100) and wants to try warm colors. Preserve the entire composition, logo silhouette and geometry, logo size and position, text wording, font, weight, width, kerning and position. Change palette only, with modest tonal refinements.
+Final exact 4:3 landscape canvas. Preserve centered 16:9 crop-safe content.
+Warm palette direction: inviting contemporary apricot cream, terracotta orange and a small golden accent. Moderately playful, refined, comfortable, clean musical technology, NOT neon or a rainbow.
+Background: light warm apricot/cream, gently varying from #F4DFC9 to #EECDB5, a very subtle broad soft warm luminous field around the emblem. Quiet nearly flat color with no visible shapes, smooth and matte. No blue or purple remains. No dark vignette, no muddy brown, no grunge or paper fibers.
+Logo: retain the exact original open piano-P outline and two lower rounded keyboard cutouts, with three ascending MIDI note capsules. Main P shape a warm mid-tone terracotta/orange #C86D45 with subtle tonal gradient from soft orange to muted burnt coral. The highest MIDI capsule a cheerful soft golden yellow #E8AC43; the other two capsules terracotta. Clear contrast against background and recognizable at thumbnail size. Clean smooth flat geometry, no thick bevel, no plastic 3D, no extra gloss.
+Title: exact "PASSHU'S PIANO", SINGLE LINE, same elegant regular sans serif and scale as source, use deep warm espresso #573D32 for strong clean legibility on the light background. Preserve original typography, centered below the logo, no heavier than the reference.
+The visual should feel warm and lightly upbeat, with the precision of the original music-tech identity. Preserve generous negative space and substantial logo and title scale. Only change palette; do not add decorations, waves, grid, lines, frames, instruments, extra notes, extra text, Chinese or Japanese, or watermark. Output one finished opaque cover.

@@ -24,6 +24,7 @@ namespace MusicMidiPlayer.Editor.Assets
             { "lastImportError", "Last import error" }, { "importFailed", "Import failed" }, { "tempoChangeCount", "Tempo changes" },
             { "maxKeyPolyphony", "Peak key polyphony" }, { "maxActivePolyphony", "Peak active polyphony" },
             { "estimatedDataBytes", "Estimated data bytes" }, { "packedDataBytes", "Packed data bytes" },
+            { "energyStarts", "Energy offsets" }, { "energyCounts", "Energy point counts" }, { "energyValues", "Sample energy (20 ms)" },
             { "bankHash", "Bank hash" }, { "clips", "Audio clips" }, { "rootPitch", "Root pitches" }, { "lowPitch", "Low pitches" },
             { "highPitch", "High pitches" }, { "sourceRate", "Source sample rates" }, { "sourceChannels", "Source channels" },
             { "sourceFrameCount", "Source frame counts" }, { "sourcePeak", "Source peaks" }, { "regionGain", "Region gains" },

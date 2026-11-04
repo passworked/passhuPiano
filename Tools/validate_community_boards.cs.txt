@@ -1,0 +1,112 @@
+// Execute through Unity MCP execute_code in the clockwork scene outside Play Mode.
+// Checks scene wiring and editor translation previews; never downloads supporter data.
+var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+if (scene.path != "Assets/Scenes/ClockworkMaintenanceStreet.unity" || EditorApplication.isPlaying) throw new Exception("Open clockwork scene in Edit Mode.");
+var root = GameObject.Find("ClockworkMaintenanceStreet/AuthorSponsorCommunityBoards");
+var ui = UnityEngine.Object.FindObjectOfType<MusicMidiPlayer.UI.MidiPlayerUI>();
+var loc = root.GetComponentInChildren<MusicMidiPlayer.CommunityBoards.LocalizationManager>(true);
+var author = root.GetComponentInChildren<MusicMidiPlayer.CommunityBoards.AuthorWallDisplay>(true);
+var sponsor = root.GetComponentInChildren<MusicMidiPlayer.CommunityBoards.SponsorWallDisplay>(true);
+var localized = root.GetComponentsInChildren<MusicMidiPlayer.CommunityBoards.LocalizedText>(true);
+var checks = new System.Collections.Generic.List<string>();
+void Need(bool ok, string message) { if (!ok) throw new Exception(message); checks.Add(message); }
+Need(loc.playerUI == ui && ui.languageListeners.Contains(loc), "Player and board language event references are connected");
+var boardFace = root.transform.Find("Sponsor wall/Sponsor list/Paper face").GetComponent<UnityEngine.UI.Image>();
+var boardTitle = root.transform.Find("Sponsor wall/Sponsor list/Green heading").GetComponent<UnityEngine.UI.Image>();
+Need(boardFace.color == ui.GetComponent<UnityEngine.UI.Image>().color, "Board panel matches installed player panel color");
+Need(boardTitle.color == ui.transform.Find("LibraryPanel").GetComponent<UnityEngine.UI.Image>().color, "Board title background matches installed player tile color");
+Need(sponsor.heading.color == ui.transform.Find("BrandIcon").GetComponent<UnityEngine.UI.Image>().color, "Board heading matches installed player gold accent");
+Need(sponsor.nameLabels.All(t => t.color == ui.titleLabel.color), "Supporter names match installed player warm white text");
+Need(sponsor.pageLabel.color == ui.transform.Find("Status").GetComponent<TMPro.TMP_Text>().color, "Board secondary text matches installed player muted text");
+var icon = root.transform.Find("Author wall/Author card/08 · 宣传栏/QQ shortcut").GetComponent<UnityEngine.UI.Image>();
+Need(icon.material.GetColor("_Ink") == sponsor.heading.color && icon.material.GetColor("_Background") == ui.transform.Find("NowPlayingPanel").GetComponent<UnityEngine.UI.Image>().color, "Social icon material matches installed gold and inset colors");
+var expectedColors = ui.transform.Find("LibraryBack").GetComponent<UnityEngine.UI.Button>().colors;
+Need(root.GetComponentsInChildren<UnityEngine.UI.Selectable>(true).All(s => s.colors.Equals(expectedColors)), "Every board selectable matches current player link states");
+var backing = UdonSharpEditor.UdonSharpEditorUtility.GetBackingUdonBehaviour(loc);
+Need(backing.publicVariables.TryGetVariableValue<VRC.Udon.UdonBehaviour>("playerUI", out var source) && source == UdonSharpEditor.UdonSharpEditorUtility.GetBackingUdonBehaviour(ui), "Backing Udon points to the same player UI");
+Need(scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Light>(true)).Count() == 1, "Scene still has exactly one Light");
+Need(root.GetComponentsInChildren<Transform>(true).All(t => GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(t.gameObject) == 0), "No missing scripts on boards");
+Need(sponsor.nameLabels.Length == 16 && sponsor.membership.sponsorWall == sponsor, "Supporter list and 16 name slots retain their wiring");
+var promo = root.GetComponentInChildren<MusicMidiPlayer.CommunityBoards.CommunityPromoUdon>(true);
+Need(promo.copyInput != null && promo.qqValue != null && promo.discordValue != null && promo.patreonValue != null && promo.vrchatGroupId.StartsWith("grp_"), "All four community destinations retain their wiring");
+var oldLanguage = ui.languageSelection;
+var clientField = typeof(MusicMidiPlayer.UI.MidiPlayerUI).GetField("_clientLanguage", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+var oldClient = clientField.GetValue(ui);
+var nodes = root.GetComponentsInChildren<Transform>(true);
+var layers = nodes.Select(t => t.gameObject.layer).ToArray();
+var texts = root.GetComponentsInChildren<TMPro.TMP_Text>(true);
+var originalTexts = texts.Select(t => t.text).ToArray();
+var canvases = root.GetComponentsInChildren<Canvas>(true);
+var cameras = canvases.Select(c => c.worldCamera).ToArray();
+var host = new GameObject("CommunityBoardsPreview_Temporary") { hideFlags = HideFlags.HideAndDontSave };
+var camera = host.AddComponent<Camera>();
+var rt = new RenderTexture(1600, 900, 24);
+var oldRT = RenderTexture.active;
+var buttons = root.GetComponentsInChildren<UnityEngine.UI.Button>(true);
+var buttonActive = buttons.Select(b => b.gameObject.activeSelf).ToArray();
+try
+{
+    foreach (var node in nodes) node.gameObject.layer = 31;
+    camera.cullingMask = 1 << 31;
+    camera.clearFlags = CameraClearFlags.SolidColor; camera.backgroundColor = new Color(.06f,.08f,.1f,1);
+    camera.orthographic = true; camera.orthographicSize = 1.15f;
+    camera.aspect = 1600f / 900f;
+    camera.nearClipPlane = .01f; camera.farClipPlane = 8;
+    camera.transform.position = root.transform.position - canvases[0].transform.forward * 3;
+    camera.transform.rotation = Quaternion.LookRotation(canvases[0].transform.forward, canvases[0].transform.up);
+    foreach (var canvas in canvases) canvas.worldCamera = camera;
+    System.IO.Directory.CreateDirectory("Captures/CommunityBoardsLocalization");
+    foreach (string code in new[] { "zh-Hans", "zh-Hant", "en", "ja" })
+    {
+        clientField.SetValue(ui, code);
+        ui.languageSelection = code == "en" ? 1 : code == "ja" ? 3 : 2;
+        ui.ApplyLanguage();
+        // Editor proxies do not dispatch Udon SendCustomEvent; preview the same listener methods explicitly.
+        author.RefreshLanguage(); sponsor.RefreshLanguage();
+        foreach (var label in localized) label.RefreshLanguage();
+        Need(author.heading.text == ui.Tr("community.creator") && sponsor.heading.text == ui.Tr("community.supporters") && author.discordCaption.text == ui.Tr("community.discord"), code + " titles and community captions use player translations");
+        Need(author.nameLabel.text == author.authorName && author.qqCaption.text.EndsWith(author.qqGroupNumber) && author.groupCaption.text.EndsWith(author.vrchatGroupCode), code + " preserves author and group identifiers");
+        foreach (var text in texts.Where(t => t.gameObject.activeInHierarchy && !t.transform.IsChildOf(promo.copyInput.transform)))
+        {
+            text.ForceMeshUpdate();
+            Need(!text.isTextOverflowing, code + " fits " + text.name);
+        }
+        Canvas.ForceUpdateCanvases();
+        camera.targetTexture = rt; camera.Render(); RenderTexture.active = rt;
+        var texture = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
+        try
+        {
+            texture.ReadPixels(new Rect(0,0,rt.width,rt.height),0,0); texture.Apply();
+            System.IO.File.WriteAllBytes("Captures/CommunityBoardsLocalization/Boards-" + code + ".png", texture.EncodeToPNG());
+        }
+        finally { UnityEngine.Object.DestroyImmediate(texture); }
+    }
+    camera.targetTexture = null;
+    foreach (var button in buttons)
+    {
+        button.gameObject.SetActive(true);
+        Canvas.ForceUpdateCanvases();
+        camera.Render();
+        var rect = (RectTransform)button.transform;
+        var data = new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current);
+        data.position = camera.WorldToScreenPoint(rect.TransformPoint(rect.rect.center));
+        var hits = new System.Collections.Generic.List<UnityEngine.EventSystems.RaycastResult>();
+        button.GetComponentInParent<UnityEngine.UI.GraphicRaycaster>().Raycast(data, hits);
+        Need(hits.Count > 0 && (hits[0].gameObject == button.gameObject || hits[0].gameObject.transform.IsChildOf(button.transform)), "UI raycast reaches " + button.name);
+        Need(button.onClick.GetPersistentEventCount() > 0 && button.onClick.GetPersistentTarget(0) != null, "Click target retained for " + button.name);
+    }
+    var report = new { success = true, scope = "Editor scene, proxy previews and raycasts; no Play Mode or VRChat client", checks = checks.ToArray(), screenshots = "Captures/CommunityBoardsLocalization/Boards-{zh-Hans,zh-Hant,en,ja}.png" };
+    var json = Newtonsoft.Json.JsonConvert.SerializeObject(report, Newtonsoft.Json.Formatting.Indented);
+    System.IO.File.WriteAllText("Logs/CommunityBoardsLocalization-validation.json", json);
+    return new { success = true, checks = checks.Count, report = "Logs/CommunityBoardsLocalization-validation.json" };
+}
+finally
+{
+    for (int i = 0; i < buttons.Length; i++) buttons[i].gameObject.SetActive(buttonActive[i]);
+    ui.languageSelection = oldLanguage; clientField.SetValue(ui, oldClient); ui.ApplyLanguage();
+    for (int i = 0; i < texts.Length; i++) texts[i].text = originalTexts[i];
+    for (int i = 0; i < nodes.Length; i++) nodes[i].gameObject.layer = layers[i];
+    for (int i = 0; i < canvases.Length; i++) canvases[i].worldCamera = cameras[i];
+    RenderTexture.active = oldRT; camera.targetTexture = null; rt.Release();
+    UnityEngine.Object.DestroyImmediate(rt); UnityEngine.Object.DestroyImmediate(host);
+}

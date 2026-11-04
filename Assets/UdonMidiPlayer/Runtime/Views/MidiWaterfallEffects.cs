@@ -19,6 +19,10 @@ namespace MusicMidiPlayer.Views
         public Light[] hitLights;
         public Transform[] glowTransforms;
         public Renderer[] glowRenderers;
+        // Optional piano-only path: 128 independent pitch envelopes in one static mesh.
+        public Renderer keyImpactRenderer;
+        public Renderer keyImpactRootRenderer;
+        public bool compactParticles;
 
         [Header("Bounded local budgets")]
         public int maxParticlesPerFrame = 64;
@@ -76,6 +80,14 @@ namespace MusicMidiPlayer.Views
         private Vector3[] _glowRestScales;
         private Material[] _glowMaterials;
         private Material _symbolMaterial;
+        private Material _impactMaterial;
+        private Vector4[] _impactData, _impactColors;
+        private int[] _impactPitches;
+        private bool[] _impactActive;
+        private int _impactCount;
+        private bool _impactDirty;
+        private bool _impactsShown, _impactRootShown;
+        private float _impactTime, _attackTime, _nextSymbolTime;
 
         public void Initialize()
         {
@@ -93,10 +105,23 @@ namespace MusicMidiPlayer.Views
             _glowColors = new Color[_glowCount];
             _glowRestScales = new Vector3[_glowCount];
             _glowMaterials = new Material[_glowCount];
-            for (int i = 0; i < _hitPoolCount; i++) ResetParticlePool(hitParticles[i], 64);
+            if (keyImpactRenderer != null)
+            {
+                _impactMaterial = keyImpactRenderer.material;
+                if (keyImpactRootRenderer != null) keyImpactRootRenderer.sharedMaterial = _impactMaterial;
+                _impactData = new Vector4[128];
+                _impactColors = new Vector4[128];
+                _impactPitches = new int[128];
+                _impactActive = new bool[128];
+                _impactMaterial.SetVectorArray("_ImpactData", _impactData);
+                keyImpactRenderer.enabled = false;
+                if (keyImpactRootRenderer != null) keyImpactRootRenderer.enabled = false;
+                _impactsShown = false; _impactRootShown = false;
+            }
+            for (int i = 0; i < _hitPoolCount; i++) ResetParticlePool(hitParticles[i], compactParticles ? 160 : 64);
             for (int i = 0; i < _symbolPoolCount; i++)
             {
-                ResetParticlePool(symbolParticles[i], 16);
+                ResetParticlePool(symbolParticles[i], compactParticles ? 32 : 16);
                 if (symbolParticles[i] == null) continue;
                 Renderer renderer = symbolParticles[i].GetComponent<ParticleSystemRenderer>();
                 if (renderer == null) continue;
@@ -134,12 +159,23 @@ namespace MusicMidiPlayer.Views
             if (_song == song && _songHash == hash) return;
             Clear(_generation);
             _song = song;
+            RefreshPalette();
+            _songHash = hash;
+        }
+
+        public void RefreshPalette()
+        {
+            Initialize();
+            if (_impactMaterial != null && waterfall != null)
+            {
+                _impactMaterial.SetColor("_LightColor", waterfall.NoteColor(21));
+                _impactMaterial.SetColor("_DarkColor", waterfall.NoteColor(22));
+            }
             if (_symbolMaterial != null && keyboard != null)
             {
                 Material theme = keyboard.GetNoteMaterial(21);
-                if (theme != null) _symbolMaterial.SetColor("_Color", theme.color);
+                if (theme != null) _symbolMaterial.SetColor("_Color", Color.white);
             }
-            _songHash = hash;
         }
 
         public void RebuildAt(int positionMs, int generation)
@@ -150,6 +186,9 @@ namespace MusicMidiPlayer.Views
             _lastPositionMs = positionMs;
             _noteCursor = UpperBoundStart(_lastPositionMs);
             _hasPosition = true;
+            _impactTime = positionMs * 0.001f;
+            RecoverHeldImpacts();
+            UpdateImpacts();
             // A seek, correction or late join never emits old attacks or reconstructs old light pulses.
         }
 
@@ -164,7 +203,7 @@ namespace MusicMidiPlayer.Views
                 _lastPositionMs = positionMs;
                 _noteCursor = 0;
                 _hasPosition = true;
-                PauseParticles();
+                if (!compactParticles) PauseParticles();
                 return;
             }
             if (!effectsEnabled)
@@ -196,13 +235,14 @@ namespace MusicMidiPlayer.Views
                 return;
             }
             float elapsed = elapsedMs * 0.001f;
+            _impactTime = positionMs * 0.001f;
             AdvanceParticles(elapsed);
             DecayEnergy(elapsed);
             liveParticleCount = CountParticles();
             _frameParticleRemaining = Mathf.Clamp(maxParticlesPerFrame, 0, 128);
 
             int end = UpperBoundStart(positionMs);
-            int first = Mathf.Max(_noteCursor, end - Mathf.Clamp(maxHitsPerFrame, 0, 64));
+            int first = Mathf.Max(_noteCursor, end - Mathf.Clamp(maxHitsPerFrame, 0, compactParticles ? 128 : 64));
             droppedHitCount += first - _noteCursor;
             for (int note = first; note < end; note++)
             {
@@ -218,6 +258,7 @@ namespace MusicMidiPlayer.Views
             _lastPositionMs = positionMs;
             UpdateLights();
             UpdateGlows();
+            UpdateImpacts();
         }
 
         public void Clear(int generation)
@@ -230,10 +271,21 @@ namespace MusicMidiPlayer.Views
             _hasPosition = false;
             _lastPositionMs = 0;
             _noteCursor = 0;
-            for (int i = 0; i < _hitPoolCount; i++) ResetParticlePool(hitParticles[i], 64);
+            _nextSymbolTime = -1f;
+            if (_impactData != null)
+            {
+                for (int i = 0; i < 128; i++) { _impactData[i] = Vector4.zero; _impactActive[i] = false; }
+                _impactCount = 0;
+                _impactMaterial.SetVectorArray("_ImpactData", _impactData);
+                keyImpactRenderer.enabled = false;
+                if (keyImpactRootRenderer != null) keyImpactRootRenderer.enabled = false;
+                _impactsShown = false; _impactRootShown = false;
+                _impactDirty = false;
+            }
+            for (int i = 0; i < _hitPoolCount; i++) ResetParticlePool(hitParticles[i], compactParticles ? 160 : 64);
             for (int i = 0; i < _symbolPoolCount; i++)
             {
-                ResetParticlePool(symbolParticles[i], 16);
+                ResetParticlePool(symbolParticles[i], compactParticles ? 32 : 16);
                 if (symbolParticles[i] == null) continue;
                 Renderer renderer = symbolParticles[i].GetComponent<ParticleSystemRenderer>();
                 if (renderer == null) continue;
@@ -286,11 +338,14 @@ namespace MusicMidiPlayer.Views
                 Clear(generation);
                 _liveMode = true;
                 _liveLastSeconds = now;
+                _impactTime = (float)now;
+                RecoverHeldImpacts();
             }
             if (_liveFrame == Time.frameCount) return;
             _liveFrame = Time.frameCount;
             float elapsed = (float)System.Math.Max(0.0, now - _liveLastSeconds);
             _liveLastSeconds = now;
+            _impactTime = (float)now;
             if (elapsed > 0f)
             {
                 AdvanceParticles(elapsed);
@@ -301,6 +356,7 @@ namespace MusicMidiPlayer.Views
             _liveFrameHits = 0;
             UpdateLights();
             UpdateGlows();
+            UpdateImpacts();
         }
 
         public void LiveHit(int pitch, int velocity, int generation)
@@ -308,32 +364,34 @@ namespace MusicMidiPlayer.Views
             if (pitch < 0 || pitch > 127 || velocity <= 0 || velocity > 127 || generation < _generation) return;
             RefreshLive(generation);
             if (!effectsEnabled) return;
-            if (_liveFrameHits >= Mathf.Clamp(maxHitsPerFrame, 0, 64))
+            if (_liveFrameHits >= Mathf.Clamp(maxHitsPerFrame, 0, compactParticles ? 128 : 64))
             {
                 droppedHitCount++;
                 return;
             }
             _liveFrameHits++;
-            HitPitch(pitch, velocity);
+            _attackTime = _impactTime;
+            HitPitch(pitch, velocity, waterfall == null ? Color.white : waterfall.NoteColor(pitch));
             UpdateLights();
             UpdateGlows();
+            UpdateImpacts();
         }
 
         private void Hit(int note)
         {
-            if (_song.channel[note] == 9) return;
+            if (waterfall.instrumentRouter == null && _song.channel[note] == 9) return;
             if (waterfall.instrumentRouter != null && waterfall.instrumentRouter.TargetForNote(note) != waterfall.instrumentTarget) return;
-            HitPitch(_song.pitch[note], _song.velocity[note]);
+            _attackTime = _song.startMs[note] * 0.001f;
+            HitPitch(FilePitch(note), _song.velocity[note], waterfall.FileNoteColor(note));
         }
 
-        private void HitPitch(int pitch, int midiVelocity)
+        private void HitPitch(int pitch, int midiVelocity, Color color)
         {
             int key = pitch - 21;
             if (pitch < 0 || pitch > 127) return;
             float velocity = Mathf.Clamp01(midiVelocity / 127f);
             float strength = Mathf.Pow(velocity, 1.35f);
-            Material palette = keyboard == null ? null : keyboard.GetNoteMaterial(pitch);
-            Color color = palette == null ? Color.white : palette.color;
+            RecordImpact(pitch, strength, _attackTime, color);
             color.a = 1f;
             Vector3 point = HitPoint(key);
             // Particle pools stay bounded; their emission point follows the virtual key.
@@ -342,12 +400,19 @@ namespace MusicMidiPlayer.Views
             Vector3 forward = waterfall == null ? Vector3.forward : waterfall.transform.forward;
             Vector3 particlePoint = point + up * particleLift + forward * particleDepthOffset;
             int count = Mathf.Clamp(Mathf.RoundToInt(2f + velocity * 5f), 1, 8);
+            if (compactParticles)
+            {
+                // The precise impact stays visible even when decoration is throttled.
+                float density = Mathf.Clamp01(liveParticleCount / 192f);
+                count = Mathf.Max(1, Mathf.RoundToInt((1f + strength * 3f) * (1f - density * 0.75f)));
+            }
             // Cadence follows hits actually rendered locally, so skipped attacks cannot starve this layer.
             // The first visible hit and each third one emit a symbol; rare strong accents get two.
             // Emit it first so a dense dust burst cannot monopolize the shared frame allowance.
-            if (symbolLayersEnabled && _symbolPoolCount > 0 && processedHitCount % 3 == 0)
+            if (symbolLayersEnabled && _symbolPoolCount > 0 && (compactParticles ? _impactTime >= _nextSymbolTime : processedHitCount % 3 == 0))
             {
-                int desired = velocity >= 0.85f && processedHitCount % 6 == 0 ? 2 : 1;
+                int desired = !compactParticles && velocity >= 0.85f && processedHitCount % 6 == 0 ? 2 : 1;
+                if (compactParticles) _nextSymbolTime = _impactTime + 0.14f;
                 int available = Mathf.Max(0, Mathf.Clamp(totalSymbolBudget, 0, 192) - liveSymbolParticleCount);
                 int requested = Mathf.Min(desired, available);
                 droppedParticleCount += desired - requested;
@@ -426,7 +491,7 @@ namespace MusicMidiPlayer.Views
             main.playOnAwake = false;
             main.loop = true;
             main.simulationSpace = ParticleSystemSimulationSpace.World;
-            main.maxParticles = Mathf.Clamp(limit, 1, 64);
+            main.maxParticles = Mathf.Clamp(limit, 1, 192);
             ParticleSystem.EmissionModule emission = system.emission;
             emission.enabled = false;
             system.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -479,6 +544,7 @@ namespace MusicMidiPlayer.Views
 
         private void DecayEnergy(float seconds)
         {
+            if (_lightCount == 0 && _glowCount == 0) return;
             float lightDecay = Mathf.Exp(-seconds / Mathf.Max(0.02f, lightDecaySeconds));
             float glowDecay = Mathf.Exp(-seconds / Mathf.Max(0.02f, glowDecaySeconds));
             for (int i = 0; i < _lightCount; i++) _lightEnergy[i] *= lightDecay;
@@ -528,6 +594,85 @@ namespace MusicMidiPlayer.Views
             }
         }
 
+        private int PhysicalCount(int pitch)
+        {
+            if (waterfall != null && waterfall.instrumentRouter != null)
+                return waterfall.instrumentRouter.keyCounts[waterfall.instrumentTarget * 128 + pitch];
+            int key = pitch - 21;
+            if (keyboard != null && keyboard.sequencer != null && key >= 0 && key < 88)
+                return keyboard.sequencer.keyDownCount[key];
+            return 0;
+        }
+
+        private void RecordImpact(int pitch, float strength, float attack, Color color)
+        {
+            if (_impactData == null) return;
+            if (!_impactActive[pitch])
+            {
+                _impactActive[pitch] = true;
+                _impactPitches[_impactCount++] = pitch;
+            }
+            _impactColors[pitch] = color;
+            _impactData[pitch] = new Vector4(attack, Mathf.Max(0.06f, strength), -1f, 0f);
+            _impactDirty = true;
+        }
+
+        private void RecoverHeldImpacts()
+        {
+            if (_impactData == null) return;
+            // Restore only the quiet held layer, never replay an attack on seek/late join.
+            for (int pitch = 0; pitch < 128; pitch++)
+                if (PhysicalCount(pitch) > 0)
+                {
+                    Color color = waterfall == null ? Color.white : waterfall.NoteColor(pitch);
+                    int latest = -1;
+                    if (!_liveMode && _song != null && keyboard != null && keyboard.sequencer != null)
+                        for (int i = 0; i < keyboard.sequencer.activeNoteCount; i++)
+                        {
+                            int n = keyboard.sequencer.activeNoteIds[i];
+                            if (n <= latest || FilePitch(n) != pitch || _song.keyUpMs[n] <= _impactTime * 1000f) continue;
+                            if (waterfall.instrumentRouter == null ? _song.channel[n] == 9 : waterfall.instrumentRouter.TargetForNote(n) != waterfall.instrumentTarget) continue;
+                            latest = n; color = waterfall.FileNoteColor(n);
+                        }
+                    RecordImpact(pitch, .45f, _impactTime - 10f, color);
+                }
+        }
+
+        private void UpdateImpacts()
+        {
+            if (_impactMaterial == null) return;
+            // Only live pitches are inspected; no per-key Transform/material animation.
+            for (int i = _impactCount - 1; i >= 0; i--)
+            {
+                int pitch = _impactPitches[i];
+                Vector4 data = _impactData[pitch];
+                if (data.z < 0f && _impactTime > data.x + 0.0001f && PhysicalCount(pitch) == 0)
+                {
+                    data.z = _impactTime;
+                    _impactData[pitch] = data;
+                    _impactDirty = true;
+                }
+                if (data.z >= 0f && _impactTime - Mathf.Max(data.x, data.z) > 0.55f)
+                {
+                    _impactActive[pitch] = false;
+                    _impactPitches[i] = _impactPitches[--_impactCount];
+                }
+            }
+            if (_impactDirty)
+            {
+                _impactMaterial.SetVectorArray("_ImpactData", _impactData);
+                _impactMaterial.SetVectorArray("_ImpactColors", _impactColors);
+                _impactDirty = false;
+            }
+            if (_impactCount > 0) _impactMaterial.SetFloat("_VisualTime", _impactTime);
+            bool show = effectsEnabled && _impactCount > 0;
+            bool root = waterfall != null && waterfall.landAtKeyRoot && keyImpactRootRenderer != null;
+            bool frontShown = show && !root, rearShown = show && root;
+            if (_impactsShown != frontShown) { keyImpactRenderer.enabled = frontShown; _impactsShown = frontShown; }
+            if (keyImpactRootRenderer != null && _impactRootShown != rearShown)
+            { keyImpactRootRenderer.enabled = rearShown; _impactRootShown = rearShown; }
+        }
+
         private int UpperBoundStart(int timeMs)
         {
             if (_song == null || _song.startMs == null) return 0;
@@ -541,5 +686,7 @@ namespace MusicMidiPlayer.Views
             }
             return lo;
         }
+        private int FilePitch(int note)
+        { return waterfall.instrumentRouter == null ? _song.pitch[note] : waterfall.instrumentRouter.PitchForNote(note); }
     }
 }

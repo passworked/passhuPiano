@@ -72,7 +72,7 @@ namespace MusicMidiPlayer.Views
             Color color=Color.HSVToRGB(hue,saturation*.82f,value);
             for(int i=0;i<_glowColors.Length;i++)_glowColors[i]=color;
             for(int channel=0;channel<16;channel++)
-                _channelColors[channel]=Color.HSVToRGB(Mathf.Repeat(hue+channel*.38196601125f,1f),saturation*.82f,value);
+                _channelColors[channel]=Color.HSVToRGB(Mathf.Repeat(hue+(channel%2)*.14f,1f),saturation*.82f,value);
             if(lanes!=null){lanes.SetPalette(color);lanes.SetChannelPalette(_channelColors);}
         }
         public void SetPerformancePalette(string displayName)
@@ -106,7 +106,7 @@ namespace MusicMidiPlayer.Views
                 int first=Upper(ms-1900);
                 // Restore residual motion without replaying historical attack effects.
                 for(int i=Mathf.Max(first,_noteCursor-256);i<_noteCursor;i++)
-                {int n=lanes.noteIds[i];Record(lanes.DrumPitch(n),_song.velocity[n],_song.startMs[n],_song.channel[n]);}
+                {int n=lanes.noteIds[i];Record(lanes.DrumPitch(n),_song.velocity[n],_song.startMs[n],_song.ColorChannelForNote(n));}
                 for(int i=_noteCursor-1;i>=0;i--)
                 {int n=lanes.noteIds[i], pitch=lanes.DrumPitch(n);if(pitch==42 || pitch==44 || pitch==46)
                     {_openHat=pitch==46;break;}}
@@ -121,7 +121,7 @@ namespace MusicMidiPlayer.Views
             int end=Upper(ms);
             for(int i=Mathf.Max(_noteCursor,end-64);i<end;i++)
             {int n=lanes.noteIds[i];if(ms-_song.startMs[n]<=80)
-                {Record(lanes.DrumPitch(n),_song.velocity[n],_song.startMs[n],_song.channel[n]);processedHitCount++;}}
+                {Record(lanes.DrumPitch(n),_song.velocity[n],_song.startMs[n],_song.ColorChannelForNote(n));processedHitCount++;}}
             _noteCursor=end;_lastMs=ms;ApplyPose(ms);if(lanes!=null)lanes.Refresh(ms);
         }
         public void LiveHit(int pitch,int velocity,int generation)

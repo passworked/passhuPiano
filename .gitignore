@@ -35,3 +35,12 @@ Thumbs.db
 /Tools/LiveMidi/Portable/
 /Assets/UdonMidiPlayer/Runtime/RegressionTemp/
 /Assets/UdonMidiPlayer/Runtime/RegressionTemp.meta
+# Local art scenes and their scene-specific baked resources remain on this machine.
+/Assets/Scenes/ClockworkMaintenanceStreet.unity
+/Assets/Scenes/ClockworkMaintenanceStreet.unity.meta
+/Assets/Scenes/ClockworkMaintenanceStreet/
+/Assets/Scenes/ClockworkMaintenanceStreet.meta
+/Assets/Scenes/UnderwaterMusicGarden.unity
+/Assets/Scenes/UnderwaterMusicGarden.unity.meta
+/Assets/Scenes/UnderwaterMusicGarden/
+/Assets/Scenes/UnderwaterMusicGarden.meta

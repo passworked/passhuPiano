@@ -28,6 +28,7 @@ namespace MusicMidiPlayer.Logic
         public MidiInstrumentRouter instrumentRouter;
         public MidiInstrumentFanLayout instrumentFanLayout;
         public ClockworkMusicLink clockworkMusicLink;
+        public UnderwaterMusicLink underwaterMusicLink;
         [Header("Hardware MIDI channel targets")]
         [Tooltip("Index 0..15 = MIDI channel 1..16. -1: automatic; 0: piano; 1: marimba; 2: violin; 3: viola; 4: cello; 5: contrabass; 6: retired; 7: music box. Channel 10 always plays drums. Explicit targets must be enabled.")]
         // New players follow the enabled instrument set on every melodic channel.
@@ -439,6 +440,7 @@ namespace MusicMidiPlayer.Logic
                 else if (!held && !sustained && wasSounding) voicePool.LiveNoteRelease(id);
                 if (held != _liveHeld[id] || (held && changedTarget))
                 {
+                    sequencer.keyCountRevision++;
                     int key = id % 128 - 21;
                     if (key >= 0 && key < 88 && held != _liveHeld[id]) sequencer.keyDownCount[key] = Mathf.Max(0, sequencer.keyDownCount[key] + (held ? 1 : -1));
                     if (instrumentRouter != null) RouteLiveVisual(id, held, value & 127, false);
@@ -480,6 +482,7 @@ namespace MusicMidiPlayer.Logic
                 if (voicePool.drums != null) voicePool.drums.LiveNoteDown(number, velocity, liveMidiEventSequence++);
                 if (drumView != null) drumView.LiveHit(number, velocity, applyGeneration);
                 if (clockworkMusicLink != null) clockworkMusicLink.Pulse(8, number, velocity);
+                if (underwaterMusicLink != null) underwaterMusicLink.Pulse(8, number, velocity);
                 return;
             }
             int id = channel * 128 + number;
@@ -492,7 +495,10 @@ namespace MusicMidiPlayer.Logic
             int key = number - 21;
             if (key >= 0 && key < 88) sequencer.keyDownCount[key]++;
             voicePool.LiveNoteDown(id, number, velocity, applyGeneration);
+            sequencer.keyCountRevision++;
             if (clockworkMusicLink != null) clockworkMusicLink.Pulse(instrumentRouter == null
+                ? (selectedInstrument < 2 ? 0 : selectedInstrument - 1) : instrumentRouter.liveTargets[id], number, velocity);
+            if (underwaterMusicLink != null) underwaterMusicLink.Pulse(instrumentRouter == null
                 ? (selectedInstrument < 2 ? 0 : selectedInstrument - 1) : instrumentRouter.liveTargets[id], number, velocity);
             if (instrumentRouter != null) RouteLiveVisual(id, true, velocity, true);
             else
@@ -509,6 +515,7 @@ namespace MusicMidiPlayer.Logic
             int id = channel * 128 + number;
             if (!_liveHeld[id]) return;
             _liveHeld[id] = false;
+            sequencer.keyCountRevision++;
             int key = number - 21;
             if (key >= 0 && key < 88) sequencer.keyDownCount[key] = Mathf.Max(0, sequencer.keyDownCount[key] - 1);
             if (instrumentRouter != null) RouteLiveVisual(id, false, 0, false);
@@ -559,9 +566,11 @@ namespace MusicMidiPlayer.Logic
 
         private void ClearLiveMidiState(bool clearViews)
         {
+            if (clearViews && underwaterMusicLink != null && (clock == null || clock.GetState() == 0)) underwaterMusicLink.ClearPerformance();
             if (clearViews && instrumentRouter != null) ClearRoutedViews();
             if (voicePool != null) voicePool.LiveAllSoundOff(-1);
             for (int i = 0; i < 2048; i++) { _liveHeld[i] = false; _liveSustained[i] = false; }
+            if (sequencer != null) sequencer.keyCountRevision++;
             for (int i = 0; i < 16; i++) _livePedal[i] = false;
         }
 
@@ -570,6 +579,7 @@ namespace MusicMidiPlayer.Logic
             if (voicePool != null)
                 for (int channel = 0; channel < 16; channel++) if (channel != 9) voicePool.LiveAllSoundOff(channel);
             for (int i = 0; i < 2048; i++) { _liveHeld[i] = false; _liveSustained[i] = false; }
+            if (sequencer != null) sequencer.keyCountRevision++;
             for (int i = 0; i < 16; i++) _livePedal[i] = false;
         }
 
@@ -1005,6 +1015,7 @@ namespace MusicMidiPlayer.Logic
                 && _song != null && id == selectedSongId
                 && System.Math.Abs(position - clock.GetPositionSeconds()) <= 0.002
                 && ((clock.GetState() == 1 && state == 2) || (clock.GetState() == 2 && state == 1));
+            if (!preservePose && underwaterMusicLink != null) underwaterMusicLink.ClearPerformance();
             ClearLiveMidiState(!preservePose);
             int old = applyGeneration++;
             voicePool.CancelGeneration(old);
@@ -1050,6 +1061,7 @@ namespace MusicMidiPlayer.Logic
 
         private void RebuildCurrent(int ms)
         {
+            if (underwaterMusicLink != null) underwaterMusicLink.ClearPerformance();
             RefreshPerformancePalette();
             int old = applyGeneration++;
             voicePool.CancelGeneration(old);
@@ -1068,6 +1080,7 @@ namespace MusicMidiPlayer.Logic
 
         private void ClearOutput()
         {
+            if (underwaterMusicLink != null) underwaterMusicLink.ClearPerformance();
             if (drumView != null) drumView.Clear(applyGeneration + 1);
             ClearLiveMidi();
             int old = applyGeneration++;

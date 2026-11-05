@@ -16,9 +16,9 @@
 
 **MIDI playback, multiplayer synchronization, and live performance for VRChat Worlds.**
 
-The main scene includes piano, marimba, music box, strings, and drums, with editable artwork and authoring tools. The two standalone piano Prefabs are maintained separately.
+The main scene and both standalone player Prefabs include piano, marimba, music box, strings, and drums, with editable artwork and authoring tools. The Prefabs default to grand or digital piano and retain their independent 13-song distribution library. Their November 5 update passed Editor validation; VRChat client acceptance remains pending.
 
-File-playback channels use golden-angle colors. Manage MIDI in a folder/song editor with drag-and-drop files, folders and ZIPs, editable metadata, ordering, source maintenance, and one Save and apply action. See the [Unity MIDI import tutorial](Docs/MIDI_IMPORT.md) (Chinese).
+File-playback display channels alternate between two coordinated hues by parity, retaining light/dark shades for white/black keys. Manage MIDI in a folder/song editor with drag-and-drop files, folders and ZIPs, editable metadata, ordering, source maintenance, and one Save and apply action. See the [Unity MIDI import tutorial](Docs/MIDI_IMPORT.md) (Chinese).
 
 > Development candidate `1.0.0-rc.3`, with PC as the priority. See [current implementation](Docs/Developer/CURRENT_STATE.md) for features and validation status.
 

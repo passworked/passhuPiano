@@ -5,6 +5,9 @@ Shader "MusicMidiPlayer/PianoKeyBreathing"
         _Color ("Song Color", Color) = (0.16, 0.9, 1, 1)
         [HDR] _EmissionColor ("Emission", Color) = (0, 0, 0, 1)
         [HideInInspector] _QuietHeld ("Piano sustained layer", Float) = 0
+        _RestColor ("Resting key", Color) = (.83,.81,.75,1)
+        _GlowTiming ("Attack seconds / velocity", Vector) = (-100,0,0,0)
+        _VisualTime ("Music seconds", Float) = 0
     }
     SubShader
     {
@@ -17,7 +20,9 @@ Shader "MusicMidiPlayer/PianoKeyBreathing"
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
             #include "UnityCG.cginc"
-            half4 _Color, _EmissionColor;
+            half4 _Color, _EmissionColor, _RestColor;
+            float4 _GlowTiming;
+            float _VisualTime;
             half _QuietHeld;
             struct v2f
             {
@@ -38,10 +43,12 @@ Shader "MusicMidiPlayer/PianoKeyBreathing"
             half4 frag(v2f i) : SV_Target
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-                // Shared clock keeps held keys and landed notes in phase, with no CPU updates.
-                half breath = 0.825h + 0.175h * cos(_Time.y * 5.235987756);
-                breath = lerp(breath, 0.64h, _QuietHeld);
-                half4 color = half4((_Color.rgb + _EmissionColor.rgb) * breath, 1);
+                float age = max(0.0, _VisualTime - _GlowTiming.x);
+                // 25 ms smooth attack, then a 280 ms half-life and a soft finite tail.
+                half envelope = smoothstep(0.0, .025, age) * exp2(-max(0.0, age - .025) / .28);
+                envelope *= 1.0 - smoothstep(1.0, 1.4, age);
+                half energy = pow(saturate(_GlowTiming.y), 1.35) * envelope;
+                half4 color = half4(lerp(_RestColor.rgb, _Color.rgb, saturate(energy * .6)) + _Color.rgb * energy * 3.2, 1);
                 UNITY_APPLY_FOG(i.fogCoord, color);
                 return color;
             }

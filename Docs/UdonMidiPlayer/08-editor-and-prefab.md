@@ -2,6 +2,25 @@
 
 编辑器管线将复杂 MIDI 处理和资源接线提前完成，让世界作者只操作文件、曲库和 Inspector。运行结构见 [架构](01-architecture.md)，数据细节见 [导入分册](02-data-and-import.md)。
 
+## 分发 Prefab 显式同步（2026-11-05）
+
+按用户本次明确要求，两份分发资源从旧单钢琴配置增量接入主场景的完整便携播放器：
+
+- 共享七个活动旋律目标、两种钢琴外观、独立鼓组及 64 个物理声音源；停用目标 6／模型 7 继续隐藏。
+- 当前 `selected-gm-v13-track-pitch` 路由，文件音色／音轨映射、轨名适配、逐轨开关、逐轨八度和自动音域；硬件 MIDI、PC／VR 输入接线同步。
+- 两种钢琴的逐键命中合并网格及两套低负载粒子、现有共用 Shader 配色、最新运行 bank／能量数组、规则哈希和 catalogHash；音量平衡默认开启。
+- 独立借物表只列分发曲库的 13 首作品，并保留新增乐器音源署名。普通控件、弹层和 Backplate 沿当前层级排序。
+
+`UdonMidiPlayer.prefab` 默认外观 1（三角钢琴），`UdonMidiPlayer_Upright.prefab` 默认外观 0（数码钢琴）；默认勾选钢琴与鼓组。保留各自配置源、原有 13 首歌曲顺序及默认 songId、原钢琴对象、歌曲对象和 64 个 AudioSource；更新资源本体而非 Apply 场景实例覆盖。两份 Prefab 的 `.meta`／GUID 不变。场景专属扇形布局、海底环境／法阵／鱼群和历史钟楼表现不属于便携 Prefab。
+
+保存后重新加载，两份均通过 `MidiBuildValidator.ValidateRoot` 和分发歌曲白名单检查；检查内部对象引用及 MIDI／UI／路由／bank backing 接线，修正保留三角钢琴椅子的索引为 1。保留钢琴的序列化数值及布局数组与主场景对应外观一致。Editor 隔离副本完成默认歌曲解码及路由绑定，并渲染检查两份主面板、乐器菜单和按音轨映射。报告：`Logs/DistributionPrefabSync-20261105.json`；截图：`Captures/DistributionPrefabs/` 中带 `(Clone)` 的六张 PNG。它们是 Editor 代理预览，不代表实际播放、网络同步或客户端验收；未运行 Play Mode、构建、打包或发布。
+
+补齐配置器 `MidiPlayerBuilder.Configure` 的多乐器分支：跳过弦乐的空瀑布槽与八音盒的独立滚筒表现，不再对它们套用普通钢琴的 512 槽要求；保留八音盒 28 槽及机械 timing。C# 刷新完成，Udon 程序无编译错误。完整重应用配置复测被并行操作的海底场景 Play Mode 门控挡住，未绕过门控，也未将并行播放当作本次验收。最终保存资源的 backing 默认值、四个座椅索引、唯一 Manual Transport 及无场景依赖检查见 `Logs/DistributionPrefabSync-20261105-final.json`。
+
+生成临时新组件时，UdonSharp 的延迟 `RunBehaviourSetup` 在副本卸载后产生一次 `MissingReferenceException`（SDK `UdonSharpEditorUtility.cs:931`）；已定位到编辑器延迟 hideFlags 回写，保存资源重新加载校验通过。Impact 网格沿用既有资源名，也出现主对象名与文件名不同的导入警告；未为消除工具警告修改 SDK 或共享资产。
+
+本次操作未保存主／海底／历史钟楼／练习场景，不改变分发曲库成员。初次 2,113 项资产哈希审计仅两份 Prefab 改变，受保护的原对象 fileID 无丢失，见 `Logs/DistributionPrefabSync-20261105-identities.json`；后期海底场景被并行操作另行保存及播放，保留其修改与状态。以后加歌或修改场景仍遵守显式同步边界，不自动更新 Prefab。
+
 ## 1. 世界作者的接入流程
 
 1. 将 .mid 放入项目的 Assets 源文件目录。

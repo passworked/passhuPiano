@@ -110,12 +110,13 @@ namespace MusicMidiPlayer.Views
             float hue = ((seed & 0x00ffffffu) * (360f / 16777216f)) / 360f;
             float saturation = .70f + .18f * ((tone & 65535u) / 65535f), value = .90f + .10f * ((tone >> 16) / 65535f);
             songPalette[0] = Color.HSVToRGB(hue, saturation * .82f, value);
-            songPalette[1] = Color.HSVToRGB(hue, saturation, value * .55f);
+            songPalette[1] = Color.HSVToRGB(hue, saturation * .94f, value * .80f);
             for (int channel = 0; channel < 16; channel++)
             {
-                float channelHue = Mathf.Repeat(hue + channel * .38196601125f, 1f);
+                // Match the keyboard's two channel hues and white/black shades.
+                float channelHue = Mathf.Repeat(hue + (channel % 2) * .14f, 1f);
                 _channelPalette[channel * 2] = Color.HSVToRGB(channelHue, saturation * .82f, value);
-                _channelPalette[channel * 2 + 1] = Color.HSVToRGB(channelHue, saturation, value * .55f);
+                _channelPalette[channel * 2 + 1] = Color.HSVToRGB(channelHue, saturation * .94f, value * .80f);
             }
             foreach (Material material in _materials) material.SetColor("_GlowColor", songPalette[0]);
             foreach (Material material in _contactMaterials) material.SetColor("_Color", songPalette[0]);
@@ -210,7 +211,7 @@ namespace MusicMidiPlayer.Views
                     if (facade.instrumentRouter == null ? _song.channel[n] == 9 : facade.instrumentRouter.TargetForNote(n) != routedTarget) continue;
                     int style = facade.instrumentRouter == null ? voices.articulation : facade.instrumentRouter.ArticulationForNote(routedTarget, n);
                     Gather(NoteSection(_song.channel[n], _song.trackIndex[n]), facade.instrumentRouter == null ? _song.pitch[n] : facade.instrumentRouter.PitchForNote(n), _song.velocity[n], System.Math.Max(0, (ms - _song.startMs[n]) * .001),
-                        _song.startMs[n] * .001, _song.velocity[n] / 127f * _song.ExpressionAt(_song.channel[n], ms) / 127f, style, _song.channel[n]);
+                        _song.startMs[n] * .001, _song.velocity[n] / 127f * _song.ExpressionAt(_song.channel[n], ms) / 127f, style, _song.ColorChannelForNote(n));
                 }
             else if (live)
             {

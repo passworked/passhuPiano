@@ -72,6 +72,35 @@ namespace MusicMidiPlayer.Data
         private int _extensionBytes;
         private int _expressionEnd, _expressionChannel, _expressionWrite, _expressionRemaining;
         private bool _hasExpressionExtension;
+        private bool _visualChannelsReady, _visualUsesTracks;
+        private int[] _visualTrackChannels;
+
+        // Some piano SMFs put both staves on channel 0. Keep audio channels intact;
+        // only their visual identity falls back to original note-bearing track order.
+        public int ColorChannelForNote(int note)
+        {
+            if (note < 0 || note >= channel.Length) return 0;
+            if (!_visualChannelsReady)
+            {
+                _visualChannelsReady = true; _visualUsesTracks = false;
+                int first = channel.Length > 0 ? channel[0] : 0;
+                bool multiple = false;
+                for (int i = 1; i < channel.Length; i++)
+                    if (channel[i] != first) { multiple = true; break; }
+                if (!multiple && trackIndex.Length == channel.Length)
+                {
+                    int maxTrack = 0;
+                    for (int i = 0; i < trackIndex.Length; i++) maxTrack = Mathf.Max(maxTrack, trackIndex[i]);
+                    _visualTrackChannels = new int[maxTrack + 1];
+                    for (int i = 0; i < trackIndex.Length; i++) _visualTrackChannels[trackIndex[i]] = 1;
+                    int rank = 0;
+                    for (int i = 0; i < _visualTrackChannels.Length; i++)
+                        if (_visualTrackChannels[i] != 0) _visualTrackChannels[i] = rank++ % 16;
+                    _visualUsesTracks = rank > 1;
+                }
+            }
+            return _visualUsesTracks ? _visualTrackChannels[trackIndex[note]] : channel[note];
+        }
         private int _timbreEnd, _timbrePreviousEvent;
 
         public int ExpressionAt(int channel, int ms)
@@ -458,6 +487,7 @@ namespace MusicMidiPlayer.Data
 
         public void ReleaseDecodedData()
         {
+            _visualChannelsReady = false; _visualUsesTracks = false; _visualTrackChannels = null;
             isDecoded = false;
             decodeError = "";
             _decodeStage = -1;

@@ -54,12 +54,16 @@ namespace MusicMidiPlayer.Views
         private Color[] _channelPalette = new Color[32], _channelPressedPalette = new Color[16];
         private int[] _keyChannels = new int[88], _shownChannels = new int[88];
         private MaterialPropertyBlock _channelProperties;
+        private int[] _glowStartMs = new int[88], _glowChannel = new int[88];
+        private float[] _glowVelocity = new float[88];
         private bool _paletteReady;
         private string _paletteHash = "";
         private string _performancePlayerName = "";
         private string _observedSourceHash = "";
         private int _generation = -1;
         private int _lastPositionMs;
+        private bool _liveSettled;
+        private int _liveKeyRevision;
 
         public void Initialize()
         {
@@ -119,6 +123,7 @@ namespace MusicMidiPlayer.Views
         {
             Initialize();
             sequencer = value;
+            _liveSettled = false;
         }
 
         public void BindSong(MidiSongData song)
@@ -159,7 +164,7 @@ namespace MusicMidiPlayer.Views
             _channelProperties.Clear();
             if (channel >= 0)
             {
-                // Physical black keys stay bright while the falling note keeps its dark variant.
+                // Physical black keys stay bright while falling notes keep their dark variant.
                 Color color = keyIsBlack[key] && !pluckedTines ? _channelPressedPalette[channel] : _channelPalette[channel * 2];
                 _channelProperties.SetColor("_Color", color);
                 _channelProperties.SetColor("_BaseColor", color);
@@ -198,12 +203,16 @@ namespace MusicMidiPlayer.Views
         {
             Initialize();
             if (generation < _generation) return;
+            _liveSettled = false;
             MidiSongData currentSong = sequencer == null ? null : sequencer.song;
             string sourceHash = currentSong == null ? "" : currentSong.sourceHash;
             if (currentSong != _song || sourceHash != _observedSourceHash) BindSong(currentSong);
             // Pause/resume can change generation without changing the musical instant.
             // Only explicit force snaps the pose; a generation change alone does not.
             _generation = generation;
+            if (force && positionMs != _lastPositionMs)
+                for (int key = 0; key < 88; key++)
+                { _glowVelocity[key] = 0; _glowStartMs[key] = -10000; _glowChannel[key] = -1; }
             if (force && pluckedTines) RecoverPlucks(positionMs);
             if (!force && positionMs >= _lastPositionMs) ScanPhysicalEdges(positionMs);
             for (int key = 0; key < 88; key++) _keyChannels[key] = -1;
@@ -219,7 +228,9 @@ namespace MusicMidiPlayer.Views
             for (int key = 0; key < 88; key++)
             {
                 int note = _keyChannels[key];
-                ShowKeyChannel(key, note < 0 ? -1 : _song.channel[note]);
+                if (note >= 0 && (force || _song.startMs[note] > _glowStartMs[key]))
+                    RecordGlow(key, _song.startMs[note], _song.velocity[note], _song.ColorChannelForNote(note));
+                ShowKeyChannel(key, note < 0 ? (positionMs - _glowStartMs[key] < 1400 ? _glowChannel[key] : -1) : _song.ColorChannelForNote(note));
                 int count = CurrentCount(key);
                 bool down = count > 0;
                 if (force)
@@ -237,9 +248,9 @@ namespace MusicMidiPlayer.Views
                 }
                 else if (down != _pressed[key]) BeginTransition(key, down, positionMs);
                 _scanCounts[key] = count;
-                if (force || _materialPressed[key] != down) SetKeyMaterial(key, down);
                 if (force) _appliedPress[key] = -1f;
                 ApplyPose(key, EvaluatePress(key, positionMs));
+                UpdateKeyGlow(key, positionMs, down);
             }
             _lastPositionMs = positionMs;
             RotateMechanism(positionMs);
@@ -248,21 +259,41 @@ namespace MusicMidiPlayer.Views
         public void RefreshLive(int ms, int generation)
         {
             Initialize();
+            int revision = instrumentRouter != null ? instrumentRouter.keyCountRevision
+                : sequencer == null ? 0 : sequencer.keyCountRevision;
+            if (_liveSettled && _generation == generation && _liveKeyRevision == revision
+                && (instrumentRouter != null || sequencer != null))
+            {
+                // Keep the mechanism's next input frame anchored without scanning resting keys.
+                _lastLiveMs = ms;
+                return;
+            }
             _generation = generation;
-            bool moving = false;
+            _liveKeyRevision = revision;
+            bool moving = false, animating = false;
             for (int key = 0; key < 88; key++)
             {
                 ShowKeyChannel(key, -1);
                 bool down = CurrentCount(key) > 0;
                 if (down != _pressed[key]) BeginTransition(key, down, ms);
-                if (_materialPressed[key] != down) SetKeyMaterial(key, down);
                 ApplyPose(key, EvaluatePress(key, ms));
+                UpdateKeyGlow(key, ms, down);
+                if (ms - _glowStartMs[key] < 1400) animating = true;
                 if (down || (_targetPress[key] > .5f && ms - _transitionStartMs[key] < 1800)) moving = true;
+                // Finish the exact existing release/pluck envelope before allowing idle sleep.
+                int age = ms - _transitionStartMs[key];
+                if (pluckedTines)
+                {
+                    if (_targetPress[key] > .5f && age <= 900) animating = true;
+                }
+                else if (_fromPress[key] != _targetPress[key]
+                    && age < Mathf.Max(1f, _targetPress[key] > .5f ? pressDurationMs : releaseDurationMs)) animating = true;
             }
             if (moving) _liveMechanismMs += _lastLiveMs == 0 ? 0 : Mathf.Clamp(ms - _lastLiveMs, 0, 250);
             else _liveMechanismMs = 0;
             _lastLiveMs = ms;
             RotateMechanism(_liveMechanismMs);
+            _liveSettled = !moving && !animating;
         }
 
         public void PluckLive(int midiPitch, int ms)
@@ -271,15 +302,44 @@ namespace MusicMidiPlayer.Views
             Initialize(); BeginTransition(midiPitch - 21, true, ms);
         }
 
+        public void GlowLive(int midiPitch, int velocity)
+        {
+            if (midiPitch < 21 || midiPitch > 108) return;
+            Initialize();
+            RecordGlow(midiPitch - 21, (int)(Time.realtimeSinceStartup * 1000f), velocity, -1);
+            _liveSettled = false;
+        }
+
+        private void RecordGlow(int key, int ms, int velocity, int channel)
+        {
+            _glowStartMs[key] = ms; _glowVelocity[key] = Mathf.Clamp01(velocity / 127f); _glowChannel[key] = channel;
+        }
+
+        private void UpdateKeyGlow(int key, int ms, bool down)
+        {
+            if (keyRenderers == null || key >= keyRenderers.Length || keyRenderers[key] == null) return;
+            bool glowing = _glowVelocity[key] > 0f && ms - _glowStartMs[key] < 1400;
+            if (_materialPressed[key] != (down || glowing)) SetKeyMaterial(key, down || glowing);
+            if (!glowing && !down) { ShowKeyChannel(key, -1); return; }
+            keyRenderers[key].GetPropertyBlock(_channelProperties);
+            _channelProperties.SetVector("_GlowTiming", new Vector4(_glowStartMs[key] * .001f, _glowVelocity[key], 0, 0));
+            _channelProperties.SetFloat("_VisualTime", ms * .001f);
+            Material rest = RestMaterial(key);
+            _channelProperties.SetColor("_RestColor", rest != null && rest.HasProperty("_Color") ? rest.color : (keyIsBlack[key] ? Color.black : Color.white));
+            keyRenderers[key].SetPropertyBlock(_channelProperties);
+        }
+
         public void Clear(int generation)
         {
             Initialize();
+            _liveSettled = false;
             _generation = generation;
             _lastPositionMs = 0;
             _lastLiveMs = 0; _liveMechanismMs = 0;
             if (rotatingMechanism != null) rotatingMechanism.localRotation = _mechanismRest;
             for (int key = 0; key < 88; key++)
             {
+                _glowVelocity[key] = 0; _glowStartMs[key] = -10000; _glowChannel[key] = -1;
                 ShowKeyChannel(key, -1);
                 _pressed[key] = false;
                 _scanCounts[key] = 0;
@@ -306,6 +366,7 @@ namespace MusicMidiPlayer.Views
                 if (instrumentRouter != null && instrumentRouter.TargetForNote(note) != instrumentTarget) continue;
                 int key = FilePitch(note) - 21;
                 if (key < 0 || key >= 88) continue;
+                if (kind == 0) RecordGlow(key, _song.eventMs[e], _song.velocity[note], _song.ColorChannelForNote(note));
                 bool wasDown = _scanCounts[key] > 0;
                 _scanCounts[key] = Mathf.Max(0, _scanCounts[key] + (kind == 0 ? 1 : -1));
                 bool down = _scanCounts[key] > 0;
@@ -315,6 +376,7 @@ namespace MusicMidiPlayer.Views
 
         private void BeginTransition(int key, bool down, int timeMs)
         {
+            _liveSettled = false;
             // Releasing a metal comb does not cause another mechanical pluck.
             if (pluckedTines && !down) { _pressed[key] = false; return; }
             _fromPress[key] = EvaluatePress(key, timeMs);
@@ -409,6 +471,7 @@ namespace MusicMidiPlayer.Views
 
         private void BuildPalette()
         {
+            _liveSettled = false;
             bool performance = !string.IsNullOrEmpty(_performancePlayerName);
             string text = performance ? _performancePlayerName : (string.IsNullOrEmpty(_paletteHash) ? "MusicMidiPlayer" : _paletteHash);
             uint seed = 2166136261u;
@@ -427,12 +490,13 @@ namespace MusicMidiPlayer.Views
             if (songPalette == null || songPalette.Length != 2) songPalette = new Color[2];
             float hue = paletteBaseHueDegrees / 360f;
             songPalette[0] = Color.HSVToRGB(hue, saturation * 0.82f, value);
-            songPalette[1] = Color.HSVToRGB(hue, saturation, value * 0.55f);
+            songPalette[1] = Color.HSVToRGB(hue, saturation * .94f, value * .80f);
             for (int channel = 0; channel < 16; channel++)
             {
-                float channelHue = Mathf.Repeat(hue + channel * 0.38196601125f, 1f);
+                // Two analogous channel hues, 50.4 degrees apart, with white/black shades.
+                float channelHue = Mathf.Repeat(hue + (channel % 2) * .14f, 1f);
                 _channelPalette[channel * 2] = Color.HSVToRGB(channelHue, saturation * .82f, value);
-                _channelPalette[channel * 2 + 1] = Color.HSVToRGB(channelHue, saturation, value * .55f);
+                _channelPalette[channel * 2 + 1] = Color.HSVToRGB(channelHue, saturation * .94f, value * .80f);
                 _channelPressedPalette[channel] = Color.HSVToRGB(channelHue, saturation, value);
             }
             for (int key = 0; key < 88; key++) _shownChannels[key] = -2;

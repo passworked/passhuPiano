@@ -49,6 +49,9 @@ namespace MusicMidiPlayer.Logic
         [HideInInspector] public int[] notePrograms = new int[0];
         [HideInInspector] public int[] resolvedPrograms = new int[128];
         [HideInInspector] public int[] keyCounts = new int[1024];
+        [HideInInspector] public int keyCountRevision;
+        private bool _liveKeyCountsCurrent;
+        private int _liveKeyCountsRevision, _liveKeyCountsMask;
         [HideInInspector] public int[] livePrograms = new int[16];
         [HideInInspector] public int[] liveTargets = new int[2048];
         private MidiSongData _song;
@@ -413,6 +416,15 @@ namespace MusicMidiPlayer.Logic
 
         public void RefreshKeyCounts(int ms, bool live)
         {
+            // Held identities and their targets change at input/restore boundaries, not every frame.
+            // A file/live switch or selection change must still replace the previous counts.
+            int revision = facade.sequencer == null ? 0 : facade.sequencer.keyCountRevision;
+            if (live && facade.sequencer != null && _liveKeyCountsCurrent
+                && _liveKeyCountsRevision == revision && _liveKeyCountsMask == enabledMask) return;
+            _liveKeyCountsCurrent = live;
+            _liveKeyCountsRevision = revision;
+            _liveKeyCountsMask = enabledMask;
+            keyCountRevision++;
             for (int i = 0; i < keyCounts.Length; i++) keyCounts[i] = 0;
             if (live)
             {

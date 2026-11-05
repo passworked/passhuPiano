@@ -1,5 +1,13 @@
 # UI 层级与绘制顺序
 
+## 2026-11-05 分发 Prefab 同步
+
+两份旧单琴 Prefab 已按本次明确要求增量接入主场景的乐器多选、鼓组开关、弦乐奏法、硬件 MIDI 映射和 `FileMappingPanel`，包括 `ByProgram`／`ByTrack`、逐轨开关、八度及自动音域。既有 UI 根位置与分发歌曲对象保留；沿 `ConfigureHierarchy()` 排序，普通控件在弹层之前，Backplate 最后绘制。独立 `Presentation/Credits` 绑定当前播放器并只列其 13 首分发歌曲。两份主面板、乐器菜单与按音轨映射已通过 Editor 相机渲染检查；未进行真实 VR 射线或客户端验收，见[第08册](08-editor-and-prefab.md#分发-prefab-显式同步2026-11-05)。
+
+## 2026-11-05 海底场景蓝色主题
+
+海底场景全部 UI 按播放器预制体恢复 VizVid 蓝灰／青蓝色系，包含弹层、借物表和作者／赞助／社群板；完整控制台 Canvas 前移约37.2 mm，避免支柱穿过静音区域，最小净距25 mm。维护入口为 `UnderwaterUIThemeBuilder.Install()`，不 Apply 共享预制体，不改控件层级、回调或曲库；范围及验证见[第27册](27-underwater-music-garden.md#蓝色-ui-与控制台间隙2026-11-05)。下方绿金主题仅保留为历史钟楼约定。
+
 ## 2026-11-04 钟楼绿金主题
 
 按最新要求，钟楼场景的 `Presentation/UI` 与 `Presentation/Credits` 改为统一绿金风格：面板 `#143E32`、次级卡片 `#1C4A3D`、内嵌底 `#09261E`，金色强调／描边 `#D8B96A`，正文暖白 `#F6EDD5`，次级文字 `#C5C9A8`。主按钮、链接、进度填充、复选标记、全部未启用弹层、输入框插入符／文字选区与 Selectable 的悬停／按下／选中／禁用状态同步调整；原 Logo／旗帜图像保持原色。
@@ -69,6 +77,12 @@ Editor 渲染见 `Captures/ClockworkUITheme/`，覆盖主面板、许可面板�
 ## 2026-11-02 主场景面板位置
 
 `UdonMidiPlayer/Presentation/UI` 移至教室后墙中央，世界坐标 `(0, 1.35, -5.05)`、Y 旋转 `180°`，正面朝向室内。原对象、缩放、子层级、UI 引用与 trigger 碰撞器保留；不更新分发 Prefab。Unity Editor 截图确认可见，面板前方抽样区域无实体碰撞阻挡；未进行真实 VRChat 验收。
+
+## 2026-11-05 plum 曲库目录
+
+按用户要求新增 `游戏音乐/plum`，包含既有《R - Plum》和新导入的《Orca》。R 的源文件、歌曲资产、GUID 与 songId 保持不变；Orca 保留全部音轨与 MIDI 音高，作者填写 Plum（[曲目署名来源](https://music.apple.com/us/song/1611003147)）。作者工程完整曲库由 570 首增至 571 首，使用现有曲库同步入口更新并保存当前打开的 `UnderwaterMusicGarden`，目录、搜索与 backing Udon 已核对。此前场景的 547 首运行曲库同步到当前完整曲库；已有分类及 570 首歌曲的顺序和身份保持不变。
+
+同步前发现既有 Rush E 源 MIDI 和 `.meta` 缺失；从 Downloads 中 SHA-256 与歌曲资产记录完全一致的原件恢复源文件，沿用原源 GUID，不重导入或修改歌曲资产。未打开的主场景、历史钟楼、练习场景及两份分发 Prefab 不自动同步。本次为 Editor 数据检查，未进行真实 VRChat 播放验收。
 
 ## 2026-11-02 曲库目录归类
 

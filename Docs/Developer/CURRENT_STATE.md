@@ -1,5 +1,23 @@
 # 当前实现与源码地图
 
+## 2026-11-05：海底全场景 3D 声音覆盖
+
+海底场景64个共用音源的完整音量半径由5 m扩大至30 m，远端保持80 m，保留3D空间化；配置工具保留已有场景的空间参数。ClientSim已核对实际衰减曲线，主场景、历史钟楼、练习场景和分发Prefab保持，未做真实VRChat听音验收。详见[第27册](../UdonMidiPlayer/27-underwater-music-garden.md#全场景-3d-声音覆盖2026-11-05)。
+
+## 2026-11-05：分发 Prefab 显式同步
+
+推送边界补充：钟楼／海底场景文件、`.meta` 与 `Assets/Scenes/` 下同名专用资源目录仅在作者工程本地维护，不再由 Git 跟踪。下文两场景说明为本地实现事实，源码 checkout 不再携带其场景；通用播放器依赖继续完整保留。
+
+按用户要求，两份分发 Prefab 从旧单钢琴配置增量同步主场景的七个活动旋律目标、独立鼓组、实时／文件映射、逐轨开关和八度／自动音域 UI、钢琴逐键命中与合并粒子、音源能量包络和当前规则哈希。分别默认三角／数码钢琴，保留原 13 首曲目及顺序、默认曲目、配置 GUID、原钢琴、歌曲对象与 64 个声音源；未 Apply 场景覆盖。主场景、海底、历史钟楼和练习场景未重存，美术场景专属表现未加入。保存后重新加载通过 `MidiBuildValidator.ValidateRoot`，Editor 隔离预览已检查主面板、乐器菜单和音轨映射；未构建、打包或做 VRChat 客户端验收。细节见[第08册](../UdonMidiPlayer/08-editor-and-prefab.md#分发-prefab-显式同步2026-11-05)。下方各功能“分发 Prefab 未更新”均为相应历史轮次记录。
+
+## 2026-11-05：海底整体低台
+
+海底演奏区按用户最新要求改为50 cm浅暖米色整体舞台，前方入口缓坡已删除，改为左右两侧各一组三等高踏步楼梯；乐器组合整体抬高，法阵从布局中心读取台面高度。首版18 cm的记录与最新50 cm验证分开保留，见[第27册](../UdonMidiPlayer/27-underwater-music-garden.md)。主场景、历史钟楼、练习场景及两份分发Prefab文件未变，未做世界构建或真实VRChat验收。
+
+## 2026-11-05：文件音符奇偶双色
+
+当前文件音符显示通道按奇偶最多两种色调，使用源MIDI主题下相差50.4°的邻近色调；单通道多音轨保留原音轨色槽回退，黑白键仍保留同色系深浅，最多两种色调、四种音符基础色。取代下文历史黄金角描述，实时演奏者主题不变。共用Runtime增量更新，无场景或分发Prefab重存；验证与实际Shader预览见[第06册](../UdonMidiPlayer/06-waterfall-and-keyboard.md#作者工程文件音符奇偶双色2026-11-05)，未做Play Mode或VRChat验收。
+
 ## 2026-11-04：rc.3 发布候选
 
 本地当前 `VERSION=1.0.0-rc.3`，包含本页所记作者工程的黄金角文件通道配色和当前多乐器链。新增统一 [MIDI 曲库编辑器](../../Assets/UdonMidiPlayer/Editor/Import/MidiImportWindow.cs)、[源文件操作服务](../../Assets/UdonMidiPlayer/Editor/Import/MidiLibraryEditing.cs)及 [Unity 导入教程](../MIDI_IMPORT.md)。分类与曲目先编辑草稿，保存时编排源文件、源歌曲、曲库和场景应用；保持独立分发配置。下面 `21c0593 / rc.2` 为历史可获取基线，不代表 rc.3 缺少这些实现。rc.3 的发布产物与远端身份以第22册及该版本 `SEALED.json` 为准。
@@ -12,15 +30,18 @@
 | --- | --- | --- |
 | Unity 工程 | 仓库根；Unity 2022.3.22f1 / Worlds SDK 3.10.5 是记录基线 | 经 VCC / ALCOM 恢复 SDK；未声明支持所有更高版本 |
 | 主场景 | [VRCDefaultWorldScene](../../Assets/Scenes/VRCDefaultWorldScene.unity) | 多乐器开发世界；不是两份分发 Prefab 能力的证明 |
-| 钟楼第二场景 | [ClockworkMaintenanceStreet](../../Assets/Scenes/ClockworkMaintenanceStreet.unity) | 2026-11-04 独立创建；沿用现有播放器，齿数约束传动与连接钟摆、客户端本地时钟、封闭结构及单一实时 Point Light 日月透光；回廊木构连接修正，另补无新增 Light 的屋顶间接光烘焙与探针；专属居中、落地、0.65 m 占地净距的固定组合扇形布局；美术精修轮次记录约 6.606 MB 源资源，包含材质、维修道具与单光源联动空气表现，后续光照资产及世界包增量见专题，未构建测量；Editor / Udon VM 检查按轮次记录，见[第二场景说明](../UdonMidiPlayer/25-clockwork-second-scene.md)，尚无真实客户端验收 |
-| 三角钢琴 | [UdonMidiPlayer.prefab](../../Assets/UdonMidiPlayer/Prefabs/UdonMidiPlayer.prefab) | 独立分发配置及合规曲库 |
-| 立式 / 数码钢琴 | [UdonMidiPlayer_Upright.prefab](../../Assets/UdonMidiPlayer/Prefabs/UdonMidiPlayer_Upright.prefab) | 独立模型配置，不自动继承主场景扩展 |
+| 当前海底美术场景 | [UnderwaterMusicGarden](../../Assets/Scenes/UnderwaterMusicGarden.unity) | 独立透明穹顶、大陆坡人工平台、海床遗迹与最多八件乐器；八音盒有琴时放琴上，无琴时使用独立桌。演奏显示地面法阵；七种鱼加水母以音符染色的点线／薄膜网格呈现，最多两色，覆盖上半球；外围生成后向外离场、不折返，运动与寿命跟随音乐时钟。当前海底使用唯一 Mixed Point Light、独立方向光照图与探针。钟楼保留原文件与 GUID 并标记 Historical；主场景和分发 Prefab 不替换，维护与验证见[第27册](../UdonMidiPlayer/27-underwater-music-garden.md) |
+| 钟楼历史场景 | [ClockworkMaintenanceStreet](../../Assets/Scenes/ClockworkMaintenanceStreet.unity) | 2026-11-04 独立创建；沿用现有播放器，齿数约束传动与连接钟摆、客户端本地时钟、封闭结构及单一实时 Point Light 日月透光；回廊木构连接修正，另补无新增 Light 的屋顶间接光烘焙与探针；专属居中、落地、0.65 m 占地净距的固定组合扇形布局；美术精修轮次记录约 6.606 MB 源资源，包含材质、维修道具与单光源联动空气表现，后续光照资产及世界包增量见专题，未构建测量；Editor / Udon VM 检查按轮次记录，见[第二场景说明](../UdonMidiPlayer/25-clockwork-second-scene.md)，尚无真实客户端验收 |
+| 默认三角钢琴的多乐器播放器 | [UdonMidiPlayer.prefab](../../Assets/UdonMidiPlayer/Prefabs/UdonMidiPlayer.prefab) | 2026-11-05 显式同步多乐器；独立分发配置及 13 首合规曲库 |
+| 默认数码钢琴的多乐器播放器 | [UdonMidiPlayer_Upright.prefab](../../Assets/UdonMidiPlayer/Prefabs/UdonMidiPlayer_Upright.prefab) | 同次显式同步，保留默认外观；日常场景修改仍不自动同步 |
 | 练习场景 | [MidiPractice.unity](../../Assets/UdonMidiPlayer/Samples/MidiPractice.unity) | 独立个人练习用途 |
 | 可编辑美术 | `ArtSource/` | 保持在 Assets 外；对应导入模型与 `.meta` 不重复生成 |
 
 私仓源码中为经审核的 13 首 MIDI、13 个曲目源资产和 757 个采样；作者工程完整曲库是另一内容集合。两者不能混写数字或自动同步。仓库仍为 private，尚无正式 v1.0 稳定发布或完整客户端性能验收。
 
 ## 模块与单向数据流
+
+上表钟楼为历史版本 `Historical` / `Clockwork-2026-11-04`，其专用功能说明保留为历史事实；当前美术维护目标为海底场景。
 
 ```mermaid
 flowchart LR
@@ -124,3 +145,11 @@ flowchart LR
 ## 作者工程：文件通道黄金角配色（2026-11-04）
 
 文件播放／暂停以源 MIDI 哈希主色为起点，原始通道索引每步旋转黄金角约137.507764°；瀑布、琴键、命中／粒子、弦乐、鼓组和钟楼连线统一跟随，保留黑白键深浅。实时演奏沿用玩家名称主色，无新增网络字段或场景接线。UdonSharp编译与87项隔离Editor代理检查通过，未做真实客户端验收，详见[通道配色](../UdonMidiPlayer/06-waterfall-and-keyboard.md#作者工程文件通道黄金角配色2026-11-04)。
+
+## 作者工程：海底场景与单通道多音轨配色（2026-11-05）
+
+Testify 钢琴谱两条音轨共用源 MIDI 通道0，新增仅表现的音轨色槽回退，使两轨各自保留黑白键两档、共四色；多通道歌曲沿用原通道色。海底法阵固定通道0明色，鱼群最多两种明色并覆盖上半球，外围鱼只向外离场。琴键与GPU Note新增力度峰值、25 ms起亮和缓慢衰减的Shader包络；海底场景接入专属按键材质、大陆坡平台、高质量单点光源软阴影和独立光照烘焙。维护入口、证据与验收边界见[第27册](../UdonMidiPlayer/27-underwater-music-garden.md#大陆坡四色与力度发光调整2026-11-05)。未构建或做真实VRChat验收。
+
+## 作者工程：十二等分中空法阵（2026-11-05）
+
+海底法阵依照新 ImageGen 环形参考重描，十二份同一扇区的几何保证旋转对称；中心留白，依次展开内环、交织弧带、外围骨架、符纹、刻度封环。完整展开2.8秒，短音保留完整展开时间，连续音延长停留且不重启，暂停冻结。原法阵网格GUID、固定通道0配色、琴上八音盒共用及单Point Light约束保留。维护入口与证据见[第27册](../UdonMidiPlayer/27-underwater-music-garden.md#十二等分中空法阵与分阶段展开2026-11-05)。

@@ -211,16 +211,28 @@ Shader "MusicMidiPlayer/WaterfallVolume"
                 {
                     half strength = pow(saturate(timing.w), 1.35h);
                     float age = max(0.0, _VisualTime - timing.x);
-                    half attack = smoothstep(0.0, 0.025, age) * exp2(-max(0.0, age - 0.025) * 17.0);
+                    half attack = smoothstep(0.0, 0.025, age) * exp2(-max(0.0, age - 0.025) / .28);
+                    attack *= 1.0 - smoothstep(1.0, 1.4, age);
                     // Measure from the actual landing plane, in note-width units. Long
                     // notes retain their crystal body instead of turning into white lamps.
                     float fromLanding = max(0.0, i.noteLocal.y + 0.5) * i.noteNormal.w;
                     half nearLanding = exp2(-fromLanding * 1.8);
                     half touching = timing.z < 0.5 ? step(timing.x, _VisualTime) : (timing.y < 0.0 ? 1.0h : 0.0h);
-                    landingPulse = nearLanding * touching * (0.12h + attack * (0.35h + strength * 0.75h));
+                    landingPulse = (0.65h + nearLanding * .35h) * step(timing.x, _VisualTime) * attack * strength * max(0.0, _NoteEmission);
                     noteColor = UNITY_ACCESS_INSTANCED_PROP(NoteData, _Color).rgb;
                     emissionColor = noteColor * max(0.0, _NoteEmission) * lerp(0.80h, 1.12h, strength);
                 }
+            }
+            // All keyboard instruments share the same velocity envelope, including live notes.
+            if (_GpuAnimation > .5 && _PianoImpact < .5)
+            {
+                float4 timing = UNITY_ACCESS_INSTANCED_PROP(NoteData, _NoteTiming);
+                float age = max(0.0, _VisualTime - timing.x);
+                half envelope = smoothstep(0.0, .025, age) * exp2(-max(0.0, age - .025) / .28);
+                envelope *= 1.0 - smoothstep(1.0, 1.4, age);
+                landingPulse = step(timing.x, _VisualTime) * envelope * pow(saturate(timing.w), 1.35) * max(0.0, _NoteEmission);
+                noteColor = UNITY_ACCESS_INSTANCED_PROP(NoteData, _Color).rgb;
+                emissionColor = noteColor * max(0.0, _NoteEmission);
             }
             half3 hue = SaturatePreservingHueValue(noteColor);
             half3 emissionHue = SaturatePreservingHueValue(emissionColor);
@@ -241,7 +253,7 @@ Shader "MusicMidiPlayer/WaterfallVolume"
             half4 color = half4(body + glow + reflected * lerp(0.035h, 0.18h, _Metallic) * (0.35h + fresnel) * lerp(half3(1,1,1), hue, _Metallic), 1);
             color.rgb += lerp(hue, half3(1,1,1), 0.20h) * landingPulse;
             half breath = 0.825h + 0.175h * cos(_Time.y * 5.235987756);
-            color.rgb *= lerp(1.0h, breath, _RollOverDrum > 0.5 || _PianoImpact > 0.5 ? 0.0h : hit);
+            color.rgb *= lerp(1.0h, breath, _GpuAnimation > .5 ? 0.0h : hit);
             UNITY_APPLY_FOG(i.fogCoord, color);
             return color;
         }

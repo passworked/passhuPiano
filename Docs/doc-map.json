@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_on": "2026-11-04",
+  "updated_on": "2026-11-05",
   "readme_localization": {
     "default_language": "en",
     "canonical": "README.md",
@@ -36,6 +36,11 @@
   },
   "documents": [
     {
+      "path": "Docs/UdonMidiPlayer/27-underwater-music-garden.md",
+      "status": "implemented_editor_verified_pending_client_acceptance",
+      "purpose": "Current underwater art scene on a continental-slope platform; twelvefold hollow ground seal with five-stage unfolding, coordinated two-hue display-channel parity with single-channel multitrack fallback and retained white/black key shades, two fish colors across the hemisphere without exterior return paths, velocity shader envelopes, one mixed Point Light, baked directional lightmaps and probes; preserved historical scene and eight-instrument layout"
+    },
+    {
       "path": "Docs/UdonMidiPlayer/06-waterfall-and-keyboard.md",
       "status": "editor_proxy_render_and_udon_vm_verified_pending_client_acceptance",
       "purpose": "Crystal waterfall, velocity-sensitive independent piano impacts, merged collision-free particles, musical-time lifecycle and scene-only migration boundaries"
@@ -47,7 +52,7 @@
     },
     {
       "path": "Docs/UdonMidiPlayer/25-clockwork-second-scene.md",
-      "status": "editor_udon_vm_verified_pending_client_acceptance",
+      "status": "historical_scene_preserved_2026_11_04",
       "purpose": "Independent enclosed clockwork scene, coupled mechanics and local clock, one celestial Point Light, translucent dial, floral sky, fixed fan layouts, heritage art refinement and original workshop props, 10 MB resource accounting with download increment unmeasured, validation and maintenance boundaries"
     },
     {
@@ -78,7 +83,7 @@
     {
       "path": "Docs/Developer/CURRENT_STATE.md",
       "status": "current_baseline_facts",
-      "purpose": "Source map and explicit unpublished differences"
+      "purpose": "Source map, explicit unpublished differences and 2026-11-05 distribution Prefab synchronization"
     },
     {
       "path": "Docs/Contributing/instrument-policy.json",

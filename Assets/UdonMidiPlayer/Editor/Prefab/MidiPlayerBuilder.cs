@@ -45,14 +45,17 @@ namespace MusicMidiPlayer.Editor.Prefab
                     source.volume = 0; source.dopplerLevel = 0;
                     source.spatialBlend = voices.worldSpaceAudio ? 1 : 0;
                 }
-                // Keep the listening position inside the full-volume area.
-                // Near=0 makes the SDK distance curve very quiet just metres away.
-                var spatial = Component<VRCSpatialAudioSource>(source.gameObject);
-                spatial.Near = 5f;
-                spatial.Far = 80f;
-                spatial.UseAudioSourceVolumeCurve = false;
-                source.minDistance = 5f;
-                source.maxDistance = 80f;
+                // Initialize new sources without overwriting scene-authored coverage.
+                var spatial = source.GetComponent<VRCSpatialAudioSource>();
+                if (spatial == null)
+                {
+                    spatial = Component<VRCSpatialAudioSource>(source.gameObject);
+                    spatial.Near = 5f;
+                    spatial.Far = 80f;
+                    spatial.UseAudioSourceVolumeCurve = false;
+                    source.minDistance = 5f;
+                    source.maxDistance = 80f;
+                }
                 sources[i] = source;
             }
             // Preserve the retained sources and their file IDs. Remove only
@@ -432,6 +435,9 @@ namespace MusicMidiPlayer.Editor.Prefab
             {
                 foreach (var view in priorFacade.instrumentWaterfalls)
                 {
+                    // Strings have no waterfall; the music box owns its fixed 28-slot
+                    // drum presentation and matching mechanical timing.
+                    if (view == null || view.rollOverDrum) continue;
                     if (view.barTransforms.Length != configuration.visibleNoteLimit)
                         throw new InvalidOperationException("合并乐器的音符池请在各视图中配置；本次保留既有模型与资源");
                     view.windowMs = configuration.windowMs; view.viewHeight = configuration.viewHeight;

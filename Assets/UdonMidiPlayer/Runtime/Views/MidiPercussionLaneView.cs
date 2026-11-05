@@ -89,7 +89,7 @@ namespace MusicMidiPlayer.Views
             {
                 int n=noteIds[i];
                 int pitch=DrumPitch(n), lane=bank.Lane(pitch);if(lane<0)continue;
-                Show(visibleCount++,lane,Mathf.Max(0,(_song.startMs[n]-ms)/(float)windowMs)*height,pitch,n,_channelColors==null? _liveColor : _channelColors[Mathf.Clamp(_song.channel[n],0,15)]);
+                Show(visibleCount++,lane,Mathf.Max(0,(_song.startMs[n]-ms)/(float)windowMs)*height,pitch,n,_channelColors==null? _liveColor : _channelColors[_song.ColorChannelForNote(n)]);
             }
             for(int i=visibleCount;i<bars.Length;i++)if(bars[i]!=null)bars[i].gameObject.SetActive(false);
         }

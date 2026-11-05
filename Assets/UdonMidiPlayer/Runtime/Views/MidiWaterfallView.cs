@@ -412,6 +412,7 @@ namespace MusicMidiPlayer.Views
         {
             Initialize();
             if (pitch < 0 || pitch > 127 || _capacity == 0) return;
+            if (keyboard != null) keyboard.GlowLive(pitch, velocity);
             int slot = -1;
             for (int i = 0; i < _capacity; i++)
                 if (_liveId[i] < 0) { slot = i; break; }
@@ -654,7 +655,7 @@ namespace MusicMidiPlayer.Views
 
         public Color FileNoteColor(int note)
         {
-            return keyboard == null ? Color.white : keyboard.FileChannelColor(FilePitch(note), _song.channel[note]);
+            return keyboard == null ? Color.white : keyboard.FileChannelColor(FilePitch(note), _song.ColorChannelForNote(note));
         }
 
         public Color NoteColor(int pitch)

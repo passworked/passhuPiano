@@ -22,7 +22,7 @@
 
 | 用途 | 入口 | 注意 |
 | --- | --- | --- |
-| 把独立钢琴接进自己的世界 | `Assets/UdonMidiPlayer/Prefabs/UdonMidiPlayer.prefab` 或 `UdonMidiPlayer_Upright.prefab` | 使用独立分发配置；不会因此具备主场景所有乐器扩展 |
+| 把独立播放器接进自己的世界 | `Assets/UdonMidiPlayer/Prefabs/UdonMidiPlayer.prefab` 或 `UdonMidiPlayer_Upright.prefab` | 2026-11-05 已同步主场景多乐器与映射 UI；分别默认三角／数码钢琴，使用独立 13 首分发曲库，不包含美术场景环境 |
 | 查看完整开发世界 | `Assets/Scenes/VRCDefaultWorldScene.unity` | 继续使用原主场景，不为普通修改新建替代场景 |
 | 个人练习 | `Assets/UdonMidiPlayer/Samples/MidiPractice.unity` | 独立用途，不把练习模式强加到分发 Prefab |
 | 修改模型 | `ArtSource/` 中对应源文件及制作脚本 | 保留导入资源的 `.meta`；重跑生成器可能覆盖手工模型 |

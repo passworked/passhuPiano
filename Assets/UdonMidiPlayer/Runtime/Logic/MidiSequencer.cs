@@ -11,8 +11,11 @@ namespace MusicMidiPlayer.Logic
     {
         public PianoVoicePool voicePool;
         public MusicMidiPlayer.Views.ClockworkMusicLink clockworkMusicLink;
+        public MusicMidiPlayer.Views.UnderwaterMusicLink underwaterMusicLink;
         [HideInInspector] public MidiSongData song;
         [HideInInspector] public int[] keyDownCount = new int[88];
+        // Local presentation invalidation; includes live input written by the facade.
+        [HideInInspector] public int keyCountRevision;
         [HideInInspector] public int[] activeNoteIds = new int[0];
         [HideInInspector] public int activeNoteCount;
         [HideInInspector] public int eventCursor;
@@ -41,6 +44,7 @@ namespace MusicMidiPlayer.Logic
                 _held[id] = false;
             }
             for (int i = 0; i < 88; i++) keyDownCount[i] = 0;
+            keyCountRevision++;
             activeNoteCount = 0;
             eventCursor = 0;
             _lastPosition = 0;
@@ -95,7 +99,7 @@ namespace MusicMidiPlayer.Logic
             {
                 _held[id] = true;
                 int key = IsDrum(id) ? -1 : song.pitch[id] - 21;
-                if (key >= 0 && key < 88) keyDownCount[key]++;
+                if (key >= 0 && key < 88) { keyDownCount[key]++; keyCountRevision++; }
             }
         }
 
@@ -131,17 +135,18 @@ namespace MusicMidiPlayer.Logic
                 if (!_held[id])
                 {
                     _held[id] = true;
-                    if (key >= 0 && key < 88) keyDownCount[key]++;
+                    if (key >= 0 && key < 88) { keyDownCount[key]++; keyCountRevision++; }
                 }
                 if (output && voicePool != null) voicePool.NoteDown(id, positionMs, generation);
                 if (output && clockworkMusicLink != null) clockworkMusicLink.FileNote(id, positionMs);
+                if (output && underwaterMusicLink != null) underwaterMusicLink.FileNote(id, positionMs);
             }
             else if (kind == 1)
             {
                 if (_held[id])
                 {
                     _held[id] = false;
-                    if (key >= 0 && key < 88) keyDownCount[key] = Mathf.Max(0, keyDownCount[key] - 1);
+                    if (key >= 0 && key < 88) { keyDownCount[key] = Mathf.Max(0, keyDownCount[key] - 1); keyCountRevision++; }
                 }
             }
             else

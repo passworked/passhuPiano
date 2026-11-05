@@ -51,11 +51,10 @@ Shader "MusicMidiPlayer/PianoKeyImpact"
                 float age = max(0.0, _VisualTime - data.x);
                 float released = data.z < 0.0 ? 0.0 : max(0.0, _VisualTime - data.z);
                 half gate = data.z < 0.0 ? 1.0h : exp2(-released * 14.0) * saturate(1.0 - released * 2.0);
-                half pulse = smoothstep(0.0, 0.025, age) * exp2(-max(0.0, age - 0.025) * 18.0);
-                pulse *= saturate(1.0 - age * 2.0);
+                half pulse = smoothstep(0.0, 0.025, age) * exp2(-max(0.0, age - 0.025) / .28);
+                pulse *= 1.0 - smoothstep(1.0, 1.4, age);
                 half strength = saturate(data.y);
-                half energy = (pulse * (0.38h + strength * 0.85h)
-                    + gate * (0.055h + strength * 0.09h)) * step(0.001h, data.y);
+                half energy = pulse * strength * 1.4h;
                 // Collapse unused pitches before rasterization; the entire keyboard is one draw.
                 float scale = energy > 0.0005 ? lerp(0.72, 1.0, strength) : 0.0;
                 v.vertex.xyz = v.center + (v.vertex.xyz - v.center) * scale;

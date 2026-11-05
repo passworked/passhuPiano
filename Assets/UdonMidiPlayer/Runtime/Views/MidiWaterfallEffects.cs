@@ -652,7 +652,7 @@ namespace MusicMidiPlayer.Views
                     _impactData[pitch] = data;
                     _impactDirty = true;
                 }
-                if (data.z >= 0f && _impactTime - Mathf.Max(data.x, data.z) > 0.55f)
+                if (data.z >= 0f && _impactTime - Mathf.Max(data.x, data.z) > 1.4f)
                 {
                     _impactActive[pitch] = false;
                     _impactPitches[i] = _impactPitches[--_impactCount];

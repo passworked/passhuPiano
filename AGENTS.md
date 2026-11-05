@@ -6,6 +6,7 @@
 - 主场景：`Assets/Scenes/VRCDefaultWorldScene.unity`；练习系统保持独立，不新建替代主场景。
 - 当前海底美术场景为 `Assets/Scenes/UnderwaterMusicGarden.unity`，不替代主场景；最多 8 件乐器，八音盒与钢琴同开时放琴上，无钢琴时用独立桌，见第 27 册。
 - 钟楼 `Assets/Scenes/ClockworkMaintenanceStreet.unity` 已标记为历史版本，保留场景、GUID 和资源；两个美术场景各自仅允许一个 Point Light，含未启用对象，见第 25 / 27 册。
+- 钟楼／海底场景、对应 `.meta` 及 `Assets/Scenes/` 下同名专用资源目录仅本地保留，不纳入 Git 跟踪；分发 Prefab 的通用乐器依赖仍须完整提交。
 - 场景曲库与分发 Prefab 分开；日常加歌不自动同步 Prefab，不擅自 Apply 实例覆盖。
 - 沿用 `MusicMidiPlayer.*` 命名空间和现有架构，保持 Runtime/Editor 隔离。
 - Unity 操作与截图优先 MCP；浏览器显式使用 Chrome，禁止 Edge 或自动回退。
